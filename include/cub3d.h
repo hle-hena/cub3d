@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/04 16:30:38 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/07 15:39:29 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,9 @@ typedef struct s_trigometry_values
 
 typedef struct s_color
 {
-	int r;
-	int g;
-	int b;
+	int re;
+	int gr;
+	int bl;
 }	t_col;
 
 
@@ -56,15 +56,22 @@ typedef struct s_point
 	int		z;
 }	t_point;
 
+typedef struct s_img
+{
+	void	*img;
+	int		width;
+	int		height;
+}	t_img;
+
 typedef struct s_map
 {
 	int		**matrix;
 	int		len;
 	int		wid;
-	char	*path_no;
-	char	*path_so;
-	char	*path_we;
-	char	*path_ea;
+	t_img	img_no;
+	t_img	img_so;
+	t_img	img_we;
+	t_img	img_ea;
 	t_col	floor;
 	t_col	ceiling;
 }	t_map;
@@ -87,5 +94,12 @@ typedef struct s_data
 	t_map	*map;
 	t_event	event;
 }	t_data;
+
+
+t_data	*get_data(void);
+t_map	*get_map(void);
+t_map	load_map(int ac, char **av);
+void	retrieve_map_info(t_map **map, char *map_name, int *err);
+
 
 #endif
