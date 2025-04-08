@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 10:15:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/07 15:37:35 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/08 10:37:50 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ char	*ft_strrchr(const char *str, int c)
 	while (*str)
 	{
 		if (*str == (char) c)
-			retunr ((char *)str);
+			return ((char *)str);
 		str++;
 	}
 	if (*str == (char) c)

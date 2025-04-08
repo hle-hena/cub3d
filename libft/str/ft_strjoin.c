@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 11:04:59 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/04 15:56:48 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/08 10:54:33 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ char	*ft_strjoin(const char *s1, const char *s2)
 	return (dest);
 }
 
-char	*ft_strsjoin(const char **strs)
+char	*ft_strsjoin(char **strs)
 {
 	char	*dest;
 	int		i;

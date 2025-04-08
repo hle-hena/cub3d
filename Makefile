@@ -2,7 +2,7 @@ MAKEFLAGS += --no-print-directory
 
 NAME = cub3d
 CC = cc
-FLAGS = -Wall -Wextra -Werror -I./includes
+FLAGS = -Wall -Wextra -Werror -I./include -Imlx -g
 RM = rm -f
 
 FRAMEDIR = ./mlx
@@ -11,7 +11,12 @@ FRAMEWORK = -Lmlx -lmlx -Imlx -lXext -lX11 -lm -lz -lXfixes
 LIBFT_DIR = libft
 LIBFT = $(LIBFT_DIR)/libft.a
 
-SRCS = $(addprefix srcs/, main.c)
+SRCS = $(addprefix srcs/, \
+	$(addprefix clean/, clean_data.c clean_map.c)\
+	$(addprefix utils/, add_link.c)\
+	$(addprefix parser/, parser.c retrieve_map_info.c retrieve_map_info_utils.c retrieve_map_grid.c)\
+	main.c\
+)
 
 OBJ = $(SRCS:.c=.o)
 
@@ -21,6 +26,9 @@ OBJ = $(SRCS:.c=.o)
 	@printf "\r\033[K"
 
 all: $(NAME)
+
+valgrind: all
+	valgrind --leak-check=full --show-leak-kinds=all ./$(NAME) $(ARG)
 
 $(LIBFT):
 	@echo

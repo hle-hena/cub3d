@@ -6,14 +6,14 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/21 12:46:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2024/11/29 12:53:31 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/08 17:01:33 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../libft.h"
 #include <stdio.h>
 
-t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *))
+t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void **))
 {
 	t_list	*dest_lst;
 	t_list	*new_node;
@@ -33,7 +33,7 @@ t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *))
 		{
 			ft_lstclear(&dest_lst, del);
 			if (content)
-				del(content);
+				del((void **)&content);
 			return (NULL);
 		}
 		ft_lstadd_back(&dest_lst, new_node);

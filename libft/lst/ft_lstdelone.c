@@ -6,14 +6,14 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/21 12:27:47 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/02/12 15:35:24 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/08 17:01:14 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../libft.h"
 
-void	ft_lstdelone(t_list *lst, void (*del)(void *))
+void	ft_lstdelone(t_list *lst, void (*del)(void **))
 {
-	del(lst->content);
-	del(lst);
+	del((void **)&lst->content);
+	del((void **)&lst);
 }
