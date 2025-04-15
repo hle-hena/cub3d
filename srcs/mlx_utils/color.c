@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:25:58 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/04 16:26:33 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/12 21:58:15 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int	calc_color(t_col col)
 {
-	return ((col.r << 16) | (col.g << 8) | col.b);
+	return ((col.re << 16) | (col.gr << 8) | col.bl);
 }
 
 t_col	rev_calc_color(int col)

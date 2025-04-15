@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:37:49 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/08 17:29:34 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/13 11:31:26 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,13 +44,14 @@ int	check_line(t_map *map, char *line)
 	{
 		if (ft_strchr("01", line[len]))
 			continue ;
-		if (ft_strchr("NSWE", line[len]))
+		else if (ft_strchr("NSWE", line[len]))
 		{
 			if (map->player.y != -1)
 				return (ft_perror(-1, "Too many players.", 0), -1);
 			map->player.x = len;
 			map->player.y = map->len;
-			continue ;
+			map->player.rot = 180 * (line[len] == 'W') + 90 * (line[len] == 'S')
+				+ 270 * (line[len] == 'N');
 		}
 		else if (line[len] == '\n')
 			return (len);
@@ -73,11 +74,11 @@ void	set_map(t_map *map, t_list *grid, int *err)
 	len = 0;
 	resize_lines(grid, map->wid, err);
 	if (*err)
-		return (ft_perror(-1, "cub3d: Internal error: malloc", clean_data()),
+		return (ft_perror(-1, "cub3d: Internal error: malloc", 0),
 			ft_lstclear(&grid, ft_del), *err = 1, (void)0);
 	map->matrix = malloc((map->len + 1) * sizeof(char *));
 	if (!map->matrix)
-		return (ft_perror(-1, "cub3d: Internal error: malloc", clean_data()),
+		return (ft_perror(-1, "cub3d: Internal error: malloc", 0),
 			ft_lstclear(&grid, ft_del), *err = 1, (void)0);
 	while (grid)
 	{
@@ -122,6 +123,7 @@ void	retrieve_map_grid(t_map *map, int map_fd, int *err)
 			break ;
 		if (ft_strncmp(line, "\n", 2) == 0)
 		{
+			ft_del((void **)&line);
 			handle_empty_line(grid, map_fd, err);
 			if (*err)
 				return ;

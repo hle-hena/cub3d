@@ -1,30 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   clean_data.c                                       :+:      :+:    :+:   */
+/*   draw_line.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/08 10:18:57 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/15 12:20:43 by hle-hena         ###   ########.fr       */
+/*   Created: 2025/04/13 19:54:48 by hle-hena          #+#    #+#             */
+/*   Updated: 2025/04/13 20:06:49 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-int	clean_data(void)
+void	draw_line_in_direction(t_data *data, t_point start, t_vec dir,
+	float dist)
 {
-	t_data	*data;
+	float	step = 0.5;
+	float	curr_dist = 0.0;
+	t_point	curr;
 
-	data = get_data();
-	clean_map();
-	// mlx_do_key_autorepeaton(data->mlx);
-	if (data->img.img)
-		mlx_destroy_image(data->mlx, data->img.img);
-	if (data->win)
-		mlx_destroy_window(data->mlx, data->win);
-	if (data->mlx)
-		mlx_destroy_display(data->mlx);
-	ft_del((void **)&data->mlx);
-	return (0);
+	while (curr_dist < dist)
+	{
+		curr.x = start.x + dir.x * curr_dist;
+		curr.y = start.y + dir.y * curr_dist;
+		if (point_is_in_mini_map(data, curr))
+			ft_put_pixel(data, curr, 0x0000FF);
+		curr_dist += step;
+	}
 }

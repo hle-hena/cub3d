@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/08 17:21:27 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/15 23:08:39 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,10 @@
 # include <mlx.h>
 # include <fcntl.h>
 # include <time.h>
+# include <sys/time.h>
 # include <stdio.h>
+
+# define PI 3.1415926535897932384
 
 typedef struct s_trigometry_values
 {
@@ -66,14 +69,22 @@ typedef struct s_flood
 typedef struct s_img
 {
 	void	*img;
+	char	*data;
+	int		bpp;
+	int		size_line;
+	int		endian;
 	int		width;
 	int		height;
 }	t_img;
+
+# define MOVE_SPEED 0.04
+# define ROT_SPEED 1
 
 typedef struct s_player
 {
 	float	x;
 	float	y;
+	int		rot;
 }	t_player;
 
 typedef struct s_map
@@ -88,27 +99,57 @@ typedef struct s_map
 	t_col		floor;
 	t_col		ceiling;
 	t_player	player;
+	t_point		mini_map;
+	int			mini_map_scale;
 }	t_map;
 
 typedef struct s_events
 {
 	int		mo_f;
-	int		mo_s;
-	int		rot_y;
-	int		lock;
+	int		mo_b;
+	int		mo_l;
+	int		mo_r;
+	float	rot;
+	int		echap;
 }	t_event;
+
+typedef struct s_hit
+{
+	float	dist;
+	t_vec	ray_hit;
+	t_vec	ray_dir;
+	t_img	texture;
+	int		side;
+}	t_hit;
+
+typedef struct s_ray
+{
+	t_vec	dist;
+	t_vec	slope;
+	t_point	curr;
+	t_point	step;
+	int		side;
+}	t_ray;
+
+typedef	struct s_cam
+{
+	t_vec	dir;
+	t_vec	plane;
+	float	plane_len;
+}	t_cam;
+
 
 typedef struct s_data
 {
 	void	*mlx;
 	void	*win;
-	void	*img;
+	t_img	img;
 	int		win_len;
 	int		win_wid;
+	t_cam	cam;
 	t_map	*map;
 	t_event	event;
 }	t_data;
-
 
 t_data	*get_data(void);
 t_map	*get_map(void);
@@ -123,5 +164,32 @@ t_img	get_path(char *line, int *err);
 t_col	get_color(char *line, int *err);
 void	add_link(t_list **lst, char *content);
 void	retrieve_map_grid(t_map *map, int map_fd, int *err);
+
+void	loop(void);
+int		mlx_close(t_data *data);
+int		event_loop(t_data *data);
+int		key_down(int keycode, t_data *data);
+int		key_up(int keycode, t_data *data);
+int		mouse_down(int button, int x, int y, t_data *data);
+int		mouse_up(int button, int x, int y, t_data *data);
+int		mouse_move(int x, int y, t_data *data);
+t_col	rev_calc_color(int col);
+int		calc_color(t_col col);
+int		ft_get_pixel_color(t_data *data, t_point point);
+
+void	cast_rays(t_data *data);
+
+int		point_is_in_fov(t_data *data, t_point point);
+void	draw_player(t_data *data, t_point center, double theta);
+void	ft_put_pixel(t_data *data, t_point point, int color);
+void	draw_tile(t_data *data, t_point start, t_trig vals, int color);
+void	draw_circle(t_data *data, t_point center, int rad, int color);
+void	draw_line(t_data *data, t_point start, t_point end, int color);
+void	draw_mini_map(t_data *data);
+int		point_is_in_mini_map(t_data *data, t_point point);
+
+t_hit	raycast(t_data *data, t_vec dir, t_player player);
+void	draw_line_in_direction(t_data *data, t_point start, t_vec dir,
+	float dist);
 
 #endif

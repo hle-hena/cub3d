@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 16:26:41 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/08 17:37:05 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/15 12:17:15 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,11 @@ int	ft_atoi_err(char *arg, int *index)
 	if (!arg)
 		return (-1);
 	while (ft_isspace(*arg))
-		arg++;
+		(arg++, ((*index)++));
 	if (!*arg || !ft_isdigit(*arg))
 		return (-1);
 	while (*arg == '0' && ft_isdigit(*(arg + 1)))
-		arg++;
+		(arg++, ((*index)++));
 	while (ft_isdigit(*arg))
 	{
 		nb = nb * 10 + (*arg - '0');
@@ -117,5 +117,6 @@ g of the file '", line, "'.", NULL});
 		return (*err = 1, ft_perror(-1, extension, 1), (t_img){0});
 	}
 	ft_del((void **)&line);
-	return (img);
+	img.data = mlx_get_data_addr(img.img, &img.bpp, &img.size_line, &img.endian);
+	return (img.bpp /= 8, img);
 }

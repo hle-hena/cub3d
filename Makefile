@@ -2,7 +2,7 @@ MAKEFLAGS += --no-print-directory
 
 NAME = cub3d
 CC = cc
-FLAGS = -Wall -Wextra -Werror -I./include -Imlx -g
+FLAGS = -Wall -Wextra -Werror -I./include -Imlx
 RM = rm -f
 
 FRAMEDIR = ./mlx
@@ -15,6 +15,14 @@ SRCS = $(addprefix srcs/, \
 	$(addprefix clean/, clean_data.c clean_map.c)\
 	$(addprefix utils/, add_link.c)\
 	$(addprefix parser/, parser.c retrieve_map_info.c retrieve_map_info_utils.c retrieve_map_grid.c)\
+	$(addprefix mlx_utils/, color.c loop.c put_pixel.c)\
+	$(addprefix game/, \
+		$(addprefix draw/, \
+			$(addprefix mini_map/, draw_circle.c draw_line.c draw_map.c draw_player.c draw_square.c)\
+			$(addprefix raycast/, draw_line.c draw_map.c raycast.c)\
+		)\
+		$(addprefix hooks/, key.c loop.c mouse.c)\
+	)\
 	main.c\
 )
 
