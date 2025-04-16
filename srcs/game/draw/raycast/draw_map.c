@@ -6,17 +6,11 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/15 22:26:43 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/16 15:05:28 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
-
-static inline int get_texture_color(t_img texture, int tex_x, int tex_y)
-{
-	return (*(int *)(texture.data
-			+ (tex_y * texture.size_line + tex_x * texture.bpp)));
-}
 
 void draw_wall(t_data *data, t_hit ray_hit, t_point limit, int x)
 {
@@ -25,7 +19,6 @@ void draw_wall(t_data *data, t_hit ray_hit, t_point limit, int x)
 	int		tex_y;
 	float	wall_x;
 	char	*row;
-
 
 	if (ray_hit.side == 0)
 		wall_x = ray_hit.ray_hit.y - floor(ray_hit.ray_hit.y);
@@ -43,20 +36,27 @@ void draw_wall(t_data *data, t_hit ray_hit, t_point limit, int x)
 	row = data->img.data + y * data->img.size_line + x * data->img.bpp;
 	int line_height = limit.y - limit.x;
 	int	draw_end = ft_min(limit.y, data->win_len);
-	int	temp = (-data->win_len + line_height) * 128;
+	float step = (float)ray_hit.texture.height / line_height;
+	float tex_pos = (ft_max(limit.x, 0) - data->win_len / 2 + line_height / 2) * step;
 	while (++y < draw_end)
 	{
-		int d = y * 256 + temp;
-		tex_y = ((d * ray_hit.texture.height) / (line_height)) >> 8;
+		tex_y = (int)tex_pos;
 		if (tex_y < 0)
 			tex_y = 0;
-		if (tex_y >= ray_hit.texture.height)
+		else if (tex_y >= ray_hit.texture.height)
 			tex_y = ray_hit.texture.height - 1;
-		*(int *)row = *(int *)(ray_hit.texture.data + (tex_y *
-				ray_hit.texture.size_line + tex_x * ray_hit.texture.bpp));
+		*(int *)row = *(int *)(ray_hit.texture.data + tex_y * ray_hit.texture.size_line + tex_x * ray_hit.texture.bpp);
 		row += data->img.size_line;
+		tex_pos += step;
 	}
 }
+
+	// struct timespec start, end;
+	// clock_gettime(CLOCK_MONOTONIC, &start);
+	// CODE TO BENCHMARK
+	// clock_gettime(CLOCK_MONOTONIC, &end);
+	// long ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
+	// printf("Took %ldns\n", ms);
 
 void cast_ray(t_data *data, t_vec ray_dir, float ray_angle, int x)
 {
