@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/15 23:08:39 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/16 16:43:03 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,13 +113,22 @@ typedef struct s_events
 	int		echap;
 }	t_event;
 
+# define STRIPE_LEN 8
+
+typedef struct s_stripe
+{
+	int	*data;
+	int	size_line;
+}	t_stripe;
+
 typedef struct s_hit
 {
-	float	dist;
-	t_vec	ray_hit;
-	t_vec	ray_dir;
-	t_img	texture;
-	int		side;
+	float		dist;
+	t_vec		ray_hit;
+	t_vec		ray_dir;
+	t_img		texture;
+	t_stripe	stripe;
+	int			side;
 }	t_hit;
 
 typedef struct s_ray
@@ -141,14 +150,15 @@ typedef	struct s_cam
 
 typedef struct s_data
 {
-	void	*mlx;
-	void	*win;
-	t_img	img;
-	int		win_len;
-	int		win_wid;
-	t_cam	cam;
-	t_map	*map;
-	t_event	event;
+	void		*mlx;
+	void		*win;
+	t_img		img;
+	t_stripe	*img_stripes;
+	int			win_len;
+	int			win_wid;
+	t_cam		cam;
+	t_map		*map;
+	t_event		event;
 }	t_data;
 
 t_data	*get_data(void);
