@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/16 15:05:28 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/18 15:07:40 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ void draw_wall(t_data *data, t_hit ray_hit, t_point limit, int x)
 	// long ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
 	// printf("Took %ldns\n", ms);
 
-void cast_ray(t_data *data, t_vec ray_dir, float ray_angle, int x)
+void cast_ray(t_data *data, t_vec ray_dir, int x)
 {
 	t_hit	ray_hit;
 	int		line_height;
@@ -67,7 +67,7 @@ void cast_ray(t_data *data, t_vec ray_dir, float ray_angle, int x)
 
 	ray_hit = raycast(data, ray_dir, data->map->player);
 	ray_hit.ray_dir = ray_dir;
-	ray_hit.dist = ray_hit.dist * cos(ray_angle - data->map->player.rot * PI / 180);
+	ray_hit.dist = ray_hit.dist * (ray_dir.x * data->cam.dir.x + ray_dir.y * data->cam.dir.y);;
 	if (ray_hit.dist <= 0.0f)
 		ray_hit.dist = 0.0001f;
 	line_height = (int)(data->win_len / ray_hit.dist);
@@ -80,19 +80,20 @@ void cast_rays(t_data *data)
 {
 	int		x;
 	float	cam_x;
-	float	ray_angle;
-	float	fov;
 	t_vec	ray_dir;
+	float	look_dir;
+	t_cam	cam;
 
+	look_dir = (float)data->map->player.rot * PI / 180;
+	cam.dir = (t_vec){cos(look_dir), sin(look_dir), 0};
+	cam.plane = (t_vec){-sin(look_dir) * tan((float)(60 * PI / 180) / 2),
+		cos(look_dir) * tan((float)(60 * PI / 180) / 2), 0};
 	x = -1;
-	fov = 60 * PI / 180;
 	while (++x < data->win_wid)
 	{
-		cam_x = (2.0f * x) / data->win_wid - 1.0f;
-		ray_angle = data->map->player.rot * (PI / 180.0f)
-			+ atan(cam_x * tan(fov / 2.0f));
-		ray_dir.x = cos(ray_angle);
-		ray_dir.y = sin(ray_angle);
-		cast_ray(data, ray_dir, ray_angle, x);
+		cam_x = 2.0f * x / data->win_wid - 1.0f;
+		ray_dir.x = cam.dir.x + cam.plane.x * cam_x;
+		ray_dir.y = cam.dir.y + cam.plane.y * cam_x;
+		cast_ray(data, ray_dir, x);
 	}
 }
