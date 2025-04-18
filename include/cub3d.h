@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/15 23:08:39 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/18 16:05:12 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,12 @@ typedef struct s_hit
 	t_vec	ray_dir;
 	t_img	texture;
 	int		side;
+	int		draw_start;
+	int		draw_end;
+	char	*tex_col;
+	int		tex_y;
+	int		tex_pos_fp;
+	int		step_fp;
 }	t_hit;
 
 typedef struct s_ray
@@ -148,6 +154,7 @@ typedef struct s_data
 	int		win_wid;
 	t_cam	cam;
 	t_map	*map;
+	t_hit	*hits;
 	t_event	event;
 }	t_data;
 

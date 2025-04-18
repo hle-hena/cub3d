@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/18 15:16:42 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/18 16:09:13 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,10 @@ void draw_wall(t_data *data, t_hit ray_hit, t_point limit, int x)
 	char	*row;
 
 	if (ray_hit.side == 0)
-		wall_x = ray_hit.ray_hit.y - floor(ray_hit.ray_hit.y);
+		wall_x = ray_hit.ray_hit.y;
 	else
-		wall_x = ray_hit.ray_hit.x - floor(ray_hit.ray_hit.x);
-	if ((ray_hit.side == 0 && ray_hit.ray_dir.x > 0)
-		|| (ray_hit.side == 1 && ray_hit.ray_dir.y < 0))
-		wall_x = 1.0f - wall_x;
+		wall_x = ray_hit.ray_hit.x;
+	wall_x -= (int)wall_x;
 	tex_x = (int)(wall_x * (float)ray_hit.texture.width);
 	if (tex_x < 0)
 		tex_x = 0;
@@ -36,18 +34,16 @@ void draw_wall(t_data *data, t_hit ray_hit, t_point limit, int x)
 	row = data->img.data + y * data->img.size_line + x * data->img.bpp;
 	int line_height = limit.y - limit.x;
 	int	draw_end = ft_min(limit.y, data->win_len);
-	float step = (float)ray_hit.texture.height / line_height;
-	float tex_pos = (ft_max(limit.x, 0) - data->win_len / 2 + line_height / 2) * step;
+	int step_fp = (ray_hit.texture.height << 16) / line_height;
+	int tex_pos_fp = ((ft_max(limit.x, 0) - data->win_len / 2 + line_height / 2) * step_fp);
+	char *tex_col = ray_hit.texture.data + tex_x * ray_hit.texture.bpp;
+	int tex_stride = ray_hit.texture.size_line;
 	while (++y < draw_end)
 	{
-		tex_y = (int)tex_pos;
-		if (tex_y < 0)
-			tex_y = 0;
-		else if (tex_y >= ray_hit.texture.height)
-			tex_y = ray_hit.texture.height - 1;
-		*(int *)row = *(int *)(ray_hit.texture.data + tex_y * ray_hit.texture.size_line + tex_x * ray_hit.texture.bpp);
+		tex_y = tex_pos_fp >> 16;
+		*(int *)row = *(int *)(tex_col + tex_y * tex_stride);
 		row += data->img.size_line;
-		tex_pos += step;
+		tex_pos_fp += step_fp;
 	}
 }
 
@@ -58,12 +54,38 @@ void draw_wall(t_data *data, t_hit ray_hit, t_point limit, int x)
 	// long ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
 	// printf("Took %ldns\n", ms);
 
-void cast_ray(t_data *data, t_vec ray_dir, int x)
+void	draw_walls(t_data *data)
+{
+	int		y;
+	int		x;
+	char	*img;
+
+	y = -1;
+	img = data->img.data;
+	while (++y < data->win_len)
+	{
+		x = -1;
+		while (++x < data->win_wid)
+		{
+			if (y >= data->hits[x].draw_start && y < data->hits[x].draw_end)
+			{
+				data->hits[x].tex_y = data->hits[x].tex_pos_fp >> 16;
+				*(int *)img = *(int *)(data->hits[x].tex_col + data->hits[x].tex_y * data->hits[x].texture.size_line);
+				data->hits[x].tex_pos_fp += data->hits[x].step_fp;
+			}
+			img += data->img.bpp;
+		}
+	}
+}
+
+t_hit cast_ray(t_data *data, t_vec ray_dir)
 {
 	t_hit	ray_hit;
+	float	wall_x;
 	int		line_height;
-	int		draw_start;
-	int		draw_end;
+	int		tex_start;
+	int		tex_end;
+	int		tex_x;
 
 	ray_hit = raycast(data, ray_dir, data->map->player);
 	ray_hit.ray_dir = ray_dir;
@@ -71,9 +93,21 @@ void cast_ray(t_data *data, t_vec ray_dir, int x)
 	if (ray_hit.dist <= 0.0f)
 		ray_hit.dist = 0.0001f;
 	line_height = (int)(data->win_len / ray_hit.dist);
-	draw_start = -line_height / 2 + data->win_len / 2;
-	draw_end = line_height / 2 + data->win_len / 2;
-	draw_wall(data, ray_hit, (t_point){draw_start, draw_end, 0}, x);
+	tex_start = -line_height / 2 + data->win_len / 2;
+	tex_end = line_height / 2 + data->win_len / 2;
+	ray_hit.draw_start = ft_max(tex_start, 0);
+	ray_hit.draw_end = ft_min(tex_end, data->win_len - 1);
+	if (ray_hit.side == 0)
+		wall_x = ray_hit.ray_hit.y;
+	else
+		wall_x = ray_hit.ray_hit.x;
+	wall_x -= (int)wall_x;
+	tex_x = (int)(wall_x * ray_hit.texture.width);
+	line_height = tex_end - tex_start;
+	ray_hit.step_fp = (ray_hit.texture.height << 16) / line_height;
+	ray_hit.tex_pos_fp = (ray_hit.draw_start - data->win_len / 2 + line_height / 2) * ray_hit.step_fp;
+	ray_hit.tex_col = ray_hit.texture.data + tex_x * ray_hit.texture.bpp;
+	return (ray_hit);
 }
 
 void cast_rays(t_data *data)
@@ -93,6 +127,7 @@ void cast_rays(t_data *data)
 		cam_x = 2.0f * x / data->win_wid - 1.0f;
 		ray_dir.x = data->cam.dir.x + data->cam.plane.x * cam_x;
 		ray_dir.y = data->cam.dir.y + data->cam.plane.y * cam_x;
-		cast_ray(data, ray_dir, x);
+		data->hits[x] = cast_ray(data, ray_dir);
 	}
+	draw_walls(data);
 }

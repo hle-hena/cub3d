@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:05:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/15 21:06:10 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/18 15:37:31 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,9 @@ void	init_utils(t_data *data)
 	data->map->mini_map = (t_point)
 		{data->win_wid * 0.9, data->win_len * 0.15, 0};
 	data->map->mini_map_scale = 32;
+	data->hits = malloc(data->win_wid * sizeof(t_hit));
+	if (!data->hits)
+		ft_perror(-1, "cub3d: Internal error: malloc.", clean_data());
 }
 
 int	main(int ac, char **av)
