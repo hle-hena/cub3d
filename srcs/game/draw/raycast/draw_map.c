@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/18 21:51:35 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/18 22:25:00 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,33 +19,36 @@
 	// long ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
 	// printf("Took %ldns\n", ms);
 
-void	*draw_walls_thread(void *arg)
+void *draw_walls_thread(void *arg)
 {
 	t_th_draw	*td;
 	t_data		*data;
 	char		*img;
-	int			y;
-	int			x;
+	int			y, x;
+	int			color;
+	t_hit		*hit;
 
 	td = (t_th_draw *)arg;
 	data = get_data();
-	img = td->img.data;
 	y = -1;
+	img = td->img.data;
 	while (++y < data->win_len)
 	{
 		x = -1;
 		while (++x < td->end_x)
 		{
-			if (y >= data->hits[x + td->offset_x].draw_start && y < data->hits[x + td->offset_x].draw_end)
+			hit = &data->hits[x + td->offset_x];
+			if (y >= hit->draw_start && y < hit->draw_end)
 			{
-				data->hits[x + td->offset_x].tex_y = data->hits[x + td->offset_x].tex_pos_fp >> 16;
-				*(int *)img = *(int *)(data->hits[x + td->offset_x].tex_col + data->hits[x + td->offset_x].tex_y * data->hits[x + td->offset_x].texture.size_line);
-				data->hits[x + td->offset_x].tex_pos_fp += data->hits[x + td->offset_x].step_fp;
+				hit->tex_y = hit->tex_pos_fp >> 16;
+				color = *(int *)(hit->tex_col + hit->tex_y * hit->texture.size_line);
+				hit->tex_pos_fp += hit->step_fp;
 			}
-			else if (y < data->hits[x + td->offset_x].draw_start)
-				*(int *)img = calc_color(data->map->ceiling);
+			else if (y < hit->draw_start)
+				color = calc_color(data->map->ceiling);
 			else
-				*(int *)img = calc_color(data->map->floor);
+				color = calc_color(data->map->floor);
+			*(int *)img = color;
 			img += td->img.bpp;
 		}
 	}
