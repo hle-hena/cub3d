@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/16 16:43:03 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/18 13:48:03 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,12 +113,12 @@ typedef struct s_events
 	int		echap;
 }	t_event;
 
-# define STRIPE_LEN 8
+# define STRIPE_LEN 32
 
 typedef struct s_stripe
 {
-	int	*data;
-	int	size_line;
+	char	*data;
+	int		size_line;
 }	t_stripe;
 
 typedef struct s_hit

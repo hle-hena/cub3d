@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/16 16:55:19 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/18 13:47:26 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void draw_wall(t_data *data, t_hit ray_hit, t_point limit, int x)
 	int		tex_x;
 	int		tex_y;
 	float	wall_x;
-	int		*stripe;
+	char	*stripe;
 	char	*row;
 
 	if (ray_hit.side == 0)
@@ -39,7 +39,7 @@ void draw_wall(t_data *data, t_hit ray_hit, t_point limit, int x)
 	int	draw_end = ft_min(limit.y, data->win_len);
 	float step = (float)ray_hit.texture.height / line_height;
 	float tex_pos = (ft_max(limit.x, 0) - data->win_len / 2 + line_height / 2) * step;
-	stripe = ray_hit.stripe.data + (x % STRIPE_LEN) + y * ray_hit.stripe.size_line;
+	stripe = ray_hit.stripe.data + (x % STRIPE_LEN)  * sizeof(char) * 4 + y * ray_hit.stripe.size_line;
 	while (++y < draw_end)
 	{
 		tex_y = (int)tex_pos;
@@ -47,7 +47,7 @@ void draw_wall(t_data *data, t_hit ray_hit, t_point limit, int x)
 			tex_y = 0;
 		else if (tex_y >= ray_hit.texture.height)
 			tex_y = ray_hit.texture.height - 1;
-		*stripe = *(int *)(ray_hit.texture.data + tex_y * ray_hit.texture.size_line + tex_x * ray_hit.texture.bpp);
+		*(int *)stripe = *(int *)(ray_hit.texture.data + tex_y * ray_hit.texture.size_line + tex_x * ray_hit.texture.bpp);
 		stripe += ray_hit.stripe.size_line;
 		tex_pos += step;
 	}
@@ -79,34 +79,28 @@ void cast_ray(t_data *data, t_vec ray_dir, float ray_angle, int x)
 	draw_wall(data, ray_hit, (t_point){draw_start, draw_end, 0}, x);
 }
 
+#include <string.h>
 void	copy_stripes(t_data *data)
 {
 	int		y;
-	int		x;
-	int		stripe_i;
+	int		stripe;
 	int		nb_stripes = (data->win_wid + STRIPE_LEN - 1) / STRIPE_LEN;
-	int		screen_x;
-	int		stripe_w;
-	int		*stripe;
-	char	*row_start;
 
-	y = -1;
-	while (++y < data->win_len)
+	y = 0;
+	while (y < data->win_len)
 	{
-		row_start = data->img.data + y * data->img.size_line;
-		screen_x = -1;
-		stripe_i = -1;
-		while (++stripe_i < nb_stripes)
+		stripe = 0;
+		while (stripe < nb_stripes)
 		{
-			stripe_w = data->img_stripes[stripe_i].size_line;
-			stripe = data->img_stripes[stripe_i].data + y * stripe_w;
-			x = -1;
-			while (++x < stripe_w && ++screen_x < data->win_wid)
-			{
-				*(int *)(row_start + screen_x * data->img.bpp) = stripe[x];
-				stripe[x] = 0;
-			}
+			int bytes = data->img_stripes[stripe].size_line;
+			char *src = data->img_stripes[stripe].data + y * bytes;
+			char *dst = data->img.data + y * data->img.size_line + stripe * STRIPE_LEN * data->img.bpp;
+
+			memcpy(dst, src, bytes);
+
+			stripe++;
 		}
+		y++;
 	}
 }
 

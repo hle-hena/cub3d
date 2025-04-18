@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:05:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/16 16:55:11 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/18 13:40:36 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,22 +32,22 @@ void	init_img_stripes(t_data *data)
 	i = -1;
 	while (++i < nb_stripes - 1)
 	{
-		stripes[i].data = malloc((STRIPE_LEN * data->win_len) * sizeof(int));
+		stripes[i].data = malloc((STRIPE_LEN * data->win_len) * sizeof(char) * 4);
 		if (!stripes[i].data)
 		{
 			ft_free_tab((void **)stripes, i - 1);
 			ft_perror(1, "cub3d: Internal error: malloc.", clean_data());
 		}
-		stripes[i].size_line = STRIPE_LEN;
+		stripes[i].size_line = STRIPE_LEN * sizeof(char) * 4;
 	}
 	nb_stripes = ft_tern_int(data->win_wid % STRIPE_LEN, data->win_wid % STRIPE_LEN, STRIPE_LEN);
-	stripes[i].data = malloc((nb_stripes * data->win_len) * sizeof(int));
+	stripes[i].data = malloc((nb_stripes * data->win_len) * sizeof(char) * 4);
 	if (!stripes[i].data)
 	{
 		ft_free_tab((void **)stripes, i - 1);
 		ft_perror(1, "cub3d: Internal error: malloc.", clean_data());
 	}
-	stripes[i].size_line = nb_stripes;
+	stripes[i].size_line = nb_stripes * sizeof(char) * 4;
 	data->img_stripes = stripes;
 }
 
