@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/18 21:31:19 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/18 21:51:35 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,10 @@ void	*draw_walls_thread(void *arg)
 				*(int *)img = *(int *)(data->hits[x + td->offset_x].tex_col + data->hits[x + td->offset_x].tex_y * data->hits[x + td->offset_x].texture.size_line);
 				data->hits[x + td->offset_x].tex_pos_fp += data->hits[x + td->offset_x].step_fp;
 			}
+			else if (y < data->hits[x + td->offset_x].draw_start)
+				*(int *)img = calc_color(data->map->ceiling);
+			else
+				*(int *)img = calc_color(data->map->floor);
 			img += td->img.bpp;
 		}
 	}
