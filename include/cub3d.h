@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/18 16:57:42 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/18 21:28:22 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,6 +151,7 @@ typedef struct s_data
 	void	*mlx;
 	void	*win;
 	t_img	img;
+	t_img	*th_img;
 	int		win_len;
 	int		win_wid;
 	t_cam	cam;
@@ -163,10 +164,9 @@ typedef struct s_data
 
 typedef struct s_thread_draw
 {
-	t_data	*data;
-	int		start_x;
+	t_img	img;
 	int		end_x;
-	int		add_next_line;
+	int		offset_x;
 }	t_th_draw;
 
 t_data	*get_data(void);

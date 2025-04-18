@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 21:49:44 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/15 23:07:35 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/18 21:24:53 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,8 +73,8 @@ int	event_loop(t_data *data)
 	bzero_img(data);
 	move_event(data);
 	cast_rays(data);
-	draw_mini_map(data);
-	mlx_put_image_to_window(data->mlx, data->win, data->img.img, 0, 0);
+	// draw_mini_map(data);
+	// mlx_put_image_to_window(data->mlx, data->win, data->img.img, 0, 0);
 	if (data->event.echap)
 		mlx_close(data);
 	return (0);

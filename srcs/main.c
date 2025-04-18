@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:05:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/18 16:57:56 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/18 21:29:41 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,31 @@ t_data	*get_data(void)
 	static t_data	data = (t_data){0};
 
 	return (&data);
+}
+
+void	init_th_img(t_data *data)
+{
+	int	i;
+	int	img_wid;
+	int	slice;
+	int	width_left;
+
+	i = -1;
+	data->th_img = malloc(DRAW_THREADS * sizeof(t_img));
+	if (!data->th_img)
+		ft_perror(1, "cub3d: Internal error: malloc", clean_data());
+	slice = data->win_wid / DRAW_THREADS;
+	width_left = data->win_wid;
+	while (++i < DRAW_THREADS)
+	{
+		img_wid = ft_min(slice, width_left);
+		width_left -= img_wid;
+		data->th_img[i].img = mlx_new_image(data->mlx, img_wid, data->win_len);
+		data->th_img[i].data = mlx_get_data_addr(data->th_img[i].img,
+			&data->th_img[i].bpp, &data->th_img[i].size_line,
+			&data->th_img[i].endian);
+		data->th_img[i].bpp /= 8;
+	}
 }
 
 void	init_mlx(t_data *data)
@@ -32,6 +57,7 @@ void	init_mlx(t_data *data)
 		&data->img.size_line, &data->img.endian);
 	data->img.bpp /= 8;
 	data->event = (t_event){0};
+	init_th_img(data);
 }
 
 void	init_utils(t_data *data)
