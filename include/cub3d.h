@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/16 16:43:03 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/18 11:47:19 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include <time.h>
 # include <sys/time.h>
 # include <stdio.h>
+# include "mlx_int.h"
 
 # define PI 3.1415926535897932384
 
@@ -66,7 +67,7 @@ typedef struct s_flood
 }	t_flood;
 
 
-typedef struct s_img
+typedef struct s_custom_img
 {
 	void	*img;
 	char	*data;
@@ -75,7 +76,7 @@ typedef struct s_img
 	int		endian;
 	int		width;
 	int		height;
-}	t_img;
+}	t_c_img;
 
 # define MOVE_SPEED 0.04
 # define ROT_SPEED 1
@@ -92,10 +93,10 @@ typedef struct s_map
 	char		**matrix;
 	int			len;
 	int			wid;
-	t_img		img_no;
-	t_img		img_so;
-	t_img		img_we;
-	t_img		img_ea;
+	t_c_img		img_no;
+	t_c_img		img_so;
+	t_c_img		img_we;
+	t_c_img		img_ea;
 	t_col		floor;
 	t_col		ceiling;
 	t_player	player;
@@ -113,21 +114,15 @@ typedef struct s_events
 	int		echap;
 }	t_event;
 
-# define STRIPE_LEN 8
-
-typedef struct s_stripe
-{
-	int	*data;
-	int	size_line;
-}	t_stripe;
+# define STRIPE_LEN 4
 
 typedef struct s_hit
 {
 	float		dist;
 	t_vec		ray_hit;
 	t_vec		ray_dir;
-	t_img		texture;
-	t_stripe	stripe;
+	t_c_img		texture;
+	t_c_img		stripe;
 	int			side;
 }	t_hit;
 
@@ -152,8 +147,7 @@ typedef struct s_data
 {
 	void		*mlx;
 	void		*win;
-	t_img		img;
-	t_stripe	*img_stripes;
+	t_c_img		*img_stripes;
 	int			win_len;
 	int			win_wid;
 	t_cam		cam;
@@ -170,7 +164,7 @@ int		has_all_info(t_map *map);
 int		clean_map(void);
 int		clean_data(void);
 void	print_missing_info(t_map *map);
-t_img	get_path(char *line, int *err);
+t_c_img	get_path(char *line, int *err);
 t_col	get_color(char *line, int *err);
 void	add_link(t_list **lst, char *content);
 void	retrieve_map_grid(t_map *map, int map_fd, int *err);

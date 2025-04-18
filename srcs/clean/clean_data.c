@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 10:18:57 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/16 16:50:42 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/18 10:27:48 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,7 @@ void	clear_stripes(t_data *data)
 	nb_stripes = ceil((float)data->win_wid / STRIPE_LEN);
 	i = -1;
 	while (++i < nb_stripes)
-		ft_del((void **)&data->img_stripes[i].data);
-	ft_del((void **)&data->img_stripes);
+		mlx_destroy_image(data->mlx, data->img_stripes[i].img);
 }
 
 int	clean_data(void)
@@ -34,8 +33,6 @@ int	clean_data(void)
 	clean_map();
 	// mlx_do_key_autorepeaton(data->mlx);
 	clear_stripes(data);
-	if (data->img.img)
-		mlx_destroy_image(data->mlx, data->img.img);
 	if (data->win)
 		mlx_destroy_window(data->mlx, data->win);
 	if (data->mlx)

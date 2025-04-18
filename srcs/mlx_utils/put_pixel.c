@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:24:55 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/15 21:07:20 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/18 10:31:29 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,19 +21,13 @@ int	point_is_in_fov(t_data *data, t_point point)
 	return (0);
 }
 
-int	ft_get_pixel_color(t_data *data, t_point point)
-{
-	int	*img;
-	int	temp;
-	int	size_line;
-
-	img = (int *)mlx_get_data_addr(data->img.img, &temp, &size_line, &temp);
-	return (img[point.y * data->win_wid + point.x]);
-}
-
 inline void	ft_put_pixel(t_data *data, t_point point, int color)
 {
-	char *dst = data->img.data + point.y * data->img.size_line
-		+ point.x * data->img.bpp;
+	int		i;
+	char	*dst;
+
+	i = point.x / STRIPE_LEN;
+	dst = data->img_stripes[i].data + point.y * data->img_stripes[i].size_line
+		+ (point.x % STRIPE_LEN) * data->img_stripes[i].bpp;
 	*(int *)dst = color;
 }

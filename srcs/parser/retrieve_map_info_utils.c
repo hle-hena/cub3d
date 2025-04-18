@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 16:26:41 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/15 12:17:15 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/18 11:47:01 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,21 +92,21 @@ ailed.", 0), (t_col){0});
 	return (color);
 }
 
-t_img	get_path(char *line, int *err)
+t_c_img	get_path(char *line, int *err)
 {
 	char	*extension;
-	t_img	img;
+	t_c_img	img;
 
 	if (!line)
 		return (*err = 1, ft_perror(-1, "The name of the map was invalid, or th\
-e malloc failed.", 0), (t_img){0});
+e malloc failed.", 0), (t_c_img){0});
 	extension = ft_strrchr(line, '.');
 	if (!extension)
 		return (*err = 1, ft_perror(-1, "Invalid usage. Assets should be in .xp\
-m", 0), ft_del((void **)&line), (t_img){0});
+m", 0), ft_del((void **)&line), (t_c_img){0});
 	if (ft_strncmp(".xpm", extension, 5))
 		return (*err = 1, ft_perror(-1, "Invalid usage. Assets should be in .xp\
-m", 0), ft_del((void **)&line), (t_img){0});
+m", 0), ft_del((void **)&line), (t_c_img){0});
 	img.img = mlx_xpm_file_to_image(get_data()->mlx, line,
 			&img.width, &img.height);
 	if (!img.img)
@@ -114,7 +114,7 @@ m", 0), ft_del((void **)&line), (t_img){0});
 		extension = ft_strsjoin((char *[]){"An error happened during the openin\
 g of the file '", line, "'.", NULL});
 		ft_del((void **)&line);
-		return (*err = 1, ft_perror(-1, extension, 1), (t_img){0});
+		return (*err = 1, ft_perror(-1, extension, 1), (t_c_img){0});
 	}
 	ft_del((void **)&line);
 	img.data = mlx_get_data_addr(img.img, &img.bpp, &img.size_line, &img.endian);
