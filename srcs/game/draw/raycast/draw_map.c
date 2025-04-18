@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/18 22:25:00 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/18 23:04:22 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,17 +84,18 @@ t_hit cast_ray(t_data *data, t_vec ray_dir)
 	int		line_height;
 	int		tex_start;
 	int		tex_end;
+	int		win_len_half;
 
+	win_len_half = data->win_len / 2;
 	ray_hit = raycast(data, ray_dir, data->map->player);
 	ray_hit.ray_dir = ray_dir;
 	ray_hit.dist = ray_hit.dist * (ray_dir.x * data->cam.dir.x + ray_dir.y * data->cam.dir.y);
 	if (ray_hit.dist <= 0.0f)
 		ray_hit.dist = 0.0001f;
 	line_height = (int)(data->win_len / ray_hit.dist);
-	if (line_height == 0)
-		line_height = 1;
-	tex_start = -line_height / 2 + data->win_len / 2;
-	tex_end = line_height / 2 + data->win_len / 2;
+	line_height = (line_height == 0) ? 1 : line_height;
+	tex_start = -line_height / 2 + win_len_half;
+	tex_end = line_height / 2 + win_len_half;
 	ray_hit.draw_start = ft_max(tex_start, 0);
 	ray_hit.draw_end = ft_min(tex_end, data->win_len - 1);
 	if (ray_hit.side == 0)
@@ -104,10 +105,11 @@ t_hit cast_ray(t_data *data, t_vec ray_dir)
 	wall_x -= (int)wall_x;
 	line_height = tex_end - tex_start;
 	ray_hit.step_fp = (ray_hit.texture.height << 16) / line_height;
-	ray_hit.tex_pos_fp = (ray_hit.draw_start - data->win_len / 2 + line_height / 2) * ray_hit.step_fp;
+	ray_hit.tex_pos_fp = (ray_hit.draw_start - win_len_half + line_height / 2) * ray_hit.step_fp;
 	ray_hit.tex_col = ray_hit.texture.data + (int)(wall_x * ray_hit.texture.width) * ray_hit.texture.bpp;
 	return (ray_hit);
 }
+
 
 void cast_rays(t_data *data)
 {
@@ -116,6 +118,8 @@ void cast_rays(t_data *data)
 	t_vec	ray_dir;
 	float	look_dir;
 
+	// struct timespec start, end;
+	// clock_gettime(CLOCK_MONOTONIC, &start);
 	look_dir = (float)data->map->player.rot * PI / 180;
 	data->cam.dir = (t_vec){cos(look_dir), sin(look_dir), 0};
 	data->cam.plane = (t_vec){-sin(look_dir) * tan((float)(60 * PI / 180) / 2),
@@ -128,5 +132,13 @@ void cast_rays(t_data *data)
 		ray_dir.y = data->cam.dir.y + data->cam.plane.y * cam_x;
 		data->hits[x] = cast_ray(data, ray_dir);
 	}
+	// clock_gettime(CLOCK_MONOTONIC, &end);
+	// long ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
+	// printf("Raycast took %ldns\n", ms);
+	
+	// clock_gettime(CLOCK_MONOTONIC, &start);
 	draw_walls(data);
+	// clock_gettime(CLOCK_MONOTONIC, &end);
+	// ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
+	// printf("Draw took %ldns\n", ms);
 }
