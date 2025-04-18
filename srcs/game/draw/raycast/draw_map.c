@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/18 15:07:40 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/18 15:16:42 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,18 +82,17 @@ void cast_rays(t_data *data)
 	float	cam_x;
 	t_vec	ray_dir;
 	float	look_dir;
-	t_cam	cam;
 
 	look_dir = (float)data->map->player.rot * PI / 180;
-	cam.dir = (t_vec){cos(look_dir), sin(look_dir), 0};
-	cam.plane = (t_vec){-sin(look_dir) * tan((float)(60 * PI / 180) / 2),
+	data->cam.dir = (t_vec){cos(look_dir), sin(look_dir), 0};
+	data->cam.plane = (t_vec){-sin(look_dir) * tan((float)(60 * PI / 180) / 2),
 		cos(look_dir) * tan((float)(60 * PI / 180) / 2), 0};
 	x = -1;
 	while (++x < data->win_wid)
 	{
 		cam_x = 2.0f * x / data->win_wid - 1.0f;
-		ray_dir.x = cam.dir.x + cam.plane.x * cam_x;
-		ray_dir.y = cam.dir.y + cam.plane.y * cam_x;
+		ray_dir.x = data->cam.dir.x + data->cam.plane.x * cam_x;
+		ray_dir.y = data->cam.dir.y + data->cam.plane.y * cam_x;
 		cast_ray(data, ray_dir, x);
 	}
 }
