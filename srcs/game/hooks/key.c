@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 21:43:05 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/15 22:54:48 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/19 18:41:18 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,9 @@ int	key_down(int keycode, t_data *data)
 
 int	key_up(int keycode, t_data *data)
 {
-	if (keycode == 119)
+	if (keycode == 65307)
+		data->event.echap = 1;
+	else if (keycode == 119)
 		data->event.mo_f = 0;
 	else if (keycode == 115)
 		data->event.mo_b = 0;

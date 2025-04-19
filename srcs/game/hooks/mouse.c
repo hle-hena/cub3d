@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 21:48:07 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/15 23:07:51 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/19 19:27:05 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,9 @@ int	mouse_move(int x, int y, t_data *data)
 
 	if (mouse_pos == -1)
 		mouse_pos = x;
-	data->event.rot = (x - mouse_pos) * 0.25f;
+	data->event.rot = x - mouse_pos;
+	if (data->event.rot == 0)
+		return (0);
 	if (x <= 0)
 		mlx_mouse_move(data->mlx, data->win, data->win_wid - 2, y);
 	else if (x >= data->win_wid - 1)
