@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/18 16:05:12 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/20 11:42:43 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@
 # include <time.h>
 # include <sys/time.h>
 # include <stdio.h>
+
+# include <pthread.h>
 
 # define PI 3.1415926535897932384
 
@@ -144,7 +146,6 @@ typedef	struct s_cam
 	float	plane_len;
 }	t_cam;
 
-
 typedef struct s_data
 {
 	void	*mlx;
@@ -157,6 +158,16 @@ typedef struct s_data
 	t_hit	*hits;
 	t_event	event;
 }	t_data;
+
+# define DRAW_THREADS 4
+
+typedef struct s_thread_draw
+{
+	t_data	*data;
+	int		start_x;
+	int		end_x;
+	int		add_next_line;
+}	t_th_draw;
 
 t_data	*get_data(void);
 t_map	*get_map(void);

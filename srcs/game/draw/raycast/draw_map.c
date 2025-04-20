@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/19 19:37:40 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/20 11:44:21 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,32 +19,61 @@
 	// long ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
 	// printf("Took %ldns\n", ms);
 
-void	draw_walls(t_data *data)
+void	*draw_walls_thread(void *arg)
 {
-	int		y;
-	int		x;
-	char	*img;
+	t_th_draw	*td;
+	t_data		*data;
+	t_hit		*hit;
+	char		*img;
+	t_point		curr;
 
-	y = -1;
-	img = data->img.data;
-	while (++y < data->win_len)
+	td = (t_th_draw *)arg;
+	data = td->data;
+	img = data->img.data + td->start_x * data->img.bpp;
+	curr.y = -1;
+	while (++curr.y < data->win_len)
 	{
-		x = -1;
-		while (++x < data->win_wid)
+		curr.x = td->start_x - 1;
+		while (++curr.x < td->end_x)
 		{
-			if (y >= data->hits[x].draw_start && y < data->hits[x].draw_end)
+			hit = &data->hits[curr.x];
+			if (curr.y >= hit->draw_start && curr.y < hit->draw_end)
 			{
-				data->hits[x].tex_y = data->hits[x].tex_pos_fp >> 16;
-				*(int *)img = *(int *)(data->hits[x].tex_col + data->hits[x].tex_y * data->hits[x].texture.size_line);
-				data->hits[x].tex_pos_fp += data->hits[x].step_fp;
+				hit->tex_y = hit->tex_pos_fp >> 16;
+				*(int *)img = *(int *)(hit->tex_col + hit->tex_y * hit->texture.size_line);
+				hit->tex_pos_fp += hit->step_fp;
 			}
-			else if (y < data->hits[x].draw_start)
+			else if (curr.y < hit->draw_start)
 				*(int *)img = calc_color(data->map->ceiling);
 			else
 				*(int *)img = calc_color(data->map->floor);
 			img += data->img.bpp;
 		}
+		img += td->add_next_line;
 	}
+	return (NULL);
+}
+
+void	draw_walls(t_data *data)
+{
+	pthread_t	threads[DRAW_THREADS];
+	t_th_draw	td[DRAW_THREADS];
+	int			slice;
+	int			i;
+
+	slice = data->win_wid / DRAW_THREADS;
+	i = -1;
+	while (++i < DRAW_THREADS)
+	{
+		td[i].data = data;
+		td[i].start_x = i * slice;
+		td[i].end_x = (i == DRAW_THREADS - 1) ? data->win_wid : (i + 1) * slice;
+		td[i].add_next_line = (td[i].start_x + data->win_wid - td[i].end_x) * data->img.bpp;
+		pthread_create(&threads[i], NULL, draw_walls_thread, &td[i]);
+	}
+	i = -1;
+	while (++i < DRAW_THREADS)
+		pthread_join(threads[i], NULL);
 }
 
 t_hit cast_ray(t_data *data, t_vec ray_dir)
