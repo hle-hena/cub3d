@@ -1,0 +1,32 @@
+NO textures/matrix.xpm
+SO textures/matrix.xpm
+EA textures/matrix.xpm
+WE textures/matrix.xpm
+
+Z {
+	NO textures/matrix.xpm
+	SO textures/matrix.xpm
+	EA textures/matrix.xpm
+	WE textures/matrix.xpm
+	C 0,12,12
+	F textures/matrix.xpm
+	#CH 50
+	#FH 0
+	#W 0
+}
+
+C textures/matrix.xpm
+F textures/matrix.xpm
+
+1111111     111111
+1ZZZZZ1     1ZZZZ1
+1ZZZZZ1     1ZZZZ1
+1ZZZZZ1111111ZZZZ1
+1ZZZZZZZZZZZZZZZZ1
+1ZZZZZZZZZZZZZZZZ1
+1ZZZZZZZZZZZZZZZZ1
+111111111ZZZZZZZZ1
+        1ZZZZZZZZ1
+        1ZZZZZZZZ1
+        1ZZZZZZZZ1
+        1111111111

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/20 11:51:28 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/20 22:09:58 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 # include <pthread.h>
 
 # define PI 3.1415926535897932384
+# define VOID (void)0
 
 typedef struct s_trigometry_values
 {
@@ -89,17 +90,25 @@ typedef struct s_player
 	int		rot;
 }	t_player;
 
+typedef	struct s_tile
+{
+	t_img		tex_no;
+	t_img		tex_so;
+	t_img		tex_we;
+	t_img		tex_ea;
+	t_img		tex_ce;
+	t_img		tex_fl;
+	int			ceil_height;
+	int			floor_height;
+	int			is_wall;
+}	t_tile;
+
 typedef struct s_map
 {
 	char		**matrix;
 	int			len;
 	int			wid;
-	t_img		img_no;
-	t_img		img_so;
-	t_img		img_we;
-	t_img		img_ea;
-	t_col		floor;
-	t_col		ceiling;
+	t_tile		*tiles[256];
 	t_player	player;
 	t_point		mini_map;
 	int			mini_map_scale;
@@ -172,16 +181,14 @@ typedef struct s_thread_draw
 t_data	*get_data(void);
 t_map	*get_map(void);
 t_map	*load_map(int ac, char **av);
-void	retrieve_map_info(t_map *map, int map_fd, int *err);
-int		ft_atoi_err(char *arg, int *index);
-int		has_all_info(t_map *map);
 int		clean_map(void);
 int		clean_data(void);
-void	print_missing_info(t_map *map);
-t_img	get_path(char *line, int *err);
-t_col	get_color(char *line, int *err);
-void	add_link(t_list **lst, char *content);
-void	retrieve_map_grid(t_map *map, int map_fd, int *err);
+
+t_tile	*new_tile(void);
+char	*retrieve_tile_dict(t_map *map, int map_fd, int *err);
+void	retrieve_tile(t_map *map, int map_fd, char *line, int *err);
+void	retrieve_texture(t_img *texture, char *arg, int *err, char *id);
+int		is_dict_full(t_map *map);
 
 void	loop(void);
 int		mlx_close(t_data *data);
