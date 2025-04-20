@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/20 11:42:43 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/20 11:51:28 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,8 +79,8 @@ typedef struct s_img
 	int		height;
 }	t_img;
 
-# define MOVE_SPEED 0.04
-# define ROT_SPEED 1
+# define MOVE_SPEED 0.04f
+# define ROT_SPEED 0.2f
 
 typedef struct s_player
 {
@@ -111,7 +111,7 @@ typedef struct s_events
 	int		mo_b;
 	int		mo_l;
 	int		mo_r;
-	float	rot;
+	int		rot;
 	int		echap;
 }	t_event;
 
