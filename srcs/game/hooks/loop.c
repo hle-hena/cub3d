@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 21:49:44 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/15 23:07:35 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/20 11:13:05 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,39 +38,54 @@ void	move_event(t_data *data)
 	{
 		delta.x = (delta.x / len) * MOVE_SPEED;
 		delta.y = (delta.y / len) * MOVE_SPEED;
-		if (data->map->matrix[(int)(data->map->player.y)][(int)(data->map->player.x + delta.x)] != '1')
+		int wall_x = (int)(data->map->player.x + delta.x);
+		int wall_y = (int)(data->map->player.y + delta.y);
+		if (data->map->matrix[(int)data->map->player.y][wall_x] != '1')
 			data->map->player.x += delta.x;
-		if (data->map->matrix[(int)(data->map->player.y + delta.y)][(int)(data->map->player.x)] != '1')
+		else
+		{
+			if (delta.x > 0)
+				data->map->player.x = wall_x - 0.01f;
+			else if (delta.x < 0)
+				data->map->player.x = wall_x + 1.01f;
+		}
+		if (data->map->matrix[wall_y][(int)data->map->player.x] != '1')
 			data->map->player.y += delta.y;
+		else
+		{
+			if (delta.y > 0)
+				data->map->player.y = wall_y - 0.01f;
+			else if (delta.y < 0)
+				data->map->player.y = wall_y + 1.01f;
+		}
 	}
 }
 
 int	event_loop(t_data *data)
 {
-	    static struct timeval last_time = {0, 0};
-    struct timeval current_time;
-    double elapsed_time;
-    static int frame_count = 0;
-    static double fps = 0;
+	static struct timeval last_time = {0, 0};
+	struct timeval current_time;
+	double elapsed_time;
+	static int frame_count = 0;
+	static double fps = 0;
 
-    // Get current time
-    gettimeofday(&current_time, NULL);
-    
-    // Calculate elapsed time in seconds
-    elapsed_time = (current_time.tv_sec - last_time.tv_sec) + 
-                   (current_time.tv_usec - last_time.tv_usec) / 1000000.0;
-
-    // Update FPS every second
-    frame_count++;
-    if (elapsed_time >= 1.0) {
-        fps = frame_count / elapsed_time;
-        printf("\rFPS: %.2f", fps);  // Print FPS to the terminal, overwrite previous value
-        fflush(stdout);  // Ensure it updates immediately
-        frame_count = 0;
-        last_time = current_time;
-    }
+	// Get current time
+	gettimeofday(&current_time, NULL);
 	
-	bzero_img(data);
+	// Calculate elapsed time in seconds
+	elapsed_time = (current_time.tv_sec - last_time.tv_sec) + 
+				(current_time.tv_usec - last_time.tv_usec) / 1000000.0;
+
+	// Update FPS every second
+	frame_count++;
+	if (elapsed_time >= 1.0) {
+		fps = frame_count / elapsed_time;
+		printf("\rFPS: %.2f", fps);  // Print FPS to the terminal, overwrite previous value
+		fflush(stdout);  // Ensure it updates immediately
+		frame_count = 0;
+		last_time = current_time;
+	}
+
 	move_event(data);
 	cast_rays(data);
 	draw_mini_map(data);
