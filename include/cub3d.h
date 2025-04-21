@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/20 22:09:58 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/21 19:41:49 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,6 +106,8 @@ typedef	struct s_tile
 typedef struct s_map
 {
 	char		**matrix;
+	char		void_char;
+	char		replace_tile;
 	int			len;
 	int			wid;
 	t_tile		*tiles[256];
@@ -187,8 +189,14 @@ int		clean_data(void);
 t_tile	*new_tile(void);
 char	*retrieve_tile_dict(t_map *map, int map_fd, int *err);
 void	retrieve_tile(t_map *map, int map_fd, char *line, int *err);
+void	retrieve_value(int *value, char *arg, int *err, char *id);
 void	retrieve_texture(t_img *texture, char *arg, int *err, char *id);
-int		is_dict_full(t_map *map);
+void	retrieve_player(t_map *map, char *line, int *err);
+int		is_dict_full(t_map *map, int err);
+void	retrieve_map(t_map *map, char *line, int map_fd, int *err);
+int		is_map_valid(t_map *map, int err);
+
+void	add_link(t_list **lst, char *content);
 
 void	loop(void);
 int		mlx_close(t_data *data);
@@ -216,5 +224,12 @@ int		point_is_in_mini_map(t_data *data, t_point point);
 t_hit	raycast(t_data *data, t_vec dir, t_player player);
 void	draw_line_in_direction(t_data *data, t_point start, t_vec dir,
 	float dist);
+
+
+
+
+
+
+void	print_dict(t_data *data);
 
 #endif

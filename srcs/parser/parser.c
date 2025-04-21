@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:16:19 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/20 22:09:39 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/21 19:52:14 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,12 +49,15 @@ t_map	*load_map(int ac, char **av)
 	map_fd = get_map_fd(av[1]);
 	map = get_map();
 	ft_memset(map->tiles, 0, sizeof(map->tiles));
+	map->void_char = ' ';
+	map->replace_tile = map->void_char;
+	map->player.y = -1;
 	temp = retrieve_tile_dict(map, map_fd, &err);
-	ft_del((void **)&temp);
-	if (err)
-		return (clean_map(), NULL);
-	if (is_dict_full(map))
-		return (clean_map(), NULL);
+	if (is_dict_full(map, err))
+		return (NULL);
+	retrieve_map(map, temp, map_fd, &err);
+	if (is_map_valid(map, err))
+		return (NULL);
 	map->player.x += 0.5;
 	map->player.y += 0.5;
 	return (close(map_fd), map);

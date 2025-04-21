@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:05:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/20 21:30:18 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/21 19:50:42 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,20 +42,6 @@ void	init_utils(t_data *data)
 	data->hits = malloc(data->win_wid * sizeof(t_hit));
 	if (!data->hits)
 		ft_perror(-1, "cub3d: Internal error: malloc.", clean_data());
-}
-
-void	print_dict(t_data *data)
-{
-	size_t	i;
-	
-	i = -1;
-	while (++i < 256)
-	{
-		if (data->map->tiles[i])
-		{
-			printf("Id : %c\n", (char)i);
-		}
-	}
 }
 
 int	main(int ac, char **av)

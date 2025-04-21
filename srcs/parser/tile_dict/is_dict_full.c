@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 21:54:54 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/20 22:11:09 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/21 19:46:34 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,13 +40,50 @@ void	is_text_missing(void *img, char *identifier, int id, int *missing)
 	}
 }
 
-int	is_dict_full(t_map *map)
+void	fill_preset(t_map *map)
+{
+	t_tile	*tile;
+
+	tile = map->tiles['0'];
+	if (tile)
+	{
+		if (tile->ceil_height == -1)
+			tile->ceil_height = 100;
+		if (tile->floor_height == -1)
+			tile->floor_height = 0;
+		if (tile->is_wall == -1)
+			tile->is_wall = 0;
+	}
+	tile = map->tiles['1'];
+	if (tile)
+	{
+		if (tile->ceil_height == -1)
+			tile->ceil_height = 100;
+		if (tile->floor_height == -1)
+			tile->floor_height = 0;
+		if (tile->is_wall == -1)
+			tile->is_wall = 1;
+	}
+}
+
+int	is_replace_tile_missing(t_map *map)
+{
+	if (map->replace_tile == map->void_char)
+		return (ft_perror(-1, "Map is missing the player replace tile.\nYou \
+should add something like 'P=0' before starting the map.", 0), 1);
+	return (0);
+}
+
+int	is_dict_full(t_map *map, int err)
 {
 	size_t	i;
 	int		missing;
 
+	if (err || is_replace_tile_missing(map))
+		return (1);
 	i = -1;
 	missing = 0;
+	fill_preset(map);
 	while (++i < 256)
 	{
 		if (map->tiles[i])

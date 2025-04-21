@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:17:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/20 21:32:50 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/21 19:51:10 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,8 @@ int	clean_map(void)
 	int		i;
 
 	map = get_map();
+	if (!map)
+		return (0);
 	data = get_data();
 	i = -1;
 	while (++i < 256)
