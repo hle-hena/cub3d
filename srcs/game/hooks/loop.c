@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 21:49:44 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/20 11:47:56 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/22 12:56:57 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void	move_event(t_data *data)
 		delta.y = (delta.y / len) * MOVE_SPEED;
 		int wall_x = (int)(data->map->player.x + delta.x);
 		int wall_y = (int)(data->map->player.y + delta.y);
-		if (data->map->matrix[(int)data->map->player.y][wall_x] != '1')
+		if (!data->map->tiles[(int)data->map->matrix[(int)data->map->player.y][wall_x]]->is_wall)
 			data->map->player.x += delta.x;
 		else
 		{
@@ -52,7 +52,7 @@ void	move_event(t_data *data)
 			else if (delta.x < 0)
 				data->map->player.x = wall_x + 1.01f;
 		}
-		if (data->map->matrix[wall_y][(int)data->map->player.x] != '1')
+		if (!data->map->tiles[(int)data->map->matrix[wall_y][(int)data->map->player.x]]->is_wall)
 			data->map->player.y += delta.y;
 		else
 		{
