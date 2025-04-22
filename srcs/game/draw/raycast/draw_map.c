@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/22 15:21:55 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/22 16:25:45 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,48 +21,62 @@
 
 void	draw_ceil(t_data *data, t_point curr, char *img)
 {
-	float cam_x = 2.0f * curr.x / data->win_wid - 1.0f;
-	t_vec ray_dir = {
-		data->cam.dir.x + data->cam.plane.x * cam_x,
-		data->cam.dir.y + data->cam.plane.y * cam_x,
-		0
-	};
-
+	float ray_dir_x0 = data->cam.dir.x - data->cam.plane.x;
+	float ray_dir_y0 = data->cam.dir.y - data->cam.plane.y;
+	float ray_dir_x1 = data->cam.dir.x + data->cam.plane.x;
+	float ray_dir_y1 = data->cam.dir.y + data->cam.plane.y;
 	int p = data->win_len / 2 - curr.y;
-	if (p == 0) p = 1;
-
-	float dist = data->win_len / (2.0f * p);
-
-	float world_x = data->map->player.x + ray_dir.x * dist;
-	float world_y = data->map->player.y + ray_dir.y * dist;
-
-	// Map tile:
-	int tile_x = (int)world_x;
-	int tile_y = (int)world_y;
-	*(int *)img = *(int *)(data->map->tiles[(int)data->map->matrix[tile_y][tile_x]]->tex_ce.data);
+	if (p == 0)
+		p = 1;
+	float row_distance = (float)data->win_len / (2.0f * p);
+	float step_x = row_distance * (ray_dir_x1 - ray_dir_x0) / data->win_wid;
+	float step_y = row_distance * (ray_dir_y1 - ray_dir_y0) / data->win_wid;
+	float floor_x = data->map->player.x + row_distance * ray_dir_x0 + step_x * curr.x;
+	float floor_y = data->map->player.y + row_distance * ray_dir_y0 + step_y * curr.x;
+	int tile_x = (int)floor_x;
+	int tile_y = (int)floor_y;
+	t_tile	*tile = data->map->tiles[(int)data->map->matrix[tile_y][tile_x]];
+	t_img	*tex = &tile->tex_ce;
+	float tex_f_x = floor_x - tile_x;
+	float tex_f_y = floor_y - tile_y;
+	int tex_x = (int)(tex_f_x * tex->width);
+	int tex_y = (int)(tex_f_y * tex->height);
+	if (tex_x < 0) tex_x = 0;
+	if (tex_y < 0) tex_y = 0;
+	if (tex_x >= tex->width) tex_x = tex->width - 1;
+	if (tex_y >= tex->height) tex_y = tex->height - 1;
+	char *src = tex->data + tex_y * tex->size_line + tex_x * tex->bpp;
+	*(int *)img = *(int *)src;
 }
 
 void	draw_floor(t_data *data, t_point curr, char *img)
 {
-	float cam_x = 2.0f * curr.x / data->win_wid - 1.0f;
-	t_vec ray_dir = {
-		data->cam.dir.x + data->cam.plane.x * cam_x,
-		data->cam.dir.y + data->cam.plane.y * cam_x,
-		0
-	};
-
+	float ray_dir_x0 = data->cam.dir.x - data->cam.plane.x;
+	float ray_dir_y0 = data->cam.dir.y - data->cam.plane.y;
+	float ray_dir_x1 = data->cam.dir.x + data->cam.plane.x;
+	float ray_dir_y1 = data->cam.dir.y + data->cam.plane.y;
 	int p = curr.y - data->win_len / 2;
-	if (p == 0) p = 1;
-
-	float dist = data->win_len / (2.0f * p);
-
-	float world_x = data->map->player.x + ray_dir.x * dist;
-	float world_y = data->map->player.y + ray_dir.y * dist;
-
-	// Map tile:
-	int tile_x = (int)world_x;
-	int tile_y = (int)world_y;
-	*(int *)img = *(int *)(data->map->tiles[(int)data->map->matrix[tile_y][tile_x]]->tex_ce.data);
+	if (p == 0)
+		p = 1;
+	float row_distance = (float)data->win_len / (2.0f * p);
+	float step_x = row_distance * (ray_dir_x1 - ray_dir_x0) / data->win_wid;
+	float step_y = row_distance * (ray_dir_y1 - ray_dir_y0) / data->win_wid;
+	float floor_x = data->map->player.x + row_distance * ray_dir_x0 + step_x * curr.x;
+	float floor_y = data->map->player.y + row_distance * ray_dir_y0 + step_y * curr.x;
+	int tile_x = (int)floor_x;
+	int tile_y = (int)floor_y;
+	t_tile	*tile = data->map->tiles[(int)data->map->matrix[tile_y][tile_x]];
+	t_img	*tex = &tile->tex_fl;
+	float tex_f_x = floor_x - tile_x;
+	float tex_f_y = floor_y - tile_y;
+	int tex_x = (int)(tex_f_x * tex->width);
+	int tex_y = (int)(tex_f_y * tex->height);
+	if (tex_x < 0) tex_x = 0;
+	if (tex_y < 0) tex_y = 0;
+	if (tex_x >= tex->width) tex_x = tex->width - 1;
+	if (tex_y >= tex->height) tex_y = tex->height - 1;
+	char *src = tex->data + tex_y * tex->size_line + tex_x * tex->bpp;
+	*(int *)img = *(int *)src;
 }
 
 void	*draw_walls_thread(void *arg)
