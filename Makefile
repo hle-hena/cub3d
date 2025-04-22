@@ -15,9 +15,9 @@ SRCS = $(addprefix srcs/, \
 	$(addprefix clean/, clean_data.c clean_map.c)\
 	$(addprefix utils/, add_link.c)\
 	$(addprefix parser/, parser.c\
-		$(addprefix tile_dict/, is_dict_full.c retrieve_player.c \
-			retrieve_texture.c retrieve_tile_dict.c retrieve_tile_info.c \
-			retrieve_value.c)\
+		$(addprefix tile_dict/, is_dict_full.c retrieve_lonely.c \
+			retrieve_player.c retrieve_texture.c retrieve_tile_dict.c \
+			retrieve_tile_info.c retrieve_value.c)\
 		$(addprefix map/, is_map_valid.c retrieve_map.c)\
 	)\
 	$(addprefix mlx_utils/, color.c)\

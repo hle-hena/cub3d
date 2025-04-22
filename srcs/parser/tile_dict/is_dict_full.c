@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 21:54:54 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/21 19:46:34 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/22 10:50:19 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,12 +66,17 @@ void	fill_preset(t_map *map)
 	}
 }
 
-int	is_replace_tile_missing(t_map *map)
+void	is_replace_tile_missing(t_map *map, int *missing)
 {
+	if (*missing)
+		return ;
 	if (map->replace_tile == map->void_char)
 		return (ft_perror(-1, "Map is missing the player replace tile.\nYou \
-should add something like 'P=0' before starting the map.", 0), 1);
-	return (0);
+should add something like 'P=0' before starting the map.", 0), *missing = 1,
+			VOID);
+	if (map->tiles[(int)map->replace_tile]->is_wall)
+		return (ft_perror(-1, "The player replace tile should not be a wall \
+tile.", 0), *missing = 1, VOID);
 }
 
 int	is_dict_full(t_map *map, int err)
@@ -79,7 +84,7 @@ int	is_dict_full(t_map *map, int err)
 	size_t	i;
 	int		missing;
 
-	if (err || is_replace_tile_missing(map))
+	if (err)
 		return (1);
 	i = -1;
 	missing = 0;
@@ -99,5 +104,6 @@ int	is_dict_full(t_map *map, int err)
 			is_value_missing(map->tiles[i]->is_wall, "W", i, &missing);
 		}
 	}
+	is_replace_tile_missing(map, &missing);
 	return (missing);
 }

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:16:19 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/21 19:52:14 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/22 10:35:26 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ int	get_map_fd(char *map_name)
 		ft_perror(1, "Invalid usage. File name should be .cub", clean_data());
 	map_fd = open(map_name, O_RDONLY, 0777);
 	if (map_fd == -1)
-		ft_perror(1, "Map not found.", clean_data());
+		ft_perror(1, "File not found.", clean_data());
 	return (map_fd);
 }
 
@@ -54,7 +54,7 @@ t_map	*load_map(int ac, char **av)
 	map->player.y = -1;
 	temp = retrieve_tile_dict(map, map_fd, &err);
 	if (is_dict_full(map, err))
-		return (NULL);
+		return (ft_del((void **)&temp), NULL);
 	retrieve_map(map, temp, map_fd, &err);
 	if (is_map_valid(map, err))
 		return (NULL);

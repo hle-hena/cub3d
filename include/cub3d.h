@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/21 19:41:49 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/22 10:41:35 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,6 +194,7 @@ void	retrieve_texture(t_img *texture, char *arg, int *err, char *id);
 void	retrieve_player(t_map *map, char *line, int *err);
 int		is_dict_full(t_map *map, int err);
 void	retrieve_map(t_map *map, char *line, int map_fd, int *err);
+int		retrieve_lonely(t_map *map, char *line, int *err);
 int		is_map_valid(t_map *map, int err);
 
 void	add_link(t_list **lst, char *content);
