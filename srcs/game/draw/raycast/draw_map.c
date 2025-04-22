@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/22 12:44:02 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/22 15:21:55 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,52 @@
 	// clock_gettime(CLOCK_MONOTONIC, &end);
 	// long ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
 	// printf("Took %ldns\n", ms);
+
+void	draw_ceil(t_data *data, t_point curr, char *img)
+{
+	float cam_x = 2.0f * curr.x / data->win_wid - 1.0f;
+	t_vec ray_dir = {
+		data->cam.dir.x + data->cam.plane.x * cam_x,
+		data->cam.dir.y + data->cam.plane.y * cam_x,
+		0
+	};
+
+	int p = data->win_len / 2 - curr.y;
+	if (p == 0) p = 1;
+
+	float dist = data->win_len / (2.0f * p);
+
+	float world_x = data->map->player.x + ray_dir.x * dist;
+	float world_y = data->map->player.y + ray_dir.y * dist;
+
+	// Map tile:
+	int tile_x = (int)world_x;
+	int tile_y = (int)world_y;
+	*(int *)img = *(int *)(data->map->tiles[(int)data->map->matrix[tile_y][tile_x]]->tex_ce.data);
+}
+
+void	draw_floor(t_data *data, t_point curr, char *img)
+{
+	float cam_x = 2.0f * curr.x / data->win_wid - 1.0f;
+	t_vec ray_dir = {
+		data->cam.dir.x + data->cam.plane.x * cam_x,
+		data->cam.dir.y + data->cam.plane.y * cam_x,
+		0
+	};
+
+	int p = curr.y - data->win_len / 2;
+	if (p == 0) p = 1;
+
+	float dist = data->win_len / (2.0f * p);
+
+	float world_x = data->map->player.x + ray_dir.x * dist;
+	float world_y = data->map->player.y + ray_dir.y * dist;
+
+	// Map tile:
+	int tile_x = (int)world_x;
+	int tile_y = (int)world_y;
+	*(int *)img = *(int *)(data->map->tiles[(int)data->map->matrix[tile_y][tile_x]]->tex_ce.data);
+}
 
 void	*draw_walls_thread(void *arg)
 {
@@ -44,9 +90,9 @@ void	*draw_walls_thread(void *arg)
 				hit->tex_pos_fp += hit->step_fp;
 			}
 			else if (curr.y < hit->draw_start)
-				*(int *)img = *(int *)hit->ceil.data;
+				draw_ceil(data, curr, img);
 			else
-				*(int *)img = *(int *)hit->floor.data;
+				draw_floor(data, curr, img);
 			img += data->img.bpp;
 		}
 		img += td->add_next_line;
@@ -127,5 +173,6 @@ void cast_rays(t_data *data)
 		ray_dir.y = data->cam.dir.y + data->cam.plane.y * cam_x;
 		data->hits[x] = cast_ray(data, ray_dir);
 	}
+
 	draw_walls(data);
 }

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/22 11:40:37 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/22 15:23:36 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,8 +132,6 @@ typedef struct s_hit
 	t_vec	ray_hit;
 	t_vec	ray_dir;
 	t_img	texture;
-	t_img	ceil;
-	t_img	floor;
 	int		side;
 	int		draw_start;
 	int		draw_end;

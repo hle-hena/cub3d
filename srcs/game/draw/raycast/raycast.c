@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 18:51:23 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/22 11:29:07 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/22 15:23:47 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,6 @@ t_hit	hit_info(t_data *data, t_player player, t_ray ray, t_vec dir)
 		hit.texture = data->map->tiles[(int)data->map->matrix[ray.curr.y][ray.curr.x]]->tex_no;
 	else
 		hit.texture = data->map->tiles[(int)data->map->matrix[ray.curr.y][ray.curr.x]]->tex_so;
-	hit.ceil = data->map->tiles[(int)data->map->matrix[ray.curr.y][ray.curr.x]]->tex_ce;
-	hit.floor = data->map->tiles[(int)data->map->matrix[ray.curr.y][ray.curr.x]]->tex_fl;
 	hit.side = ray.side;
 	return (hit);
 }

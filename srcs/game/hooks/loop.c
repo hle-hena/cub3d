@@ -6,16 +6,11 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 21:49:44 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/22 12:56:57 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/22 15:07:00 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
-
-void	bzero_img(t_data *data)
-{
-	ft_bzero(data->img.data, data->win_len * data->win_wid * sizeof(int));
-}
 
 void	move_event(t_data *data)
 {
