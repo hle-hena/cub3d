@@ -20,17 +20,16 @@ SRCS = $(addprefix srcs/, \
 			retrieve_tile_info.c retrieve_value.c)\
 		$(addprefix map/, is_map_valid.c retrieve_map.c)\
 	)\
-	$(addprefix mlx_utils/, color.c)\
+	$(addprefix mlx_utils/, color.c loop.c put_pixel.c)\
+	$(addprefix game/, \
+		$(addprefix draw/, \
+			$(addprefix mini_map/, draw_circle.c draw_line.c draw_map.c draw_player.c draw_square.c)\
+			$(addprefix raycast/, draw_line.c draw_map.c raycast.c)\
+		)\
+		$(addprefix hooks/, key.c loop.c mouse.c)\
+	)\
 	main.c debug.c\
 )
-# $(addprefix mlx_utils/, color.c loop.c put_pixel.c)\
-# $(addprefix game/, \
-# 	$(addprefix draw/, \
-# 		$(addprefix mini_map/, draw_circle.c draw_line.c draw_map.c draw_player.c draw_square.c)\
-# 		$(addprefix raycast/, draw_line.c draw_map.c raycast.c)\
-# 	)\
-# 	$(addprefix hooks/, key.c loop.c mouse.c)\
-# )\
 
 OBJ = $(SRCS:.c=.o)
 
@@ -52,7 +51,7 @@ $(NAME): $(LIBFT) $(OBJ)
 	@echo "\n\033[2K\r\033[94mLinking $(NAME) 🗹\033[0m\n"
 	@echo "\033[2K\r\033[94mLinking mlx 🗹\033[0m\n"
 	@make -C mlx > /dev/null 2>&1
-	@$(CC) $(OBJ) $(FRAMEWORK) -o $(NAME) -L $(LIBFT_DIR) -lft -lreadline
+	@$(CC) $(OBJ) $(FRAMEWORK) -o $(NAME) -L $(LIBFT_DIR) -lft
 	@len=$$(echo -n "$(NAME)" | wc -c); \
 	border=$$(printf '=%.0s' $$(seq 1 $$((len + 36)))); \
 	echo "\n\033[94m|$$border|\033[0m"; \

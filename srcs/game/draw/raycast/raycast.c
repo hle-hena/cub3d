@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 18:51:23 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/13 22:51:17 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/22 11:29:07 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,16 +19,18 @@ t_hit	hit_info(t_data *data, t_player player, t_ray ray, t_vec dir)
 		hit.dist = (ray.curr.x - player.x + (1 - ray.step.x) / 2.0f) / dir.x;
 	else
 		hit.dist = (ray.curr.y - player.y + (1 - ray.step.y) / 2.0f) / dir.y;
-	if (ray.side == 0 && ray.step.x == 1)
-		hit.texture = data->map->img_ea;
-	else if (ray.side == 0)
-		hit.texture = data->map->img_we;
-	else if (ray.step.y == 1)
-		hit.texture = data->map->img_no;
-	else
-		hit.texture = data->map->img_so;
 	hit.ray_hit.x = player.x + dir.x * hit.dist;
 	hit.ray_hit.y = player.y + dir.y * hit.dist;
+	if (ray.side == 0 && ray.step.x == 1)
+		hit.texture = data->map->tiles[(int)data->map->matrix[ray.curr.y][ray.curr.x]]->tex_ea;
+	else if (ray.side == 0)
+		hit.texture = data->map->tiles[(int)data->map->matrix[ray.curr.y][ray.curr.x]]->tex_we;
+	else if (ray.step.y == 1)
+		hit.texture = data->map->tiles[(int)data->map->matrix[ray.curr.y][ray.curr.x]]->tex_no;
+	else
+		hit.texture = data->map->tiles[(int)data->map->matrix[ray.curr.y][ray.curr.x]]->tex_so;
+	hit.ceil = data->map->tiles[(int)data->map->matrix[ray.curr.y][ray.curr.x]]->tex_ce;
+	hit.floor = data->map->tiles[(int)data->map->matrix[ray.curr.y][ray.curr.x]]->tex_fl;
 	hit.side = ray.side;
 	return (hit);
 }
@@ -75,7 +77,7 @@ t_hit	raycast(t_data *data, t_vec dir, t_player player)
 			ray.curr.y += ray.step.y;
 			ray.side = 1;
 		}
-		if (data->map->matrix[ray.curr.y][ray.curr.x] == '1')
+		if (data->map->tiles[(int)data->map->matrix[ray.curr.y][ray.curr.x]]->is_wall)
 			return (hit_info(data, player, ray, dir));
 	}
 }

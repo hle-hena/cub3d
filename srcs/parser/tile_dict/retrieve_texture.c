@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 18:13:11 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/20 20:16:03 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/22 11:53:21 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,9 @@ void	retrieve_texture_color(t_img *img, char *line, int *err)
 	int		i;
 
 	i = 0;
+	if (ft_strnstr(line, ".xpm", ft_strlen(line)))
+		return (ft_perror(-1, "Assets should be in a subfolder.", 0), *err = 1,
+			VOID);
 	color.re = ft_atoi_err(line, &i);
 	if (color.re == -1 || line[i] != ',')
 		return (ft_perror(-1, ft_strsjoin((char *[]){"Expected a positive numbe\

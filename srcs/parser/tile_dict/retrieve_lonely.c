@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 10:37:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/22 10:41:20 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/22 11:50:12 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,10 @@ int	retrieve_lonely(t_map *map, char *line, int *err)
 		map->tiles['0'] = new_tile();
 	if (!map->tiles['1'] || !map->tiles['0'])
 		return (ft_perror(-1, "Internal error: malloc.", 0), *err = 1, 0);
-	lonely_type_switch(map, line, err, '0');
-	return (lonely_type_switch(map, line, err, '1'));
+	if (lonely_type_switch(map, line, err, '0'))
+		return (1);
+	if (*err)
+		return (0);
+	lonely_type_switch(map, line, err, '1');
+	return (0);
 }

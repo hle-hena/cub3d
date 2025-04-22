@@ -19,9 +19,6 @@ P=Z
 C textures/matrix.xpm
 F textures/matrix.xpm
 
-1 {
-	W 0
-}
 
 1111111     1111111
 1ZZZZZ1     1ZZZZ1
