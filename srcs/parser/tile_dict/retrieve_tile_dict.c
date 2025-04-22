@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 12:34:15 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/22 10:38:16 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/22 10:59:29 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ char	*retrieve_tile_dict(t_map *map, int map_fd, int *err)
 	{
 		temp = get_next_line(map_fd);
 		if (!temp)
-			return (ft_perror(-1, "The map is empty.", 0), *err = 1, NULL);
+			return (NULL);
 		line = ft_strtrim(temp, "\t\n ");
 		ft_del((void **)&temp);
 		if (!line)

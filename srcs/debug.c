@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 15:18:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/21 19:21:10 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/22 11:09:48 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,26 @@ void	writeBMP(const char *filename, const unsigned char *data, int width, int he
 	fclose(f);
 }
 
+void	print_map(t_data *data)
+{
+	int	y;
+
+	y = -1;
+	printf("Map is :\n");
+	printf("\t.");
+	for (int i = 0; i < data->map->wid + 2; i++)
+		printf("-");
+	printf(".\n");
+	printf("\t| %*s |\n", data->map->wid, "");
+	while (++y < data->map->len)
+		printf("\t| %*s |\n", data->map->wid, data->map->matrix[y]);
+	printf("\t| %*s |\n", data->map->wid, "");
+	printf("\t*");
+	for (int i = 0; i < data->map->wid + 2; i++)
+		printf("-");
+	printf("*\n");
+}
+
 #define EXPORT_TEXTURE(tex, label, id_char)                                       \
 	do {                                                                          \
 		if ((tex).img) {                                                          \
@@ -84,12 +104,13 @@ void	print_dict(t_data *data)
 
 	make_dir_if_needed("print");
 	i = -1;
+	printf("Tiles in map are :\n");
 	while (++i < 256)
 	{
 		tile = data->map->tiles[i];
 		if (tile)
 		{
-			printf("Id : %c\n", (char)i);
+			printf("\tId : %c\n", (char)i);
 			EXPORT_TEXTURE(tile->tex_no, "tex_no", (char)i);
 			EXPORT_TEXTURE(tile->tex_so, "tex_so", (char)i);
 			EXPORT_TEXTURE(tile->tex_we, "tex_we", (char)i);
@@ -98,4 +119,6 @@ void	print_dict(t_data *data)
 			EXPORT_TEXTURE(tile->tex_fl, "tex_fl", (char)i);
 		}
 	}
+	printf("\nYou can look them up at print/id/name_of_texture.bmp !\n\n");
+	print_map(data);
 }
