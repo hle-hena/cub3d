@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/22 16:25:45 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/23 11:41:37 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,65 +19,50 @@
 	// long ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
 	// printf("Took %ldns\n", ms);
 
-void	draw_ceil(t_data *data, t_point curr, char *img)
+void	draw_ceil(t_data *data, t_point curr, t_rdir ray_dir, char *img)
 {
-	float ray_dir_x0 = data->cam.dir.x - data->cam.plane.x;
-	float ray_dir_y0 = data->cam.dir.y - data->cam.plane.y;
-	float ray_dir_x1 = data->cam.dir.x + data->cam.plane.x;
-	float ray_dir_y1 = data->cam.dir.y + data->cam.plane.y;
-	int p = data->win_len / 2 - curr.y;
-	if (p == 0)
-		p = 1;
-	float row_distance = (float)data->win_len / (2.0f * p);
-	float step_x = row_distance * (ray_dir_x1 - ray_dir_x0) / data->win_wid;
-	float step_y = row_distance * (ray_dir_y1 - ray_dir_y0) / data->win_wid;
-	float floor_x = data->map->player.x + row_distance * ray_dir_x0 + step_x * curr.x;
-	float floor_y = data->map->player.y + row_distance * ray_dir_y0 + step_y * curr.x;
-	int tile_x = (int)floor_x;
-	int tile_y = (int)floor_y;
-	t_tile	*tile = data->map->tiles[(int)data->map->matrix[tile_y][tile_x]];
-	t_img	*tex = &tile->tex_ce;
-	float tex_f_x = floor_x - tile_x;
-	float tex_f_y = floor_y - tile_y;
-	int tex_x = (int)(tex_f_x * tex->width);
-	int tex_y = (int)(tex_f_y * tex->height);
-	if (tex_x < 0) tex_x = 0;
-	if (tex_y < 0) tex_y = 0;
-	if (tex_x >= tex->width) tex_x = tex->width - 1;
-	if (tex_y >= tex->height) tex_y = tex->height - 1;
-	char *src = tex->data + tex_y * tex->size_line + tex_x * tex->bpp;
-	*(int *)img = *(int *)src;
+	float	row_dist;
+	float	cam_x;
+	t_vec	world;
+	t_point	pix;
+	t_img	tex;
+
+	row_dist = (float)data->win_len / (2.0f * (data->win_len / 2 - curr.y));
+	cam_x = (float)curr.x / data->win_wid;
+	world.x = data->map->player.x + row_dist * (ray_dir.left.x + cam_x * (ray_dir.right.x - ray_dir.left.x));
+	world.y = data->map->player.y + row_dist * (ray_dir.left.y + cam_x * (ray_dir.right.y - ray_dir.left.y));
+	tex = data->map->tiles[(int)data->map->matrix[(int)world.y][(int)world.x]]->tex_ce;
+	pix.x = (int)((world.x - (int)world.x) * tex.width);
+	pix.y = (int)((world.y - (int)world.y) * tex.height);
+	if ((unsigned)pix.x >= (unsigned)tex.width)
+		pix.x = tex.width - 1;
+	if ((unsigned)pix.y >= (unsigned)tex.height)
+		pix.y = tex.height - 1;
+	*(int *)img = *(int *)(tex.data + pix.y * tex.size_line + pix.x * tex.bpp);
 }
 
-void	draw_floor(t_data *data, t_point curr, char *img)
+void draw_floor(t_data *data, t_point curr, t_rdir ray_dir, char *img)
 {
-	float ray_dir_x0 = data->cam.dir.x - data->cam.plane.x;
-	float ray_dir_y0 = data->cam.dir.y - data->cam.plane.y;
-	float ray_dir_x1 = data->cam.dir.x + data->cam.plane.x;
-	float ray_dir_y1 = data->cam.dir.y + data->cam.plane.y;
-	int p = curr.y - data->win_len / 2;
-	if (p == 0)
-		p = 1;
-	float row_distance = (float)data->win_len / (2.0f * p);
-	float step_x = row_distance * (ray_dir_x1 - ray_dir_x0) / data->win_wid;
-	float step_y = row_distance * (ray_dir_y1 - ray_dir_y0) / data->win_wid;
-	float floor_x = data->map->player.x + row_distance * ray_dir_x0 + step_x * curr.x;
-	float floor_y = data->map->player.y + row_distance * ray_dir_y0 + step_y * curr.x;
-	int tile_x = (int)floor_x;
-	int tile_y = (int)floor_y;
-	t_tile	*tile = data->map->tiles[(int)data->map->matrix[tile_y][tile_x]];
-	t_img	*tex = &tile->tex_fl;
-	float tex_f_x = floor_x - tile_x;
-	float tex_f_y = floor_y - tile_y;
-	int tex_x = (int)(tex_f_x * tex->width);
-	int tex_y = (int)(tex_f_y * tex->height);
-	if (tex_x < 0) tex_x = 0;
-	if (tex_y < 0) tex_y = 0;
-	if (tex_x >= tex->width) tex_x = tex->width - 1;
-	if (tex_y >= tex->height) tex_y = tex->height - 1;
-	char *src = tex->data + tex_y * tex->size_line + tex_x * tex->bpp;
-	*(int *)img = *(int *)src;
+	float	row_dist;
+	float	cam_x;
+	t_vec	world;
+	t_point	pix;
+	t_img	tex;
+
+	row_dist = (float)data->win_len / (2.0f * (curr.y - data->win_len / 2));
+	cam_x = (float)curr.x / data->win_wid;
+	world.x = data->map->player.x + row_dist * (ray_dir.left.x + cam_x * (ray_dir.right.x - ray_dir.left.x));
+	world.y = data->map->player.y + row_dist * (ray_dir.left.y + cam_x * (ray_dir.right.y - ray_dir.left.y));
+	tex = data->map->tiles[(int)data->map->matrix[(int)world.y][(int)world.x]]->tex_fl;
+	pix.x = (int)((world.x - (int)world.x) * tex.width);
+	pix.y = (int)((world.y - (int)world.y) * tex.height);
+	if ((unsigned)pix.x >= (unsigned)tex.width)
+		pix.x = tex.width - 1;
+	if ((unsigned)pix.y >= (unsigned)tex.height)
+		pix.y = tex.height - 1;
+	*(int *)img = *(int *)(tex.data + pix.y * tex.size_line + pix.x * tex.bpp);
 }
+
 
 void	*draw_walls_thread(void *arg)
 {
@@ -104,9 +89,11 @@ void	*draw_walls_thread(void *arg)
 				hit->tex_pos_fp += hit->step_fp;
 			}
 			else if (curr.y < hit->draw_start)
-				draw_ceil(data, curr, img);
+				// *(int *)img = 0;
+				draw_ceil(data, curr, td->ray_dir, img);
 			else
-				draw_floor(data, curr, img);
+				// *(int *)img = 0;
+				draw_floor(data, curr, td->ray_dir, img);
 			img += data->img.bpp;
 		}
 		img += td->add_next_line;
@@ -118,17 +105,23 @@ void	draw_walls(t_data *data)
 {
 	pthread_t	threads[DRAW_THREADS];
 	t_th_draw	td[DRAW_THREADS];
+	t_rdir		ray_dir;
 	int			slice;
 	int			i;
 
 	slice = data->win_wid / DRAW_THREADS;
 	i = -1;
+	ray_dir.left.x = data->cam.dir.x - data->cam.plane.x;
+	ray_dir.left.y = data->cam.dir.y - data->cam.plane.y;
+	ray_dir.right.x = data->cam.dir.x + data->cam.plane.x;
+	ray_dir.right.y = data->cam.dir.y + data->cam.plane.y;
 	while (++i < DRAW_THREADS)
 	{
 		td[i].data = data;
 		td[i].start_x = i * slice;
 		td[i].end_x = (i == DRAW_THREADS - 1) ? data->win_wid : (i + 1) * slice;
 		td[i].add_next_line = (td[i].start_x + data->win_wid - td[i].end_x) * data->img.bpp;
+		td[i].ray_dir = ray_dir;
 		pthread_create(&threads[i], NULL, draw_walls_thread, &td[i]);
 	}
 	i = -1;
@@ -175,6 +168,9 @@ void cast_rays(t_data *data)
 	t_vec	ray_dir;
 	float	look_dir;
 
+	struct timespec start, end;
+	clock_gettime(CLOCK_MONOTONIC, &start);
+	// CODE TO BENCHMARK
 	look_dir = (float)data->map->player.rot * PI / 180;
 	data->cam.dir = (t_vec){cos(look_dir), sin(look_dir), 0};
 	data->cam.plane = (t_vec){-sin(look_dir) * tan((float)(60 * PI / 180) / 2),
@@ -187,6 +183,13 @@ void cast_rays(t_data *data)
 		ray_dir.y = data->cam.dir.y + data->cam.plane.y * cam_x;
 		data->hits[x] = cast_ray(data, ray_dir);
 	}
+	clock_gettime(CLOCK_MONOTONIC, &end);
+	long ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
+	// printf("Raycast took %ldns\n", ms);
 
+	clock_gettime(CLOCK_MONOTONIC, &start);
 	draw_walls(data);
+	clock_gettime(CLOCK_MONOTONIC, &end);
+	ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
+	// printf("Draw took %ldns\n", ms);
 }

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/22 15:23:36 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/23 11:27:52 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,6 +150,12 @@ typedef struct s_ray
 	int		side;
 }	t_ray;
 
+typedef	struct s_ray_dir
+{
+	t_vec	left;
+	t_vec	right;
+}	t_rdir;
+
 typedef	struct s_cam
 {
 	t_vec	dir;
@@ -170,11 +176,12 @@ typedef struct s_data
 	t_event	event;
 }	t_data;
 
-# define DRAW_THREADS 8
+# define DRAW_THREADS 4
 
 typedef struct s_thread_draw
 {
 	t_data	*data;
+	t_rdir	ray_dir;
 	int		start_x;
 	int		end_x;
 	int		add_next_line;
