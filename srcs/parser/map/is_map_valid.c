@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 18:45:08 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/21 19:58:55 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/23 14:21:08 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	print_map_open(int x, int y)
 	ft_del((void **)&y_str);
 }
 
-int	check_neighbors(t_map *map, int x, int y)
+int	check_neighbors(t_map *map, t_tile **tiles, int x, int y)
 {
 	int	open;
 
@@ -33,27 +33,27 @@ int	check_neighbors(t_map *map, int x, int y)
 	if (x >= 1)
 	{
 		if (map->matrix[y][x - 1] != ' ')
-			open += !map->tiles[(int)map->matrix[y][x - 1]]->is_wall;
+			open += !tiles[(int)map->matrix[y][x - 1]]->is_wall;
 	}
 	if (x < map->wid - 2)
 	{
 		if (map->matrix[y][x + 1] != ' ')
-			open += !map->tiles[(int)map->matrix[y][x + 1]]->is_wall;
+			open += !tiles[(int)map->matrix[y][x + 1]]->is_wall;
 	}
 	if (y >= 1)
 	{
 		if (map->matrix[y - 1][x] != ' ')
-			open += !map->tiles[(int)map->matrix[y - 1][x]]->is_wall;
+			open += !tiles[(int)map->matrix[y - 1][x]]->is_wall;
 	}
 	if (y < map->len - 2)
 	{
 		if (map->matrix[y + 1][x] != ' ')
-			open += !map->tiles[(int)map->matrix[y + 1][x]]->is_wall;
+			open += !tiles[(int)map->matrix[y + 1][x]]->is_wall;
 	}
 	return (open);
 }
 
-int	is_map_valid(t_map *map, int err)
+int	is_map_valid(t_map *map, t_tile **tiles, int err)
 {
 	int	x;
 	int	y;
@@ -70,10 +70,10 @@ int	is_map_valid(t_map *map, int err)
 		{
 			if (map->matrix[y][x] == map->void_char)
 			{
-				if (check_neighbors(map, x, y))
+				if (check_neighbors(map, tiles, x, y))
 					return (print_map_open(x + 1, y + 1), 1);
 			} 
-			else if (map->tiles[(int)map->matrix[y][x]]->is_wall != 1 && (x == 0
+			else if (tiles[(int)map->matrix[y][x]]->is_wall != 1 && (x == 0
 					|| x == map->wid - 1 || y == 0 || y == map->len - 1))
 				return (print_map_open(x + 1, y + 1), 1);
 		}

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/23 13:57:57 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/23 16:00:11 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,17 +21,24 @@
 
 void	draw_ceil(t_data *data, t_point curr, t_rdir ray_dir, char *img)
 {
-	float	row_dist;
-	float	cam_x;
+	t_tile	*tile;
+	t_vec	cast;
 	t_vec	world;
 	t_point	pix;
 	t_img	*tex;
 
-	row_dist = (float)data->win_len / (2.0f * (data->win_len / 2 - curr.y));
-	cam_x = (float)curr.x / data->win_wid;
-	world.x = data->map->player.x + row_dist * (ray_dir.left.x + cam_x * (ray_dir.right.x - ray_dir.left.x));
-	world.y = data->map->player.y + row_dist * (ray_dir.left.y + cam_x * (ray_dir.right.y - ray_dir.left.y));
-	tex = data->map->tiles[(int)data->map->matrix[(int)world.y][(int)world.x]]->tex_ce;
+	cast = (*get_cast_table())[curr.y][curr.x];
+	world.x = data->map->player.x + cast.y * (ray_dir.left.x + cast.x
+			* (ray_dir.right.x - ray_dir.left.x));
+	world.y = data->map->player.y + cast.y * (ray_dir.left.y + cast.x
+			* (ray_dir.right.y - ray_dir.left.y));
+	if ((int)world.y < 0 || (int)world.y >= data->map->len || (int)world.x < 0
+		|| (int)world.x >= data->map->wid)
+		return ;
+	tile = get_tile_dict()[(int)data->map->matrix[(int)world.y][(int)world.x]];
+	if (!tile)
+		return ;
+	tex = tile->tex_ce;
 	pix.x = (int)((world.x - (int)world.x) * tex->width);
 	pix.y = (int)((world.y - (int)world.y) * tex->height);
 	if ((unsigned)pix.x >= (unsigned)tex->width)
@@ -43,17 +50,24 @@ void	draw_ceil(t_data *data, t_point curr, t_rdir ray_dir, char *img)
 
 void draw_floor(t_data *data, t_point curr, t_rdir ray_dir, char *img)
 {
-	float	row_dist;
-	float	cam_x;
+	t_tile	*tile;
+	t_vec	cast;
 	t_vec	world;
 	t_point	pix;
 	t_img	*tex;
 
-	row_dist = (float)data->win_len / (2.0f * (curr.y - data->win_len / 2));
-	cam_x = (float)curr.x / data->win_wid;
-	world.x = data->map->player.x + row_dist * (ray_dir.left.x + cam_x * (ray_dir.right.x - ray_dir.left.x));
-	world.y = data->map->player.y + row_dist * (ray_dir.left.y + cam_x * (ray_dir.right.y - ray_dir.left.y));
-	tex = data->map->tiles[(int)data->map->matrix[(int)world.y][(int)world.x]]->tex_fl;
+	cast = (*get_cast_table())[curr.y][curr.x];
+	world.x = data->map->player.x + cast.y * (ray_dir.left.x +
+		cast.x * ray_dir.right.x);
+	world.y = data->map->player.y + cast.y * (ray_dir.left.y +
+		cast.x * ray_dir.right.y);
+	if ((int)world.y < 0 || (int)world.y >= data->map->len || (int)world.x < 0
+		|| (int)world.x >= data->map->wid)
+		return ;
+	tile = get_tile_dict()[(int)data->map->matrix[(int)world.y][(int)world.x]];
+	if (!tile)
+		return ;
+	tex = tile->tex_fl;
 	pix.x = (int)((world.x - (int)world.x) * tex->width);
 	pix.y = (int)((world.y - (int)world.y) * tex->height);
 	if ((unsigned)pix.x >= (unsigned)tex->width)
@@ -89,11 +103,9 @@ void	*draw_walls_thread(void *arg)
 				hit->tex_pos_fp += hit->step_fp;
 			}
 			else if (curr.y < hit->draw_start)
-				*(int *)img = 0;
-				// draw_ceil(data, curr, td->ray_dir, img);
+				draw_ceil(data, curr, td->ray_dir, img);
 			else
-				*(int *)img = 0;
-				// draw_floor(data, curr, td->ray_dir, img);
+				draw_floor(data, curr, td->ray_dir, img);
 			img += data->img.bpp;
 		}
 		img += td->add_next_line;
@@ -114,7 +126,9 @@ void	draw_walls(t_data *data)
 	ray_dir.left.x = data->cam.dir.x - data->cam.plane.x;
 	ray_dir.left.y = data->cam.dir.y - data->cam.plane.y;
 	ray_dir.right.x = data->cam.dir.x + data->cam.plane.x;
+	ray_dir.right.x = ray_dir.right.x - ray_dir.left.x;
 	ray_dir.right.y = data->cam.dir.y + data->cam.plane.y;
+	ray_dir.right.y = ray_dir.right.y - ray_dir.left.y;
 	while (++i < DRAW_THREADS)
 	{
 		td[i].data = data;
@@ -142,7 +156,7 @@ t_hit cast_ray(t_data *data, t_vec ray_dir)
 	ray_hit.dist = ray_hit.dist * (ray_dir.x * data->cam.dir.x + ray_dir.y * data->cam.dir.y);
 	if (ray_hit.dist <= 0.0f)
 		ray_hit.dist = 0.0001f;
-	line_height = (int)(data->win_len / ray_hit.dist);
+	line_height = (int)(data->win_len * 2 / ray_hit.dist);
 	if (line_height == 0)
 		line_height = 1;
 	tex_start = -line_height / 2 + data->win_len / 2;
@@ -168,12 +182,16 @@ void cast_rays(t_data *data)
 	t_vec	ray_dir;
 	float	look_dir;
 
-	struct timespec start, end;
-	clock_gettime(CLOCK_MONOTONIC, &start);
+	int		debug = 0;//////////////////////////set this
+	struct	timespec start, end;
+	long	ms;
+
+	if (debug)
+		clock_gettime(CLOCK_MONOTONIC, &start);
 	look_dir = (float)data->map->player.rot * PI / 180;
-	data->cam.dir = (t_vec){cos(look_dir), sin(look_dir), 0};
+	data->cam.dir = (t_vec){cos(look_dir), sin(look_dir)};
 	data->cam.plane = (t_vec){-sin(look_dir) * tan((float)(60 * PI / 180) / 2),
-		cos(look_dir) * tan((float)(60 * PI / 180) / 2), 0};
+		cos(look_dir) * tan((float)(60 * PI / 180) / 2)};
 	x = -1;
 	while (++x < data->win_wid)
 	{
@@ -182,14 +200,21 @@ void cast_rays(t_data *data)
 		ray_dir.y = data->cam.dir.y + data->cam.plane.y * cam_x;
 		data->hits[x] = cast_ray(data, ray_dir);
 	}
-	clock_gettime(CLOCK_MONOTONIC, &end);
-	long ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
-	printf("Raycast took\t%ldns\n", ms);
+	if (debug)
+	{
+		clock_gettime(CLOCK_MONOTONIC, &end);
+		long ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
+		printf("Raycast took\t%ldns\n", ms);
+	}
 
 
-	clock_gettime(CLOCK_MONOTONIC, &start);
+	if (debug)
+		clock_gettime(CLOCK_MONOTONIC, &start);
 	draw_walls(data);
-	clock_gettime(CLOCK_MONOTONIC, &end);
-	ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
-	printf("Draw took\t%ldns\n\n", ms);
+	if (debug)
+	{
+		clock_gettime(CLOCK_MONOTONIC, &end);
+		ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
+		printf("Draw took\t%ldns\n\n", ms);
+	}
 }

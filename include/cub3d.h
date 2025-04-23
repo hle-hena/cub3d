@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/23 13:51:02 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/23 15:10:42 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,34 +39,17 @@ typedef struct s_color
 	int bl;
 }	t_col;
 
-
 typedef struct s_vector
 {
 	float	x;
 	float	y;
-	float	z;
 }	t_vec;
-
-typedef struct s_quat
-{
-	float	w;
-	float	x;
-	float	y;
-	float	z;
-}	t_quat;
 
 typedef struct s_point
 {
 	int		x;
 	int		y;
-	int		z;
 }	t_point;
-
-typedef struct s_flood
-{
-	t_point			point;
-	struct s_list	*next;
-}	t_flood;
 
 # define HASH_SIZE 1024
 
@@ -112,7 +95,6 @@ typedef struct s_map
 	char		replace_tile;
 	int			len;
 	int			wid;
-	t_tile		*tiles[256];
 	t_player	player;
 	t_point		mini_map;
 	int			mini_map_scale;
@@ -195,9 +177,12 @@ t_map	*load_map(int ac, char **av);
 int		clean_map(void);
 int		clean_data(void);
 
+void	fill_cast_table(t_data *data, int *err);
+
 t_tile	*new_tile(void);
+t_tile	**get_tile_dict(void);
 char	*retrieve_tile_dict(t_map *map, int map_fd, int *err);
-void	retrieve_tile(t_map *map, int map_fd, char *line, int *err);
+void	retrieve_tile(t_tile **tiles, int map_fd, char *line, int *err);
 void	retrieve_value(int *value, char *arg, int *err, char *id);
 void	retrieve_texture(t_img **texture, char *arg, int *err, char *id);
 void	retrieve_texture_color(t_img **img, char *line, int *err);
@@ -207,7 +192,7 @@ void	retrieve_player(t_map *map, char *line, int *err);
 int		is_dict_full(t_map *map, int err);
 void	retrieve_map(t_map *map, char *line, int map_fd, int *err);
 int		retrieve_lonely(t_map *map, char *line, int *err);
-int		is_map_valid(t_map *map, int err);
+int		is_map_valid(t_map *map, t_tile **tiles, int err);
 
 void	add_link(t_list **lst, char *content);
 
@@ -235,6 +220,7 @@ void	draw_mini_map(t_data *data);
 int		point_is_in_mini_map(t_data *data, t_point point);
 
 t_hit	raycast(t_data *data, t_vec dir, t_player player);
+t_vec	***get_cast_table(void);
 void	draw_line_in_direction(t_data *data, t_point start, t_vec dir,
 	float dist);
 

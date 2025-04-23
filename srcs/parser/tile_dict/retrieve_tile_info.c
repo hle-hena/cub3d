@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:28:34 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/23 13:31:05 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/23 14:19:07 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,17 +72,15 @@ t_tile	*new_tile(void)
 	return (new);
 }
 
-void	retrieve_tile(t_map *map, int map_fd, char *line, int *err)
+void	retrieve_tile(t_tile **tiles, int map_fd, char *line, int *err)
 {
 	char	*temp;
-	t_tile	**tile;
 
 	if (*err)
 		return ;
-	tile = &map->tiles[(int)(*line)];
-	if (!*tile)
-		*tile = new_tile();
-	if (!*tile)
+	if (!*tiles)
+		*tiles = new_tile();
+	if (!*tiles)
 		return (ft_perror(-1, "Internal error: malloc.", 0), *err = 1, VOID);
 	while (1)
 	{
@@ -95,7 +93,7 @@ void	retrieve_tile(t_map *map, int map_fd, char *line, int *err)
 			return (ft_perror(-1, "Internal error: malloc.", 0), *err = 1, VOID);
 		if (ft_strncmp("}", line, 2) == 0)
 			return (ft_del((void **)&line), VOID);
-		retrieve_switch(*tile, line, err);
+		retrieve_switch(*tiles, line, err);
 		ft_del((void **)&line);
 		if (*err)
 			return ;

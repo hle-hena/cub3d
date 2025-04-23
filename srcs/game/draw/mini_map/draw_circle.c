@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 23:18:32 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/13 15:28:28 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/23 14:22:50 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,14 +44,14 @@ void	draw_circle(t_data *data, t_point center, int radius, int color)
 	d = 3 - 2 * radius;
 	while (++x <= y)
 	{
-		ft_put_pixel(data, (t_point){center.x + x, center.y + y, 0}, color);
-		ft_put_pixel(data, (t_point){center.x - x, center.y + y, 0}, color);
-		ft_put_pixel(data, (t_point){center.x + x, center.y - y, 0}, color);
-		ft_put_pixel(data, (t_point){center.x - x, center.y - y, 0}, color);
-		ft_put_pixel(data, (t_point){center.x + y, center.y + x, 0}, color);
-		ft_put_pixel(data, (t_point){center.x - y, center.y + x, 0}, color);
-		ft_put_pixel(data, (t_point){center.x + y, center.y - x, 0}, color);
-		ft_put_pixel(data, (t_point){center.x - y, center.y - x, 0}, color);
+		ft_put_pixel(data, (t_point){center.x + x, center.y + y}, color);
+		ft_put_pixel(data, (t_point){center.x - x, center.y + y}, color);
+		ft_put_pixel(data, (t_point){center.x + x, center.y - y}, color);
+		ft_put_pixel(data, (t_point){center.x - x, center.y - y}, color);
+		ft_put_pixel(data, (t_point){center.x + y, center.y + x}, color);
+		ft_put_pixel(data, (t_point){center.x - y, center.y + x}, color);
+		ft_put_pixel(data, (t_point){center.x + y, center.y - x}, color);
+		ft_put_pixel(data, (t_point){center.x - y, center.y - x}, color);
 		if (d < 0)
 			d += 4 * x + 6;
 		else

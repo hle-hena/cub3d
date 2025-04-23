@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 18:51:23 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/22 15:23:47 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/23 14:26:21 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,13 @@ t_hit	hit_info(t_data *data, t_player player, t_ray ray, t_vec dir)
 	hit.ray_hit.x = player.x + dir.x * hit.dist;
 	hit.ray_hit.y = player.y + dir.y * hit.dist;
 	if (ray.side == 0 && ray.step.x == 1)
-		hit.texture = data->map->tiles[(int)data->map->matrix[ray.curr.y][ray.curr.x]]->tex_ea;
+		hit.texture = get_tile_dict()[(int)data->map->matrix[ray.curr.y][ray.curr.x]]->tex_ea;
 	else if (ray.side == 0)
-		hit.texture = data->map->tiles[(int)data->map->matrix[ray.curr.y][ray.curr.x]]->tex_we;
+		hit.texture = get_tile_dict()[(int)data->map->matrix[ray.curr.y][ray.curr.x]]->tex_we;
 	else if (ray.step.y == 1)
-		hit.texture = data->map->tiles[(int)data->map->matrix[ray.curr.y][ray.curr.x]]->tex_no;
+		hit.texture = get_tile_dict()[(int)data->map->matrix[ray.curr.y][ray.curr.x]]->tex_no;
 	else
-		hit.texture = data->map->tiles[(int)data->map->matrix[ray.curr.y][ray.curr.x]]->tex_so;
+		hit.texture = get_tile_dict()[(int)data->map->matrix[ray.curr.y][ray.curr.x]]->tex_so;
 	hit.side = ray.side;
 	return (hit);
 }
@@ -75,7 +75,7 @@ t_hit	raycast(t_data *data, t_vec dir, t_player player)
 			ray.curr.y += ray.step.y;
 			ray.side = 1;
 		}
-		if (data->map->tiles[(int)data->map->matrix[ray.curr.y][ray.curr.x]]->is_wall)
+		if (get_tile_dict()[(int)data->map->matrix[ray.curr.y][ray.curr.x]]->is_wall)
 			return (hit_info(data, player, ray, dir));
 	}
 }

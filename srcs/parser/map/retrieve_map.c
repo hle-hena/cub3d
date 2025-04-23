@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 18:02:27 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/21 19:54:38 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/23 14:22:23 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ int	check_line(t_map *map, char *line)
 	len = -1;
 	while (line[++len])
 	{
-		if (map->tiles[(int)line[len]])
+		if (get_tile_dict()[(int)line[len]])
 			continue ;
 		else if (ft_strchr("NSWE", line[len]))
 		{

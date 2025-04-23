@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 11:37:46 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/13 15:53:43 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/23 14:23:08 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ void	draw_high(t_data *data, t_point start, t_point end, int color)
 	dx = end.x - start.x;
 	dy = end.y - start.y;
 	err = 2 * ft_abs(dx) - dy;
-	curr = (t_point){start.x, start.y, 0};
+	curr = (t_point){start.x, start.y};
 	while (curr.y <= end.y)
 	{
 		if (point_is_in_mini_map(data, curr))
@@ -53,7 +53,7 @@ void	draw_low(t_data *data, t_point start, t_point end, int color)
 	dx = end.x - start.x;
 	dy = end.y - start.y;
 	err = 2 * ft_abs(dy) - dx;
-	curr = (t_point){start.x, start.y, 0};
+	curr = (t_point){start.x, start.y};
 	while (curr.x <= end.x)
 	{
 		if (point_is_in_mini_map(data, curr))

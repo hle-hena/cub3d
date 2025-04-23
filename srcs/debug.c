@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 15:18:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/23 13:27:26 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/23 14:25:57 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,7 @@ void	print_dict(t_data *data)
 	printf("Tiles in map are :\n");
 	while (++i < 256)
 	{
-		tile = data->map->tiles[i];
+		tile = get_tile_dict()[i];
 		if (tile)
 		{
 			printf("\tId : %c\n", (char)i);

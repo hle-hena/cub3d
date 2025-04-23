@@ -6,11 +6,18 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 12:34:15 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/22 10:59:29 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/23 14:46:06 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
+
+t_tile	**get_tile_dict(void)
+{
+	static t_tile	*tiles[256];
+
+	return (tiles);
+}
 
 int	is_define(char *line, int *err)
 {
@@ -48,7 +55,7 @@ char	*retrieve_tile_dict(t_map *map, int map_fd, int *err)
 			continue ;
 		}
 		if (is_define(line, err))
-			retrieve_tile(map, map_fd, line, err);
+			retrieve_tile(&get_tile_dict()[(int)*line], map_fd, line, err);
 		else if (retrieve_lonely(map, line, err))
 				return (line);
 		ft_del((void **)&line);

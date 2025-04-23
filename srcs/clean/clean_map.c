@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:17:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/23 13:54:38 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/23 14:14:03 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ int	clean_map(void)
 {
 	t_map	*map;
 	t_data	*data;
+	t_tile	**tiles;
 	int		i;
 
 	map = get_map();
@@ -52,17 +53,18 @@ int	clean_map(void)
 		return (0);
 	data = get_data();
 	i = -1;
+	tiles = get_tile_dict();
 	while (++i < 256)
 	{
-		if (map->tiles[i])
+		if (tiles[i])
 		{
-			remove_img(data, map->tiles[i]->tex_no);
-			remove_img(data, map->tiles[i]->tex_so);
-			remove_img(data, map->tiles[i]->tex_ea);
-			remove_img(data, map->tiles[i]->tex_we);
-			remove_img(data, map->tiles[i]->tex_ce);
-			remove_img(data, map->tiles[i]->tex_fl);
-			ft_del((void **)&map->tiles[i]);
+			remove_img(data, tiles[i]->tex_no);
+			remove_img(data, tiles[i]->tex_so);
+			remove_img(data, tiles[i]->tex_ea);
+			remove_img(data, tiles[i]->tex_we);
+			remove_img(data, tiles[i]->tex_ce);
+			remove_img(data, tiles[i]->tex_fl);
+			ft_del((void **)&tiles[i]);
 		}
 	}
 	clean_hash(data);
