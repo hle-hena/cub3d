@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 21:49:44 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/22 15:07:00 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/23 11:52:10 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,28 +61,28 @@ void	move_event(t_data *data)
 
 int	event_loop(t_data *data)
 {
-	static struct timeval last_time = {0, 0};
-	struct timeval current_time;
-	double elapsed_time;
-	static int frame_count = 0;
-	static double fps = 0;
+	// static struct timeval last_time = {0, 0};
+	// struct timeval current_time;
+	// double elapsed_time;
+	// static int frame_count = 0;
+	// static double fps = 0;
 
-	// Get current time
-	gettimeofday(&current_time, NULL);
+	// // Get current time
+	// gettimeofday(&current_time, NULL);
 	
-	// Calculate elapsed time in seconds
-	elapsed_time = (current_time.tv_sec - last_time.tv_sec) + 
-				(current_time.tv_usec - last_time.tv_usec) / 1000000.0;
+	// // Calculate elapsed time in seconds
+	// elapsed_time = (current_time.tv_sec - last_time.tv_sec) + 
+	// 			(current_time.tv_usec - last_time.tv_usec) / 1000000.0;
 
-	// Update FPS every second
-	frame_count++;
-	if (elapsed_time >= 1.0) {
-		fps = frame_count / elapsed_time;
-		printf("\rFPS: %.2f", fps);  // Print FPS to the terminal, overwrite previous value
-		fflush(stdout);  // Ensure it updates immediately
-		frame_count = 0;
-		last_time = current_time;
-	}
+	// // Update FPS every second
+	// frame_count++;
+	// if (elapsed_time >= 1.0) {
+	// 	fps = frame_count / elapsed_time;
+	// 	printf("\rFPS: %.2f", fps);  // Print FPS to the terminal, overwrite previous value
+	// 	fflush(stdout);  // Ensure it updates immediately
+	// 	frame_count = 0;
+	// 	last_time = current_time;
+	// }
 
 	move_event(data);
 	cast_rays(data);

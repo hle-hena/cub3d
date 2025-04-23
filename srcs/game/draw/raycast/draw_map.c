@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/23 11:41:37 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/23 11:54:29 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,9 +168,6 @@ void cast_rays(t_data *data)
 	t_vec	ray_dir;
 	float	look_dir;
 
-	struct timespec start, end;
-	clock_gettime(CLOCK_MONOTONIC, &start);
-	// CODE TO BENCHMARK
 	look_dir = (float)data->map->player.rot * PI / 180;
 	data->cam.dir = (t_vec){cos(look_dir), sin(look_dir), 0};
 	data->cam.plane = (t_vec){-sin(look_dir) * tan((float)(60 * PI / 180) / 2),
@@ -183,13 +180,5 @@ void cast_rays(t_data *data)
 		ray_dir.y = data->cam.dir.y + data->cam.plane.y * cam_x;
 		data->hits[x] = cast_ray(data, ray_dir);
 	}
-	clock_gettime(CLOCK_MONOTONIC, &end);
-	long ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
-	// printf("Raycast took %ldns\n", ms);
-
-	clock_gettime(CLOCK_MONOTONIC, &start);
 	draw_walls(data);
-	clock_gettime(CLOCK_MONOTONIC, &end);
-	ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
-	// printf("Draw took %ldns\n", ms);
 }
