@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/23 15:10:42 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/23 16:31:39 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ typedef	struct s_tile
 
 typedef struct s_map
 {
-	char		**matrix;
+	int			*matrix;
 	char		void_char;
 	char		replace_tile;
 	int			len;
@@ -176,6 +176,11 @@ t_map	*get_map(void);
 t_map	*load_map(int ac, char **av);
 int		clean_map(void);
 int		clean_data(void);
+
+static inline int	access(t_map *map, int x, int y)
+{
+	return (map->matrix[y * map->wid + x]);
+}
 
 void	fill_cast_table(t_data *data, int *err);
 

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 18:02:27 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/23 14:22:23 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/23 16:26:56 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,15 +47,16 @@ void	set_map(t_map *map, t_list *grid, int *err)
 	resize_lines(grid, map->void_char, map->wid, err);
 	if (*err)
 		return (ft_lstclear(&grid, ft_del), (void)0);
-	map->matrix = malloc((map->len + 1) * sizeof(char *));
+	map->matrix = malloc((map->len * map->wid) * sizeof(int));
 	if (!map->matrix)
 		return (ft_perror(-1, "cub3d: Internal error: malloc", 0),
 			ft_lstclear(&grid, ft_del), *err = 1, (void)0);
 	while (grid)
 	{
-		map->matrix[len] = grid->content;
+		ft_memcpy(map->matrix + len * map->wid, grid->content, map->wid);
 		len++;
 		next = grid->next;
+		ft_del((void **)&grid->content);
 		ft_del((void **)&grid);
 		grid = next;
 	}
