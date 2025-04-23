@@ -6,16 +6,39 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:17:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/21 19:51:10 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/23 13:54:38 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-void	remove_img(t_data *data, t_img texture)
+void	remove_img(t_data *data, t_img *texture)
 {
-	if (texture.img)
-		mlx_destroy_image(data->mlx, texture.img);
+	if (texture)
+	{
+		if (texture->endian == 1)
+			return ;
+		if (texture->img)
+			mlx_destroy_image(data->mlx, texture->img);
+		ft_del((void **)&texture);
+	}
+}
+
+void	clean_hash(t_data *data)
+{
+	t_img			**hash_table;
+	unsigned int	i;
+
+	i = -1;
+	hash_table = get_hash_table();
+	while (++i != HASH_SIZE)
+	{
+		if (!hash_table[i])
+			continue;
+		ft_del((void **)&hash_table[i]->path);
+		hash_table[i]->endian = 0;
+		remove_img(data, hash_table[i]);
+	}
 }
 
 int	clean_map(void)
@@ -42,6 +65,7 @@ int	clean_map(void)
 			ft_del((void **)&map->tiles[i]);
 		}
 	}
+	clean_hash(data);
 	if (map->matrix)
 		ft_free_tab((void **)map->matrix, map->len);
 	return (0);

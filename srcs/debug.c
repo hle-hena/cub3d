@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 15:18:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/22 11:09:48 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/23 13:27:26 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,12 +111,12 @@ void	print_dict(t_data *data)
 		if (tile)
 		{
 			printf("\tId : %c\n", (char)i);
-			EXPORT_TEXTURE(tile->tex_no, "tex_no", (char)i);
-			EXPORT_TEXTURE(tile->tex_so, "tex_so", (char)i);
-			EXPORT_TEXTURE(tile->tex_we, "tex_we", (char)i);
-			EXPORT_TEXTURE(tile->tex_ea, "tex_ea", (char)i);
-			EXPORT_TEXTURE(tile->tex_ce, "tex_ce", (char)i);
-			EXPORT_TEXTURE(tile->tex_fl, "tex_fl", (char)i);
+			EXPORT_TEXTURE(*tile->tex_no, "tex_no", (char)i);
+			EXPORT_TEXTURE(*tile->tex_so, "tex_so", (char)i);
+			EXPORT_TEXTURE(*tile->tex_we, "tex_we", (char)i);
+			EXPORT_TEXTURE(*tile->tex_ea, "tex_ea", (char)i);
+			EXPORT_TEXTURE(*tile->tex_ce, "tex_ce", (char)i);
+			EXPORT_TEXTURE(*tile->tex_fl, "tex_fl", (char)i);
 		}
 	}
 	printf("\nYou can look them up at print/id/name_of_texture.bmp !\n\n");

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 21:54:54 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/22 11:56:06 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/23 13:24:42 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void	is_value_missing(int value, char *identifier, int id, int *missing)
 	}
 }
 
-void	is_text_missing(void *img, char *identifier, int id, int *missing)
+void	is_text_missing(t_img *img, char *identifier, int id, int *missing)
 {
 	char	letter[2];
 
@@ -95,12 +95,12 @@ int	is_dict_full(t_map *map, int err)
 	{
 		if (map->tiles[i])
 		{
-			is_text_missing(map->tiles[i]->tex_no.img, "NO", i, &missing);
-			is_text_missing(map->tiles[i]->tex_so.img, "SO", i, &missing);
-			is_text_missing(map->tiles[i]->tex_we.img, "WE", i, &missing);
-			is_text_missing(map->tiles[i]->tex_ea.img, "EA", i, &missing);
-			is_text_missing(map->tiles[i]->tex_ce.img, "C", i, &missing);
-			is_text_missing(map->tiles[i]->tex_fl.img, "F", i, &missing);
+			is_text_missing(map->tiles[i]->tex_no, "NO", i, &missing);
+			is_text_missing(map->tiles[i]->tex_so, "SO", i, &missing);
+			is_text_missing(map->tiles[i]->tex_we, "WE", i, &missing);
+			is_text_missing(map->tiles[i]->tex_ea, "EA", i, &missing);
+			is_text_missing(map->tiles[i]->tex_ce, "C", i, &missing);
+			is_text_missing(map->tiles[i]->tex_fl, "F", i, &missing);
 			is_value_missing(map->tiles[i]->ceil_height, "CH", i, &missing);
 			is_value_missing(map->tiles[i]->floor_height, "FH", i, &missing);
 			is_value_missing(map->tiles[i]->is_wall, "W", i, &missing);

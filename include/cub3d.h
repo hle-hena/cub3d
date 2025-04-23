@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/23 11:27:52 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/23 13:51:02 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,11 +68,13 @@ typedef struct s_flood
 	struct s_list	*next;
 }	t_flood;
 
+# define HASH_SIZE 1024
 
 typedef struct s_img
 {
 	void	*img;
 	char	*data;
+	char	*path;
 	int		bpp;
 	int		size_line;
 	int		endian;
@@ -92,12 +94,12 @@ typedef struct s_player
 
 typedef	struct s_tile
 {
-	t_img		tex_no;
-	t_img		tex_so;
-	t_img		tex_we;
-	t_img		tex_ea;
-	t_img		tex_ce;
-	t_img		tex_fl;
+	t_img		*tex_no;
+	t_img		*tex_so;
+	t_img		*tex_we;
+	t_img		*tex_ea;
+	t_img		*tex_ce;
+	t_img		*tex_fl;
 	int			ceil_height;
 	int			floor_height;
 	int			is_wall;
@@ -131,7 +133,7 @@ typedef struct s_hit
 	float	dist;
 	t_vec	ray_hit;
 	t_vec	ray_dir;
-	t_img	texture;
+	t_img	*texture;
 	int		side;
 	int		draw_start;
 	int		draw_end;
@@ -197,7 +199,10 @@ t_tile	*new_tile(void);
 char	*retrieve_tile_dict(t_map *map, int map_fd, int *err);
 void	retrieve_tile(t_map *map, int map_fd, char *line, int *err);
 void	retrieve_value(int *value, char *arg, int *err, char *id);
-void	retrieve_texture(t_img *texture, char *arg, int *err, char *id);
+void	retrieve_texture(t_img **texture, char *arg, int *err, char *id);
+void	retrieve_texture_color(t_img **img, char *line, int *err);
+t_img	**get_hash_table(void);
+t_img	*get_img_hash(char *path, int *err);
 void	retrieve_player(t_map *map, char *line, int *err);
 int		is_dict_full(t_map *map, int err);
 void	retrieve_map(t_map *map, char *line, int map_fd, int *err);
