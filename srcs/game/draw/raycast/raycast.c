@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 18:51:23 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/24 16:54:01 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/24 18:13:17 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,39 +24,44 @@ void	text_info(t_data *data, t_ray ray, t_hit *hit)
 		hit->texture = get_tile_dict()[*(data->map->matrix + ray.curr.y * data->map->wid + ray.curr.x)]->tex_so;
 }
 
-t_hit	bounce_info(t_data *data, t_player player, t_ray ray, t_vec dir)
+t_hit	bounce_info(t_data *data, t_player player, t_ray ray, t_vec dir, float precise_dist)
 {
 	t_hit	hit;
 	t_hit	bounce;
 
-	if (ray.side == 0)
-		hit.dist = (ray.curr.x - player.x + (1 - ray.step.x) / 2.0f) / dir.x;
-	else
-		hit.dist = (ray.curr.y - player.y + (1 - ray.step.y) / 2.0f) / dir.y;
-	hit.ray_hit.x = player.x + dir.x * hit.dist;
-	hit.ray_hit.y = player.y + dir.y * hit.dist;
+	hit.r_dist = precise_dist;
+	hit.ray_hit.x = player.x + dir.x * hit.r_dist;
+	hit.ray_hit.y = player.y + dir.y * hit.r_dist;
 	hit.side = ray.side;
-	if (get_tile_dict()[*(data->map->matrix + ray.curr.y * data->map->wid + ray.curr.x)]->floor_height == 1 && ray.bounce < 64)
+	hit.m_dist = hit.r_dist;
+	if (get_tile_dict()[*(data->map->matrix + ray.curr.y * data->map->wid + ray.curr.x)]->floor_height == 1
+		&& ray.bounce < MAX_BOUNCE)
 	{
 		player.x = hit.ray_hit.x;
 		player.y = hit.ray_hit.y;
+		const float epsilon = 0.001f;
+		if (ray.side == 0)
+			player.x += dir.x > 0 ? -epsilon : epsilon;
+		else
+			player.y += dir.y > 0 ? -epsilon : epsilon;
 		if (ray.side == 0)
 			dir.x = -dir.x;
 		else
 			dir.y = -dir.y;
+
 		bounce = raycast(data, dir, player, ray.bounce + 1);
 		hit.texture = bounce.texture;
-		hit.ray_hit.x = bounce.ray_hit.x;
-		hit.ray_hit.y = bounce.ray_hit.y;
-		if (bounce.dist > hit.dist)
-			hit.dist = bounce.dist;
+		hit.ray_hit = bounce.ray_hit;
+		hit.m_dist += bounce.m_dist;
 		hit.side = bounce.side;
 	}
 	else
 		text_info(data, ray, &hit);
+
 	hit.bounces = ray.bounce;
-	return (hit);
+	return hit;
 }
+
 
 void	init_ray(t_ray *ray, t_vec dir, t_player player, int bounce)
 {
@@ -89,23 +94,26 @@ void	init_ray(t_ray *ray, t_vec dir, t_player player, int bounce)
 t_hit	raycast(t_data *data, t_vec dir, t_player player, int bounce)
 {
 	t_ray	ray;
+	float	precise_dist = 0.0f;
 
 	init_ray(&ray, dir, player, bounce);
 	while (1)
 	{
 		if (ray.dist.x < ray.dist.y)
 		{
-			ray.dist.x += ray.slope.x;
+			precise_dist = ray.dist.x;
 			ray.curr.x += ray.step.x;
+			ray.dist.x += ray.slope.x;
 			ray.side = 0;
 		}
 		else
 		{
-			ray.dist.y += ray.slope.y;
+			precise_dist = ray.dist.y;
 			ray.curr.y += ray.step.y;
+			ray.dist.y += ray.slope.y;
 			ray.side = 1;
 		}
 		if (get_tile_dict()[*(data->map->matrix + ray.curr.y * data->map->wid + ray.curr.x)]->is_wall)
-			return (bounce_info(data, player, ray, dir));
+			return (bounce_info(data, player, ray, dir, precise_dist));
 	}
 }

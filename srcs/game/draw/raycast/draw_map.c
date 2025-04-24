@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/24 17:00:51 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/24 17:48:36 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,8 @@ static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img)
 	world.y = data->map->player.y + cast.y * (ray.l.y + cast.x * ray.r.y);
 	iworld.x = (int)world.x;
 	iworld.y = (int)world.y;
-	if (iworld.y < 0 || iworld.y >= data->map->len || iworld.x < 0
-		|| iworld.x >= data->map->wid)
+	if (world.y < 0 || world.y >= data->map->len || world.x < 0
+		|| world.x >= data->map->wid)
 		return ;
 	tile = *(ray.tile_dict + *(data->map->matrix + iworld.y * data->map->wid + iworld.x));
 	if (!tile)
@@ -66,8 +66,8 @@ static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img)
 	world.y = data->map->player.y + cast.y * (ray.l.y + cast.x * ray.r.y);
 	iworld.x = (int)world.x;
 	iworld.y = (int)world.y;
-	if (iworld.y < 0 || iworld.y >= data->map->len || iworld.x < 0
-		|| iworld.x >= data->map->wid)
+	if (world.y < 0 || world.y >= data->map->len || world.x < 0
+		|| world.x >= data->map->wid)
 		return ;
 	tile = *(ray.tile_dict + *(data->map->matrix + iworld.y * data->map->wid + iworld.x));
 	if (!tile)
@@ -108,10 +108,12 @@ void	*draw_walls_thread(void *arg)
 				*(int *)img = *(int *)(hit->tex_col + hit->tex_y * hit->texture->size_line);
 				hit->tex_pos_fp += hit->step_fp;
 			}
-			else if (curr.y < hit->draw_start)
+			else if (curr.y < hit->m_start)
 				draw_ceil(data, curr, td->ray_dir, img);
-			else
+			else if (curr.y > hit->m_end)
 				draw_floor(data, curr, td->ray_dir, img);
+			else
+				*(int *)img = 0;
 			img += data->img.bpp;
 		}
 		img += td->add_next_line;
@@ -159,10 +161,22 @@ t_hit cast_ray(t_data *data, t_vec ray_dir)
 
 	ray_hit = raycast(data, ray_dir, data->map->player, 0);
 	ray_hit.ray_dir = ray_dir;
-	ray_hit.dist = ray_hit.dist * (ray_dir.x * data->cam.dir.x + ray_dir.y * data->cam.dir.y);
-	if (ray_hit.dist <= 0.0f)
-		ray_hit.dist = 0.0001f;
-	line_height = (int)(data->win_len * 2 / ray_hit.dist);
+
+	ray_hit.r_dist = ray_hit.r_dist * (ray_dir.x * data->cam.dir.x + ray_dir.y * data->cam.dir.y);
+	if (ray_hit.r_dist <= 0.0f)
+		ray_hit.r_dist = 0.0001f;
+	line_height = (int)(data->win_len * 2 / ray_hit.r_dist);
+	if (line_height == 0)
+		line_height = 1;
+	tex_start = -line_height / 2 + data->win_len / 2;
+	tex_end = line_height / 2 + data->win_len / 2;
+	ray_hit.m_start = ft_max(tex_start, 0);
+	ray_hit.m_end = ft_min(tex_end, data->win_len - 1);
+
+	ray_hit.m_dist = ray_hit.m_dist * (ray_dir.x * data->cam.dir.x + ray_dir.y * data->cam.dir.y);
+	if (ray_hit.m_dist <= 0.0f)
+		ray_hit.m_dist = 0.0001f;
+	line_height = (int)(data->win_len * 2 / ray_hit.m_dist);
 	if (line_height == 0)
 		line_height = 1;
 	tex_start = -line_height / 2 + data->win_len / 2;

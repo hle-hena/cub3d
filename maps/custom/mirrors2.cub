@@ -47,10 +47,10 @@
 }
 
 5 {
-	NO textures/matrix.xpm
-	SO textures/matrix.xpm
-	EA textures/matrix.xpm
-	WE textures/matrix.xpm
+	NO 255,0,0
+	SO 0,255,0
+	WE 0,0,255
+	EA 120,120,120
 	C 0,0,0
 	F 0,0,0
 	CH 100
@@ -59,10 +59,10 @@
 }
 
 0 {
-	NO textures/simonkraft/bookshelf_01.xpm
-	SO textures/simonkraft/bookshelf_02.xpm
-	WE textures/simonkraft/bookshelf_03.xpm
-	EA textures/simonkraft/bookshelf.xpm
+	NO 120,120,120
+	SO 120,120,120
+	WE 120,120,120
+	EA 120,120,120
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
 	CH 100
@@ -72,8 +72,8 @@
 
 P=0
 
-55455
-50005
-50005
-200N5
-51555
+54445
+40004
+4E504
+40004
+54445
