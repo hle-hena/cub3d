@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/24 17:48:36 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/24 18:22:37 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,6 +189,8 @@ t_hit cast_ray(t_data *data, t_vec ray_dir)
 		wall_x = ray_hit.ray_hit.x;
 	wall_x -= (int)wall_x;
 	line_height = tex_end - tex_start;
+	if (line_height == 0)
+		line_height = 1;
 	ray_hit.step_fp = (ray_hit.texture->height << 16) / line_height;
 	ray_hit.tex_pos_fp = (ray_hit.draw_start - data->win_len / 2 + line_height / 2) * ray_hit.step_fp;
 	ray_hit.tex_col = ray_hit.texture->data + (int)(wall_x * ray_hit.texture->width) * ray_hit.texture->bpp;
