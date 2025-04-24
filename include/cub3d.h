@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/24 12:15:07 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/24 14:10:31 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,6 +161,7 @@ typedef struct s_data
 	t_img	img;
 	int		win_len;
 	int		win_wid;
+	float	delta_t;
 	t_cam	cam;
 	t_map	*map;
 	t_hit	*hits;
@@ -237,7 +238,7 @@ void	draw_line_in_direction(t_data *data, t_point start, t_vec dir,
 	float dist);
 
 
-void	fps_limiter(void);
+void	fps_counter(t_data *data);
 
 
 

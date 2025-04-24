@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 21:49:44 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/24 12:17:43 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/24 14:11:34 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,8 @@ void	move_event(t_data *data)
 	len = sqrt(delta.x * delta.x + delta.y * delta.y);
 	if (len > 0.001f)
 	{
-		delta.x = (delta.x / len) * MOVE_SPEED;
-		delta.y = (delta.y / len) * MOVE_SPEED;
+		delta.x = (delta.x / len) * MOVE_SPEED * data->delta_t;
+		delta.y = (delta.y / len) * MOVE_SPEED * data->delta_t;
 		int wall_x = (int)(data->map->player.x + delta.x);
 		int wall_y = (int)(data->map->player.y + delta.y);
 		if (!get_tile_dict()[*(data->map->matrix + (int)data->map->player.y * data->map->wid + wall_x)]->is_wall)
@@ -61,7 +61,7 @@ void	move_event(t_data *data)
 
 int	event_loop(t_data *data)
 {
-	fps_limiter();
+	fps_counter(data);
 	move_event(data);
 	cast_rays(data);
 	draw_mini_map(data);
