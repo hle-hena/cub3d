@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 18:02:27 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/23 16:26:56 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/24 11:16:47 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ void	resize_lines(t_list *grid, char void_char, size_t max_wid, int *err)
 void	set_map(t_map *map, t_list *grid, int *err)
 {
 	int		len;
+	int		i;
 	t_list	*next;
 
 	if (!grid)
@@ -53,7 +54,9 @@ void	set_map(t_map *map, t_list *grid, int *err)
 			ft_lstclear(&grid, ft_del), *err = 1, (void)0);
 	while (grid)
 	{
-		ft_memcpy(map->matrix + len * map->wid, grid->content, map->wid);
+		i = -1;
+		while (++i < map->wid)
+			*(map->matrix + len * map->wid + i) = ((char *)grid->content)[i];
 		len++;
 		next = grid->next;
 		ft_del((void **)&grid->content);

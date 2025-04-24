@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/23 16:31:39 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/24 12:15:07 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,11 @@
 
 # define PI 3.1415926535897932384
 # define VOID (void)0
+typedef unsigned long long t_uint64;
+typedef long long t_int64;
+
+# define TARGET_FPS 60
+# define FRAME_TIME_US (1000000 / 60)
 
 typedef struct s_trigometry_values
 {
@@ -136,8 +141,10 @@ typedef struct s_ray
 
 typedef	struct s_ray_dir
 {
-	t_vec	left;
-	t_vec	right;
+	t_vec	l;
+	t_vec	r;
+	t_vec	*cast_table;
+	t_tile	**tile_dict;
 }	t_rdir;
 
 typedef	struct s_cam
@@ -177,10 +184,10 @@ t_map	*load_map(int ac, char **av);
 int		clean_map(void);
 int		clean_data(void);
 
-static inline int	access(t_map *map, int x, int y)
-{
-	return (map->matrix[y * map->wid + x]);
-}
+// static inline int	get(t_map *map, int x, int y)
+// {
+// 	return (*(map->matrix + y * map->wid + x));
+// }
 
 void	fill_cast_table(t_data *data, int *err);
 
@@ -225,12 +232,12 @@ void	draw_mini_map(t_data *data);
 int		point_is_in_mini_map(t_data *data, t_point point);
 
 t_hit	raycast(t_data *data, t_vec dir, t_player player);
-t_vec	***get_cast_table(void);
+t_vec	**get_cast_table(void);
 void	draw_line_in_direction(t_data *data, t_point start, t_vec dir,
 	float dist);
 
 
-
+void	fps_limiter(void);
 
 
 

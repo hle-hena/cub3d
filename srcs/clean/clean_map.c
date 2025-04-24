@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:17:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/23 14:14:03 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/24 10:52:28 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,6 @@ int	clean_map(void)
 	}
 	clean_hash(data);
 	if (map->matrix)
-		ft_free_tab((void **)map->matrix, map->len);
+		ft_del((void **)&map->matrix);
 	return (0);
 }

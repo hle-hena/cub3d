@@ -13,7 +13,7 @@ LIBFT = $(LIBFT_DIR)/libft.a
 
 SRCS = $(addprefix srcs/, \
 	$(addprefix clean/, clean_data.c clean_map.c)\
-	$(addprefix utils/, add_link.c access.c)\
+	$(addprefix utils/, add_link.c)\
 	$(addprefix parser/, parser.c\
 		$(addprefix tile_dict/, hash_map.c is_dict_full.c retrieve_lonely.c \
 			retrieve_player.c retrieve_texture_color.c retrieve_texture.c \
@@ -23,9 +23,11 @@ SRCS = $(addprefix srcs/, \
 	$(addprefix mlx_utils/, color.c loop.c put_pixel.c)\
 	$(addprefix game/, \
 		$(addprefix draw/, \
-			$(addprefix mini_map/, draw_circle.c draw_line.c draw_map.c draw_player.c draw_square.c)\
+			$(addprefix mini_map/, draw_circle.c draw_line.c draw_map.c \
+				draw_player.c draw_square.c)\
 			$(addprefix raycast/, draw_line.c draw_map.c lookup.c raycast.c)\
 		)\
+		$(addprefix status/, fps.c)\
 		$(addprefix hooks/, key.c loop.c mouse.c)\
 	)\
 	main.c debug.c\

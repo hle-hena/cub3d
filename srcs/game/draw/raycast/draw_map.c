@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/23 16:00:11 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/24 12:24:35 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,62 +19,68 @@
 	// long ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
 	// printf("Took %ldns\n", ms);
 
-void	draw_ceil(t_data *data, t_point curr, t_rdir ray_dir, char *img)
+static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img)
 {
 	t_tile	*tile;
 	t_vec	cast;
 	t_vec	world;
+	t_point	iworld;
 	t_point	pix;
 	t_img	*tex;
+	int	offset;
 
-	cast = (*get_cast_table())[curr.y][curr.x];
-	world.x = data->map->player.x + cast.y * (ray_dir.left.x + cast.x
-			* (ray_dir.right.x - ray_dir.left.x));
-	world.y = data->map->player.y + cast.y * (ray_dir.left.y + cast.x
-			* (ray_dir.right.y - ray_dir.left.y));
-	if ((int)world.y < 0 || (int)world.y >= data->map->len || (int)world.x < 0
-		|| (int)world.x >= data->map->wid)
+	cast = *(ray.cast_table + curr.y * data->win_wid + curr.x);
+	world.x = data->map->player.x + cast.y * (ray.l.x + cast.x * ray.r.x);
+	world.y = data->map->player.y + cast.y * (ray.l.y + cast.x * ray.r.y);
+	iworld.x = (int)world.x;
+	iworld.y = (int)world.y;
+	if (iworld.y < 0 || iworld.y >= data->map->len || iworld.x < 0
+		|| iworld.x >= data->map->wid)
 		return ;
-	tile = get_tile_dict()[(int)data->map->matrix[(int)world.y][(int)world.x]];
+	tile = *(ray.tile_dict + *(data->map->matrix + iworld.y * data->map->wid + iworld.x));
 	if (!tile)
 		return ;
 	tex = tile->tex_ce;
-	pix.x = (int)((world.x - (int)world.x) * tex->width);
-	pix.y = (int)((world.y - (int)world.y) * tex->height);
-	if ((unsigned)pix.x >= (unsigned)tex->width)
+	pix.x = ((world.x - iworld.x) * tex->width);
+	pix.y = ((world.y - iworld.y) * tex->height);
+	if (pix.x >= tex->width)
 		pix.x = tex->width - 1;
-	if ((unsigned)pix.y >= (unsigned)tex->height)
+	if (pix.y >= tex->height)
 		pix.y = tex->height - 1;
-	*(int *)img = *(int *)(tex->data + pix.y * tex->size_line + pix.x * tex->bpp);
+	offset = pix.y * tex->size_line + pix.x * tex->bpp;
+	*(int *)img = *(int *)(tex->data + offset);
 }
 
-void draw_floor(t_data *data, t_point curr, t_rdir ray_dir, char *img)
+static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img)
 {
 	t_tile	*tile;
 	t_vec	cast;
 	t_vec	world;
 	t_point	pix;
+	t_point	iworld;
 	t_img	*tex;
+	int	offset;
 
-	cast = (*get_cast_table())[curr.y][curr.x];
-	world.x = data->map->player.x + cast.y * (ray_dir.left.x +
-		cast.x * ray_dir.right.x);
-	world.y = data->map->player.y + cast.y * (ray_dir.left.y +
-		cast.x * ray_dir.right.y);
-	if ((int)world.y < 0 || (int)world.y >= data->map->len || (int)world.x < 0
-		|| (int)world.x >= data->map->wid)
+	cast = *(ray.cast_table + curr.y * data->win_wid + curr.x);
+	world.x = data->map->player.x + cast.y * (ray.l.x + cast.x * ray.r.x);
+	world.y = data->map->player.y + cast.y * (ray.l.y + cast.x * ray.r.y);
+	iworld.x = (int)world.x;
+	iworld.y = (int)world.y;
+	if (iworld.y < 0 || iworld.y >= data->map->len || iworld.x < 0
+		|| iworld.x >= data->map->wid)
 		return ;
-	tile = get_tile_dict()[(int)data->map->matrix[(int)world.y][(int)world.x]];
+	tile = *(ray.tile_dict + *(data->map->matrix + iworld.y * data->map->wid + iworld.x));
 	if (!tile)
 		return ;
 	tex = tile->tex_fl;
-	pix.x = (int)((world.x - (int)world.x) * tex->width);
-	pix.y = (int)((world.y - (int)world.y) * tex->height);
-	if ((unsigned)pix.x >= (unsigned)tex->width)
+	pix.x = ((world.x - iworld.x) * tex->width);
+	pix.y = ((world.y - iworld.y) * tex->height);
+	if (pix.x >= tex->width)
 		pix.x = tex->width - 1;
-	if ((unsigned)pix.y >= (unsigned)tex->height)
+	if (pix.y >= tex->height)
 		pix.y = tex->height - 1;
-	*(int *)img = *(int *)(tex->data + pix.y * tex->size_line + pix.x * tex->bpp);
+	offset = pix.y * tex->size_line + pix.x * tex->bpp;
+	*(int *)img = *(int *)(tex->data + offset);
 }
 
 
@@ -123,12 +129,12 @@ void	draw_walls(t_data *data)
 
 	slice = data->win_wid / DRAW_THREADS;
 	i = -1;
-	ray_dir.left.x = data->cam.dir.x - data->cam.plane.x;
-	ray_dir.left.y = data->cam.dir.y - data->cam.plane.y;
-	ray_dir.right.x = data->cam.dir.x + data->cam.plane.x;
-	ray_dir.right.x = ray_dir.right.x - ray_dir.left.x;
-	ray_dir.right.y = data->cam.dir.y + data->cam.plane.y;
-	ray_dir.right.y = ray_dir.right.y - ray_dir.left.y;
+	ray_dir.l.x = data->cam.dir.x - data->cam.plane.x;
+	ray_dir.l.y = data->cam.dir.y - data->cam.plane.y;
+	ray_dir.r.x = data->cam.plane.x * 2;
+	ray_dir.r.y = data->cam.plane.y * 2;
+	ray_dir.cast_table = *get_cast_table();
+	ray_dir.tile_dict = get_tile_dict();
 	while (++i < DRAW_THREADS)
 	{
 		td[i].data = data;

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 15:18:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/23 14:25:57 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/24 11:06:24 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,14 @@ void	writeBMP(const char *filename, const unsigned char *data, int width, int he
 	fclose(f);
 }
 
+void	print_line(t_data *data, int *map)
+{
+	printf("\t| ");
+	for (int i = 0; i < data->map->wid; i++)
+		printf("%c", (char)(*(map + i)));
+	printf(" |\n");
+}
+
 void	print_map(t_data *data)
 {
 	int	y;
@@ -78,7 +86,7 @@ void	print_map(t_data *data)
 	printf(".\n");
 	printf("\t| %*s |\n", data->map->wid, "");
 	while (++y < data->map->len)
-		printf("\t| %*s |\n", data->map->wid, data->map->matrix[y]);
+		print_line(data, data->map->matrix + y * data->map->wid);
 	printf("\t| %*s |\n", data->map->wid, "");
 	printf("\t*");
 	for (int i = 0; i < data->map->wid + 2; i++)

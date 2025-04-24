@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 22:36:25 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/23 14:11:07 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/24 10:57:09 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,10 +40,10 @@ void	draw_tiles(t_data *data)
 		{
 			start.x = (curr.x) * data->map->mini_map_scale;
 			start.y = (curr.y) * data->map->mini_map_scale;
-			if (get_tile_dict()[(int)data->map->matrix[curr.y][curr.x]]->is_wall)
+			if (get_tile_dict()[*(data->map->matrix + curr.y * data->map->wid + curr.x)]->is_wall)
 				draw_tile(data, start, vals, 0xFF0000);
-			else if (data->map->matrix[curr.y][curr.x] != data->map->void_char)
-				draw_tile(data, start, vals, *(int *)(get_tile_dict()[(int)data->map->matrix[curr.y][curr.x]]->tex_fl->data));
+			else if (*(data->map->matrix + curr.y * data->map->wid + curr.x) != data->map->void_char)
+				draw_tile(data, start, vals, *(int *)(get_tile_dict()[*(data->map->matrix + curr.y * data->map->wid + curr.x)]->tex_fl->data));
 		}
 	}
 }
