@@ -28,8 +28,8 @@ PRINT = 	ft_perror.c			ft_putchar_fd.c		ft_putendl_fd.c		\
 PRINTF =	digits.c			ft_printf.c			handle_args.c		\
 			str.c
 
-MATH =		ft_abs.c			ft_atoi.c			ft_itoa.c			\
-			ft_max.c			ft_power.c
+MATH =		ft_abs.c			ft_atof.c			ft_atoi.c			\
+			ft_itoa.c			ft_max.c			ft_power.c
 
 F =			ft_ternary.c
 

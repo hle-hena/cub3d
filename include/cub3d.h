@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/24 14:45:36 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/24 17:00:57 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,6 +122,7 @@ typedef struct s_hit
 	t_vec	ray_dir;
 	t_img	*texture;
 	int		side;
+	int		bounces;
 	int		draw_start;
 	int		draw_end;
 	char	*tex_col;
@@ -137,6 +138,7 @@ typedef struct s_ray
 	t_point	curr;
 	t_point	step;
 	int		side;
+	int		bounce;
 }	t_ray;
 
 typedef	struct s_ray_dir
@@ -232,7 +234,7 @@ void	draw_line(t_data *data, t_point start, t_point end, int color);
 void	draw_mini_map(t_data *data);
 int		point_is_in_mini_map(t_data *data, t_point point);
 
-t_hit	raycast(t_data *data, t_vec dir, t_player player);
+t_hit	raycast(t_data *data, t_vec dir, t_player player, int bounce);
 t_vec	**get_cast_table(void);
 void	draw_line_in_direction(t_data *data, t_point start, t_vec dir,
 	float dist);

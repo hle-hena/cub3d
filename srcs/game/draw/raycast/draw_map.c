@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/24 12:24:35 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/24 17:00:51 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,7 +157,7 @@ t_hit cast_ray(t_data *data, t_vec ray_dir)
 	int		tex_start;
 	int		tex_end;
 
-	ray_hit = raycast(data, ray_dir, data->map->player);
+	ray_hit = raycast(data, ray_dir, data->map->player, 0);
 	ray_hit.ray_dir = ray_dir;
 	ray_hit.dist = ray_hit.dist * (ray_dir.x * data->cam.dir.x + ray_dir.y * data->cam.dir.y);
 	if (ray_hit.dist <= 0.0f)
