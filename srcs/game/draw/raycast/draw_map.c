@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/25 16:41:49 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/25 17:23:06 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,8 +141,6 @@ void	*draw_walls_thread(void *arg)
 				draw_ceil(data, curr, td->ray_dir, img, hit);
 			else if (curr.y > hit->draw_end[hit->bounces])
 				draw_floor(data, curr, td->ray_dir, img, hit);
-			else
-				*(int *)img = 0;
 			img += data->img.bpp;
 		}
 		img += td->add_next_line;
