@@ -43,10 +43,10 @@ D {
 	W 1
 }
 F {
-	NO textures/simonkraft/bookshelf_01.xpm
-	SO textures/simonkraft/bookshelf_02.xpm
+	NO textures/simonkraft/bookshelf_01.xpm 1
+	SO textures/simonkraft/bookshelf_02.xpm 1
 	WE textures/simonkraft/bookshelf_03.xpm
-	EA textures/simonkraft/bookshelf.xpm
+	EA textures/simonkraft/bookshelf.xpm 1
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
 	CH 100
@@ -82,7 +82,7 @@ C01D10A01B10D01B10D
 B10D01A10B01C10C01A
 A01A10F01D10A01A10B
 D10D01B10101F10B01C
-C01010101S10101010D
+C01010101W10101010D
 B1010AFDCBDAB10101A
 ACDA10101010101ABCB
 D101010B0A0D010101C

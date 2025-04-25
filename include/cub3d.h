@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/24 18:28:03 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/25 14:12:15 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,12 @@ typedef struct s_img
 	int		height;
 }	t_img;
 
+typedef struct s_texture
+{
+	t_img	*img;
+	float	reflectance;
+}	t_text;
+
 # define MOVE_SPEED 0.075f
 # define ROT_SPEED 0.2f
 
@@ -82,12 +88,12 @@ typedef struct s_player
 
 typedef	struct s_tile
 {
-	t_img		*tex_no;
-	t_img		*tex_so;
-	t_img		*tex_we;
-	t_img		*tex_ea;
-	t_img		*tex_ce;
-	t_img		*tex_fl;
+	t_text		tex_no;
+	t_text		tex_so;
+	t_text		tex_we;
+	t_text		tex_ea;
+	t_text		tex_ce;
+	t_text		tex_fl;
 	int			ceil_height;
 	int			floor_height;
 	int			is_wall;
@@ -123,8 +129,10 @@ typedef struct s_hit
 	float	r_dist;
 	t_vec	ray_hit;
 	t_vec	ray_dir;
+	t_vec	m_hit;
 	t_img	*texture;
 	int		side;
+	int		m_side;
 	int		bounces;
 	int		draw_start;
 	int		draw_end;
@@ -144,6 +152,7 @@ typedef struct s_ray
 	t_point	step;
 	int		side;
 	int		bounce;
+	float	precise_dist;
 }	t_ray;
 
 typedef	struct s_ray_dir
@@ -204,7 +213,8 @@ t_tile	**get_tile_dict(void);
 char	*retrieve_tile_dict(t_map *map, int map_fd, int *err);
 void	retrieve_tile(t_tile **tiles, int map_fd, char *line, int *err);
 void	retrieve_value(int *value, char *arg, int *err, char *id);
-void	retrieve_texture(t_img **texture, char *arg, int *err, char *id);
+void	retrieve_texture(t_text *texture, char *arg, int *err, char *id);
+void	retrieve_texture_val(t_text *texture, char *arg, int *err);
 void	retrieve_texture_color(t_img **img, char *line, int *err);
 t_img	**get_hash_table(void);
 t_img	*get_img_hash(char *path, int *err);

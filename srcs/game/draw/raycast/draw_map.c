@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/24 18:22:37 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/25 13:34:02 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,27 @@
 	// long ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
 	// printf("Took %ldns\n", ms);
 
-static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img)
+t_vec reflect_across_mirror(t_vec point, t_hit *hit)
+{
+	float	offset;
+	t_vec	final;
+
+	if (hit->m_side == 0)
+	{
+		offset = point.x - hit->m_hit.x;
+		final.x = point.x - (2 * offset);
+		final.y = point.y;
+	}
+	else
+	{
+		offset = point.y - hit->m_hit.y;
+		final.x = point.x;
+		final.y = point.y - (2 * offset);
+	}
+	return (final);
+}
+
+static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, int is_mirror, t_hit *hit)
 {
 	t_tile	*tile;
 	t_vec	cast;
@@ -32,6 +52,8 @@ static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img)
 	cast = *(ray.cast_table + curr.y * data->win_wid + curr.x);
 	world.x = data->map->player.x + cast.y * (ray.l.x + cast.x * ray.r.x);
 	world.y = data->map->player.y + cast.y * (ray.l.y + cast.x * ray.r.y);
+	if (is_mirror)
+		world =  reflect_across_mirror(world, hit);
 	iworld.x = (int)world.x;
 	iworld.y = (int)world.y;
 	if (world.y < 0 || world.y >= data->map->len || world.x < 0
@@ -40,7 +62,7 @@ static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img)
 	tile = *(ray.tile_dict + *(data->map->matrix + iworld.y * data->map->wid + iworld.x));
 	if (!tile)
 		return ;
-	tex = tile->tex_ce;
+	tex = tile->tex_ce.img;
 	pix.x = ((world.x - iworld.x) * tex->width);
 	pix.y = ((world.y - iworld.y) * tex->height);
 	if (pix.x >= tex->width)
@@ -51,7 +73,7 @@ static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img)
 	*(int *)img = *(int *)(tex->data + offset);
 }
 
-static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img)
+static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img, int is_mirror, t_hit *hit)
 {
 	t_tile	*tile;
 	t_vec	cast;
@@ -64,6 +86,8 @@ static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img)
 	cast = *(ray.cast_table + curr.y * data->win_wid + curr.x);
 	world.x = data->map->player.x + cast.y * (ray.l.x + cast.x * ray.r.x);
 	world.y = data->map->player.y + cast.y * (ray.l.y + cast.x * ray.r.y);
+	if (is_mirror)
+		world =  reflect_across_mirror(world, hit);
 	iworld.x = (int)world.x;
 	iworld.y = (int)world.y;
 	if (world.y < 0 || world.y >= data->map->len || world.x < 0
@@ -72,7 +96,7 @@ static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img)
 	tile = *(ray.tile_dict + *(data->map->matrix + iworld.y * data->map->wid + iworld.x));
 	if (!tile)
 		return ;
-	tex = tile->tex_fl;
+	tex = tile->tex_fl.img;
 	pix.x = ((world.x - iworld.x) * tex->width);
 	pix.y = ((world.y - iworld.y) * tex->height);
 	if (pix.x >= tex->width)
@@ -82,7 +106,6 @@ static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img)
 	offset = pix.y * tex->size_line + pix.x * tex->bpp;
 	*(int *)img = *(int *)(tex->data + offset);
 }
-
 
 void	*draw_walls_thread(void *arg)
 {
@@ -109,11 +132,13 @@ void	*draw_walls_thread(void *arg)
 				hit->tex_pos_fp += hit->step_fp;
 			}
 			else if (curr.y < hit->m_start)
-				draw_ceil(data, curr, td->ray_dir, img);
+				draw_ceil(data, curr, td->ray_dir, img, 0, hit);
 			else if (curr.y > hit->m_end)
-				draw_floor(data, curr, td->ray_dir, img);
+				draw_floor(data, curr, td->ray_dir, img, 0, hit);
+			else if (curr.y < hit->draw_start)
+				draw_ceil(data, curr, td->ray_dir, img, 1, hit);
 			else
-				*(int *)img = 0;
+				draw_floor(data, curr, td->ray_dir, img, 1, hit);
 			img += data->img.bpp;
 		}
 		img += td->add_next_line;
