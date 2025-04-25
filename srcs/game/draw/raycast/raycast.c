@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 18:51:23 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/25 15:02:19 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/25 16:44:35 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,16 +58,13 @@ void	handle_hit(t_data *data, t_ray *ray, t_hit *hit)
 	t_text	texture;
 
 	texture = hit_text(data, ray);
-	if (ray->bounce == 0)
-	{
-		hit->m_dist = ray->precise_dist;
-		hit->m_side = ray->side;
-	}
 	hit->hit[ray->bounce].x = ray->origin.x + ray->dir.x * ray->precise_dist;
 	hit->hit[ray->bounce].y = ray->origin.y + ray->dir.y * ray->precise_dist;
-	if (texture.reflectance && ray->bounce < MAX_BOUNCE)
+	if (texture.reflectance && ray->bounce < MAX_BOUNCE - 1)
 	{
-		hit->dist += ray->precise_dist;
+		hit->dist[ray->bounce] = ray->precise_dist;
+		if (ray->bounce != 0)
+			hit->dist[ray->bounce] += hit->dist[ray->bounce - 1];
 		ray->origin = hit->hit[ray->bounce];
 		if (ray->side == 0)
 			ray->origin.x += ray->dir.x > 0 ? -0.001f : 0.001f;
@@ -78,14 +75,16 @@ void	handle_hit(t_data *data, t_ray *ray, t_hit *hit)
 		else
 			ray->dir.y = -ray->dir.y;
 		calc_ray(ray);
+		hit->side[ray->bounce] = ray->side;
 		ray->bounce++;
 	}
 	else
 	{
-		hit->dist += ray->precise_dist;
-		hit->side = ray->side;
+		hit->dist[ray->bounce] = ray->precise_dist;
+		if (ray->bounce != 0)
+			hit->dist[ray->bounce] += hit->dist[ray->bounce - 1];
+		hit->side[ray->bounce] = ray->side;
 		hit->texture = texture.img;
-		hit->ray_hit = hit->hit[ray->bounce];
 		ray->running = 0;
 		hit->bounces = ray->bounce;
 	}

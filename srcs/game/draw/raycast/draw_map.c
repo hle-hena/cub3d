@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/25 15:03:25 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/25 16:41:49 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,34 +19,35 @@
 	// long ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
 	// printf("Took %ldns\n", ms);
 
-t_vec reflect_across_mirror(t_vec point, t_hit *hit)
+t_vec reflect_across_mirror(t_vec point, t_hit *hit, t_point curr)
 {
 	float	offset;
 	t_vec	final;
 	int		bounce;
 
-	bounce = -1;
-	while (++bounce < hit->bounces)
+	bounce = 0;
+	while (++bounce <= hit->bounces)
 	{
-		if (hit->m_side == 0)
+		if (curr.y < hit->draw_start[bounce - 1] || curr.y > hit->draw_end[bounce - 1])
+			return (point);
+		if (hit->side[bounce - 1] == 0)
 		{
-			offset = point.x - hit->hit[bounce].x;
+			offset = point.x - hit->hit[bounce - 1].x;
 			final.x = point.x - (2 * offset);
 			final.y = point.y;
 		}
 		else
 		{
-			offset = point.y - hit->hit[bounce].y;
+			offset = point.y - hit->hit[bounce - 1].y;
 			final.x = point.x;
 			final.y = point.y - (2 * offset);
 		}
 		point = final;
 	}
-	return (final);
-
+	return (point);
 }
 
-static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, int is_mirror, t_hit *hit)
+static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, t_hit *hit)
 {
 	t_tile	*tile;
 	t_vec	cast;
@@ -59,16 +60,15 @@ static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, 
 	cast = *(ray.cast_table + curr.y * data->win_wid + curr.x);
 	world.x = data->map->player.x + cast.y * (ray.l.x + cast.x * ray.r.x);
 	world.y = data->map->player.y + cast.y * (ray.l.y + cast.x * ray.r.y);
-	if (is_mirror)
-		world =  reflect_across_mirror(world, hit);
+	world =  reflect_across_mirror(world, hit, curr);
 	iworld.x = (int)world.x;
 	iworld.y = (int)world.y;
 	if (world.y < 0 || world.y >= data->map->len || world.x < 0
 		|| world.x >= data->map->wid)
-		return ;
+		return (*(int *)img = 0, VOID);
 	tile = *(ray.tile_dict + *(data->map->matrix + iworld.y * data->map->wid + iworld.x));
 	if (!tile)
-		return ;
+		return (*(int *)img = 0, VOID);
 	tex = tile->tex_ce.img;
 	pix.x = ((world.x - iworld.x) * tex->width);
 	pix.y = ((world.y - iworld.y) * tex->height);
@@ -80,7 +80,7 @@ static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, 
 	*(int *)img = *(int *)(tex->data + offset);
 }
 
-static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img, int is_mirror, t_hit *hit)
+static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img, t_hit *hit)
 {
 	t_tile	*tile;
 	t_vec	cast;
@@ -93,16 +93,15 @@ static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img,
 	cast = *(ray.cast_table + curr.y * data->win_wid + curr.x);
 	world.x = data->map->player.x + cast.y * (ray.l.x + cast.x * ray.r.x);
 	world.y = data->map->player.y + cast.y * (ray.l.y + cast.x * ray.r.y);
-	if (is_mirror)
-		world =  reflect_across_mirror(world, hit);
+	world =  reflect_across_mirror(world, hit, curr);
 	iworld.x = (int)world.x;
 	iworld.y = (int)world.y;
 	if (world.y < 0 || world.y >= data->map->len || world.x < 0
 		|| world.x >= data->map->wid)
-		return ;
+		return (*(int *)img = 0, VOID);
 	tile = *(ray.tile_dict + *(data->map->matrix + iworld.y * data->map->wid + iworld.x));
 	if (!tile)
-		return ;
+		return (*(int *)img = 0, VOID);
 	tex = tile->tex_fl.img;
 	pix.x = ((world.x - iworld.x) * tex->width);
 	pix.y = ((world.y - iworld.y) * tex->height);
@@ -132,20 +131,18 @@ void	*draw_walls_thread(void *arg)
 		while (++curr.x < td->end_x)
 		{
 			hit = &data->hits[curr.x];
-			if (curr.y >= hit->draw_start && curr.y < hit->draw_end)
+			if (curr.y >= hit->draw_start[hit->bounces] && curr.y < hit->draw_end[hit->bounces])
 			{
 				hit->tex_y = hit->tex_pos_fp >> 16;
 				*(int *)img = *(int *)(hit->tex_col + hit->tex_y * hit->texture->size_line);
 				hit->tex_pos_fp += hit->step_fp;
 			}
-			else if (curr.y < hit->m_start)
-				draw_ceil(data, curr, td->ray_dir, img, 0, hit);
-			else if (curr.y > hit->m_end)
-				draw_floor(data, curr, td->ray_dir, img, 0, hit);
-			else if (curr.y < hit->draw_start)
-				draw_ceil(data, curr, td->ray_dir, img, 1, hit);
+			else if (curr.y < hit->draw_start[hit->bounces])
+				draw_ceil(data, curr, td->ray_dir, img, hit);
+			else if (curr.y > hit->draw_end[hit->bounces])
+				draw_floor(data, curr, td->ray_dir, img, hit);
 			else
-				draw_floor(data, curr, td->ray_dir, img, 1, hit);
+				*(int *)img = 0;
 			img += data->img.bpp;
 		}
 		img += td->add_next_line;
@@ -183,50 +180,51 @@ void	draw_walls(t_data *data)
 		pthread_join(threads[i], NULL);
 }
 
+int	init_line_heights(t_data *data, t_hit *hit, t_vec ray_dir)
+{
+	int	i;
+	int	tex_start;
+	int	tex_end;
+	int	line_height;
+
+	i = -1;
+	while (++i <= hit->bounces)
+	{
+		hit->dist[i] = hit->dist[i] * (ray_dir.x * data->cam.dir.x + ray_dir.y * data->cam.dir.y);
+		if (hit->dist[i] <= 0.0f)
+			hit->dist[i] = 0.0001f;
+		line_height = (int)(data->win_len * 2 / hit->dist[i]);
+		if (line_height == 0)
+			line_height = 1;
+		tex_start = -line_height / 2 + data->win_len / 2;
+		tex_end = line_height / 2 + data->win_len / 2;
+		hit->draw_start[i] = ft_max(tex_start, 0);
+		hit->draw_end[i] = ft_min(tex_end, data->win_len - 1);
+	}
+	return (tex_end - tex_start);
+}
+
+
 t_hit cast_ray(t_data *data, t_vec ray_dir)
 {
-	t_hit	ray_hit;
+	t_hit	hit;
 	float	wall_x;
 	int		line_height;
-	int		tex_start;
-	int		tex_end;
 
-	ray_hit = raycast(data, ray_dir, data->map->player);
-	ray_hit.ray_dir = ray_dir;
-
-	ray_hit.m_dist = ray_hit.m_dist * (ray_dir.x * data->cam.dir.x + ray_dir.y * data->cam.dir.y);
-	if (ray_hit.m_dist <= 0.0f)
-		ray_hit.m_dist = 0.0001f;
-	line_height = (int)(data->win_len * 2 / ray_hit.m_dist);
+	hit = raycast(data, ray_dir, data->map->player);
+	hit.ray_dir = ray_dir;
+	line_height = init_line_heights(data, &hit, ray_dir);
 	if (line_height == 0)
 		line_height = 1;
-	tex_start = -line_height / 2 + data->win_len / 2;
-	tex_end = line_height / 2 + data->win_len / 2;
-	ray_hit.m_start = ft_max(tex_start, 0);
-	ray_hit.m_end = ft_min(tex_end, data->win_len - 1);
-
-	ray_hit.dist = ray_hit.dist * (ray_dir.x * data->cam.dir.x + ray_dir.y * data->cam.dir.y);
-	if (ray_hit.dist <= 0.0f)
-		ray_hit.dist = 0.0001f;
-	line_height = (int)(data->win_len * 2 / ray_hit.dist);
-	if (line_height == 0)
-		line_height = 1;
-	tex_start = -line_height / 2 + data->win_len / 2;
-	tex_end = line_height / 2 + data->win_len / 2;
-	ray_hit.draw_start = ft_max(tex_start, 0);
-	ray_hit.draw_end = ft_min(tex_end, data->win_len - 1);
-	if (ray_hit.side == 0)
-		wall_x = ray_hit.ray_hit.y;
+	if (hit.side[hit.bounces] == 0)
+		wall_x = hit.hit[hit.bounces].y;
 	else
-		wall_x = ray_hit.ray_hit.x;
+		wall_x = hit.hit[hit.bounces].x;
 	wall_x -= (int)wall_x;
-	line_height = tex_end - tex_start;
-	if (line_height == 0)
-		line_height = 1;
-	ray_hit.step_fp = (ray_hit.texture->height << 16) / line_height;
-	ray_hit.tex_pos_fp = (ray_hit.draw_start - data->win_len / 2 + line_height / 2) * ray_hit.step_fp;
-	ray_hit.tex_col = ray_hit.texture->data + (int)(wall_x * ray_hit.texture->width) * ray_hit.texture->bpp;
-	return (ray_hit);
+	hit.step_fp = (hit.texture->height << 16) / line_height;
+	hit.tex_pos_fp = (hit.draw_start[hit.bounces] - data->win_len / 2 + line_height / 2) * hit.step_fp;
+	hit.tex_col = hit.texture->data + (int)(wall_x * hit.texture->width) * hit.texture->bpp;
+	return (hit);
 }
 
 void cast_rays(t_data *data)

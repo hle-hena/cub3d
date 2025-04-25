@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/25 15:09:37 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/25 15:33:42 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,23 +125,18 @@ typedef struct s_events
 
 typedef struct s_hit
 {
-	float	m_dist;
-	float	dist;
-	t_vec	ray_hit;
+	t_img	*texture;
 	t_vec	ray_dir;
 	t_vec	hit[MAX_BOUNCE];
-	t_img	*texture;
-	int		side;
-	int		m_side;
+	float	dist[MAX_BOUNCE];
+	int		draw_start[MAX_BOUNCE];
+	int		draw_end[MAX_BOUNCE];
+	int		side[MAX_BOUNCE];
 	int		bounces;
-	int		draw_start;
-	int		draw_end;
-	int		m_start;
-	int		m_end;
-	char	*tex_col;
 	int		tex_y;
 	int		tex_pos_fp;
 	int		step_fp;
+	char	*tex_col;
 }	t_hit;
 
 typedef struct s_ray
