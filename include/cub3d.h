@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/25 14:12:15 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/25 15:09:37 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,10 +126,10 @@ typedef struct s_events
 typedef struct s_hit
 {
 	float	m_dist;
-	float	r_dist;
+	float	dist;
 	t_vec	ray_hit;
 	t_vec	ray_dir;
-	t_vec	m_hit;
+	t_vec	hit[MAX_BOUNCE];
 	t_img	*texture;
 	int		side;
 	int		m_side;
@@ -148,10 +148,13 @@ typedef struct s_ray
 {
 	t_vec	dist;
 	t_vec	slope;
+	t_vec	origin;
+	t_vec	dir;
 	t_point	curr;
 	t_point	step;
 	int		side;
 	int		bounce;
+	int		running;
 	float	precise_dist;
 }	t_ray;
 
@@ -249,7 +252,7 @@ void	draw_line(t_data *data, t_point start, t_point end, int color);
 void	draw_mini_map(t_data *data);
 int		point_is_in_mini_map(t_data *data, t_point point);
 
-t_hit	raycast(t_data *data, t_vec dir, t_player player, int bounce);
+t_hit	raycast(t_data *data, t_vec dir, t_player player);
 t_vec	**get_cast_table(void);
 void	draw_line_in_direction(t_data *data, t_point start, t_vec dir,
 	float dist);

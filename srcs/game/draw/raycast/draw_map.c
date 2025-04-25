@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/25 13:34:02 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/25 15:03:25 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,20 +23,27 @@ t_vec reflect_across_mirror(t_vec point, t_hit *hit)
 {
 	float	offset;
 	t_vec	final;
+	int		bounce;
 
-	if (hit->m_side == 0)
+	bounce = -1;
+	while (++bounce < hit->bounces)
 	{
-		offset = point.x - hit->m_hit.x;
-		final.x = point.x - (2 * offset);
-		final.y = point.y;
-	}
-	else
-	{
-		offset = point.y - hit->m_hit.y;
-		final.x = point.x;
-		final.y = point.y - (2 * offset);
+		if (hit->m_side == 0)
+		{
+			offset = point.x - hit->hit[bounce].x;
+			final.x = point.x - (2 * offset);
+			final.y = point.y;
+		}
+		else
+		{
+			offset = point.y - hit->hit[bounce].y;
+			final.x = point.x;
+			final.y = point.y - (2 * offset);
+		}
+		point = final;
 	}
 	return (final);
+
 }
 
 static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, int is_mirror, t_hit *hit)
@@ -184,13 +191,13 @@ t_hit cast_ray(t_data *data, t_vec ray_dir)
 	int		tex_start;
 	int		tex_end;
 
-	ray_hit = raycast(data, ray_dir, data->map->player, 0);
+	ray_hit = raycast(data, ray_dir, data->map->player);
 	ray_hit.ray_dir = ray_dir;
 
-	ray_hit.r_dist = ray_hit.r_dist * (ray_dir.x * data->cam.dir.x + ray_dir.y * data->cam.dir.y);
-	if (ray_hit.r_dist <= 0.0f)
-		ray_hit.r_dist = 0.0001f;
-	line_height = (int)(data->win_len * 2 / ray_hit.r_dist);
+	ray_hit.m_dist = ray_hit.m_dist * (ray_dir.x * data->cam.dir.x + ray_dir.y * data->cam.dir.y);
+	if (ray_hit.m_dist <= 0.0f)
+		ray_hit.m_dist = 0.0001f;
+	line_height = (int)(data->win_len * 2 / ray_hit.m_dist);
 	if (line_height == 0)
 		line_height = 1;
 	tex_start = -line_height / 2 + data->win_len / 2;
@@ -198,10 +205,10 @@ t_hit cast_ray(t_data *data, t_vec ray_dir)
 	ray_hit.m_start = ft_max(tex_start, 0);
 	ray_hit.m_end = ft_min(tex_end, data->win_len - 1);
 
-	ray_hit.m_dist = ray_hit.m_dist * (ray_dir.x * data->cam.dir.x + ray_dir.y * data->cam.dir.y);
-	if (ray_hit.m_dist <= 0.0f)
-		ray_hit.m_dist = 0.0001f;
-	line_height = (int)(data->win_len * 2 / ray_hit.m_dist);
+	ray_hit.dist = ray_hit.dist * (ray_dir.x * data->cam.dir.x + ray_dir.y * data->cam.dir.y);
+	if (ray_hit.dist <= 0.0f)
+		ray_hit.dist = 0.0001f;
+	line_height = (int)(data->win_len * 2 / ray_hit.dist);
 	if (line_height == 0)
 		line_height = 1;
 	tex_start = -line_height / 2 + data->win_len / 2;
