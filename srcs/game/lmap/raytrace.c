@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:22:39 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/27 18:53:34 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/27 19:36:44 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,6 +118,7 @@ void	init_trace(t_trace *ray, t_vec dir, t_vec origin, float emittance)
 void	handle_attenuation(t_data *data, t_lmap *lmap, t_trace *ray)
 {
 	*(lmap->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION) = ray->emittance;
+	ray->emittance *= 0.99;
 }
 
 void	raytrace(t_data *data, t_vec origin, t_vec dir, float emittance)

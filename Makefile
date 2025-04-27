@@ -2,7 +2,7 @@ MAKEFLAGS += --no-print-directory
 
 NAME = cub3d
 CC = cc
-FLAGS = -Wall -Wextra -Werror -I./include -Imlx -g
+FLAGS = -Wall -Wextra -Werror -I./include -Imlx -O3
 RM = rm -f
 
 FRAMEDIR = ./mlx

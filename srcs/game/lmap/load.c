@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:08:29 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/27 18:42:41 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/27 19:37:25 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,16 @@
 
 void	raytrace_source(t_data *data, t_vec origin)
 {
-	int		deg;
+	float	deg;
 	t_vec	dir;
 
-	deg = -1;
-	while (++deg < 360)
+	deg = 0;
+	while (deg < 360)
 	{
 		dir.x = cos(deg * PI / 180);
 		dir.y = sin(deg * PI / 180);
 		raytrace(data, origin, dir, 1);
+		deg += 0.01;
 	}
 }
 

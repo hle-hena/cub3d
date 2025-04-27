@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/27 19:16:41 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/27 19:36:10 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,8 @@ static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, 
 	t_point	iworld;
 	t_point	pix;
 	t_img	*tex;
-	int	offset;
+	int		offset;
+	int		color;
 
 	cast = *(ray.cast_table + curr.y * data->win_wid + curr.x);
 	world.x = data->map->player.x + cast.y * (ray.l.x + cast.x * ray.r.x);
@@ -79,8 +80,8 @@ static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, 
 	offset = pix.y * tex->size_line + pix.x * tex->bpp;
 	iworld.x = world.x * LMAP_PRECISION;
 	iworld.y = world.y * LMAP_PRECISION;
-	*(int *)img = *(int *)(tex->data + offset) * *(data->lmap.lmap + iworld.x + iworld.y * data->map->wid * LMAP_PRECISION);
-}
+	color = interpolate_color(0, *(int *)(tex->data + offset), *(data->lmap.lmap + iworld.x + iworld.y * data->map->wid * LMAP_PRECISION));
+	*(int *)img = color;}
 
 static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img, t_hit *hit)
 {
@@ -90,7 +91,8 @@ static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img,
 	t_point	pix;
 	t_point	iworld;
 	t_img	*tex;
-	int	offset;
+	int		offset;
+	int		color;
 
 	cast = *(ray.cast_table + curr.y * data->win_wid + curr.x);
 	world.x = data->map->player.x + cast.y * (ray.l.x + cast.x * ray.r.x);
@@ -114,20 +116,22 @@ static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img,
 	offset = pix.y * tex->size_line + pix.x * tex->bpp;
 	iworld.x = world.x * LMAP_PRECISION;
 	iworld.y = world.y * LMAP_PRECISION;
-	*(int *)img = *(int *)(tex->data + offset) * *(data->lmap.lmap + iworld.x + iworld.y * data->map->wid * LMAP_PRECISION);
+	color = interpolate_color(0, *(int *)(tex->data + offset), *(data->lmap.lmap + iworld.x + iworld.y * data->map->wid * LMAP_PRECISION));
+	*(int *)img = color;
 }
 
 static inline void	draw_wall(t_data *data, char *img, t_hit *hit)
 {
 	float	light;
+	int		color;
 	t_point	light_point;
 
 	light_point.x = (float)(hit->hit[hit->bounces].x + (hit->ray_dir.x > 0 ? 0.001 : -0.001) * !hit->side[hit->bounces]) * LMAP_PRECISION;
 	light_point.y = (float)(hit->hit[hit->bounces].y + (hit->ray_dir.y > 0 ? 0.001 : -0.001) * hit->side[hit->bounces]) * LMAP_PRECISION;
-	// printf("(%d, %d)\n", light_point.x, light_point.y);
 	light = *(data->lmap.lmap + light_point.x + light_point.y * data->map->wid * LMAP_PRECISION);
 	hit->tex_y = hit->tex_pos_fp >> 16;
-	*(int *)img = *(int *)(hit->tex_col + hit->tex_y * hit->texture->size_line) * light;
+	color = interpolate_color(0x000000, *(int *)(hit->tex_col + hit->tex_y * hit->texture->size_line), light);
+	*(int *)img = color;
 	hit->tex_pos_fp += hit->step_fp;
 }
 

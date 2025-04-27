@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/27 18:50:03 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/27 19:37:05 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -207,7 +207,7 @@ typedef struct s_data
 }	t_data;
 
 # define DRAW_THREADS 4
-# define LMAP_PRECISION 4
+# define LMAP_PRECISION 64
 
 typedef struct s_thread_draw
 {
@@ -259,6 +259,7 @@ int		mouse_up(int button, int x, int y, t_data *data);
 int		mouse_move(int x, int y, t_data *data);
 t_col	rev_calc_color(int col);
 int		calc_color(t_col col);
+int		interpolate_color(int col1, int col2, float percent);
 int		ft_get_pixel_color(t_data *data, t_point point);
 
 void	cast_rays(t_data *data);
