@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/25 15:33:42 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/27 18:50:03 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,6 +168,29 @@ typedef	struct s_cam
 	float	plane_len;
 }	t_cam;
 
+typedef struct s_trace
+{
+	t_vec	dist;
+	t_vec	slope;
+	t_vec	origin;
+	t_vec	dir;
+	t_point	curr;
+	t_point	real;
+	t_point	step;
+	int		side;
+	int		bounce;
+	int		running;
+	float	precise_dist;
+	float	emittance;
+}	t_trace;
+
+typedef struct s_light_map
+{
+	float	*lmap;
+	t_vec	*light_sources;
+	int		nb_l_sources;
+}	t_lmap;
+
 typedef struct s_data
 {
 	void	*mlx;
@@ -176,6 +199,7 @@ typedef struct s_data
 	int		win_len;
 	int		win_wid;
 	float	delta_t;
+	t_lmap	lmap;
 	t_cam	cam;
 	t_map	*map;
 	t_hit	*hits;
@@ -183,6 +207,7 @@ typedef struct s_data
 }	t_data;
 
 # define DRAW_THREADS 4
+# define LMAP_PRECISION 4
 
 typedef struct s_thread_draw
 {
@@ -255,7 +280,8 @@ void	draw_line_in_direction(t_data *data, t_point start, t_vec dir,
 
 void	fps_counter(t_data *data);
 
-
+int		create_lmap(t_data *data);
+void	raytrace(t_data *data, t_vec origin, t_vec dir, float emittance);
 
 void	print_dict(t_data *data);
 

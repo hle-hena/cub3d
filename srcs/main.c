@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:05:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/25 10:45:01 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/27 18:14:23 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,12 @@ int	main(int ac, char **av)
 	data->map = load_map(ac, av);
 	if (data->map)
 	{
-		print_dict(data);	
+		if (create_lmap(data))
+		{
+			clean_data();
+			return (0);
+		}
+		print_dict(data);
 		init_mlx(data);
 		init_utils(data);
 		loop();

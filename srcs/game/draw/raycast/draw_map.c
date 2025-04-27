@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/25 17:24:06 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/27 19:16:41 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,9 @@ static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, 
 	if (pix.y >= tex->height)
 		pix.y = tex->height - 1;
 	offset = pix.y * tex->size_line + pix.x * tex->bpp;
-	*(int *)img = *(int *)(tex->data + offset);
+	iworld.x = world.x * LMAP_PRECISION;
+	iworld.y = world.y * LMAP_PRECISION;
+	*(int *)img = *(int *)(tex->data + offset) * *(data->lmap.lmap + iworld.x + iworld.y * data->map->wid * LMAP_PRECISION);
 }
 
 static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img, t_hit *hit)
@@ -110,7 +112,23 @@ static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img,
 	if (pix.y >= tex->height)
 		pix.y = tex->height - 1;
 	offset = pix.y * tex->size_line + pix.x * tex->bpp;
-	*(int *)img = *(int *)(tex->data + offset);
+	iworld.x = world.x * LMAP_PRECISION;
+	iworld.y = world.y * LMAP_PRECISION;
+	*(int *)img = *(int *)(tex->data + offset) * *(data->lmap.lmap + iworld.x + iworld.y * data->map->wid * LMAP_PRECISION);
+}
+
+static inline void	draw_wall(t_data *data, char *img, t_hit *hit)
+{
+	float	light;
+	t_point	light_point;
+
+	light_point.x = (float)(hit->hit[hit->bounces].x + (hit->ray_dir.x > 0 ? 0.001 : -0.001) * !hit->side[hit->bounces]) * LMAP_PRECISION;
+	light_point.y = (float)(hit->hit[hit->bounces].y + (hit->ray_dir.y > 0 ? 0.001 : -0.001) * hit->side[hit->bounces]) * LMAP_PRECISION;
+	// printf("(%d, %d)\n", light_point.x, light_point.y);
+	light = *(data->lmap.lmap + light_point.x + light_point.y * data->map->wid * LMAP_PRECISION);
+	hit->tex_y = hit->tex_pos_fp >> 16;
+	*(int *)img = *(int *)(hit->tex_col + hit->tex_y * hit->texture->size_line) * light;
+	hit->tex_pos_fp += hit->step_fp;
 }
 
 void	*draw_walls_thread(void *arg)
@@ -132,11 +150,7 @@ void	*draw_walls_thread(void *arg)
 		{
 			hit = &data->hits[curr.x];
 			if (curr.y >= hit->draw_start[hit->bounces] && curr.y < hit->draw_end[hit->bounces])
-			{
-				hit->tex_y = hit->tex_pos_fp >> 16;
-				*(int *)img = *(int *)(hit->tex_col + hit->tex_y * hit->texture->size_line);
-				hit->tex_pos_fp += hit->step_fp;
-			}
+				draw_wall(data, img, hit);
 			else if (curr.y < hit->draw_start[hit->bounces])
 				draw_ceil(data, curr, td->ray_dir, img, hit);
 			else if (curr.y >= hit->draw_end[hit->bounces])
@@ -186,12 +200,14 @@ int	init_line_heights(t_data *data, t_hit *hit, t_vec ray_dir)
 	int	line_height;
 
 	i = -1;
+	tex_end = 0;
+	tex_start = 0;
 	while (++i <= hit->bounces)
 	{
 		hit->dist[i] = hit->dist[i] * (ray_dir.x * data->cam.dir.x + ray_dir.y * data->cam.dir.y);
 		if (hit->dist[i] <= 0.0f)
 			hit->dist[i] = 0.0001f;
-		line_height = (int)(data->win_len * 2 / hit->dist[i]);
+		line_height = (int)(data->win_len * 2 / hit->dist[i]) + 2;
 		if (line_height == 0)
 			line_height = 1;
 		tex_start = -line_height / 2 + data->win_len / 2;

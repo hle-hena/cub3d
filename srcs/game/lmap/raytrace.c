@@ -1,31 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   raycast.c                                          :+:      :+:    :+:   */
+/*   raytrace.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/13 18:51:23 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/27 19:05:32 by hle-hena         ###   ########.fr       */
+/*   Created: 2025/04/27 12:22:39 by hle-hena          #+#    #+#             */
+/*   Updated: 2025/04/27 18:53:34 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-static inline t_text	hit_text(t_data *data, t_ray *ray)
+static inline t_text	hit_text(t_data *data, t_trace *ray)
 {
 	if (ray->side == 0 && ray->step.x == 1)
-		return (get_tile_dict()[*(data->map->matrix + ray->curr.y * data->map->wid + ray->curr.x)]->tex_ea);
+		return (get_tile_dict()[*(data->map->matrix + ray->real.y * data->map->wid + ray->real.x)]->tex_ea);
 	else if (ray->side == 0)
-		return (get_tile_dict()[*(data->map->matrix + ray->curr.y * data->map->wid + ray->curr.x)]->tex_we);
+		return (get_tile_dict()[*(data->map->matrix + ray->real.y * data->map->wid + ray->real.x)]->tex_we);
 	else if (ray->step.y == 1)
-		return (get_tile_dict()[*(data->map->matrix + ray->curr.y * data->map->wid + ray->curr.x)]->tex_no);
+		return (get_tile_dict()[*(data->map->matrix + ray->real.y * data->map->wid + ray->real.x)]->tex_no);
 	else
-		return (get_tile_dict()[*(data->map->matrix + ray->curr.y * data->map->wid + ray->curr.x)]->tex_so);
+		return (get_tile_dict()[*(data->map->matrix + ray->real.y * data->map->wid + ray->real.x)]->tex_so);
 
 }
 
-void	calc_ray(t_ray *ray)
+void	calc_trace(t_trace *ray)
 {
 	ray->step.x = 1;
 	if (ray->dir.x < 0)
@@ -53,44 +53,37 @@ void	calc_ray(t_ray *ray)
 	ray->precise_dist = 0;
 }
 
-void	handle_hit(t_data *data, t_ray *ray, t_hit *hit)
+void	handle_reflexion(t_data *data, t_lmap *map, t_trace *ray)
 {
 	t_text	texture;
+	t_vec	hit;
 
 	texture = hit_text(data, ray);
-	hit->hit[ray->bounce].x = ray->origin.x + ray->dir.x * ray->precise_dist;
-	hit->hit[ray->bounce].y = ray->origin.y + ray->dir.y * ray->precise_dist;
-	if (texture.reflectance && ray->bounce < MAX_BOUNCE - 1)
+	hit.x = ray->origin.x + ray->dir.x * ray->precise_dist;
+	hit.y = ray->origin.y + ray->dir.y * ray->precise_dist;
+	ray->origin = hit;
+	if (ray->side == 0)
+		ray->origin.x += ray->dir.x > 0 ? -0.001f : 0.001f;
+	else
+		ray->origin.y += ray->dir.y > 0 ? -0.001f : 0.001f;
+	if (texture.reflectance && ray->bounce < MAX_BOUNCE - 1 && ray->emittance > 0.01)
 	{
-		hit->dist[ray->bounce] = ray->precise_dist;
-		if (ray->bounce != 0)
-			hit->dist[ray->bounce] += hit->dist[ray->bounce - 1];
-		ray->origin = hit->hit[ray->bounce];
-		if (ray->side == 0)
-			ray->origin.x += ray->dir.x > 0 ? -0.001f : 0.001f;
-		else
-			ray->origin.y += ray->dir.y > 0 ? -0.001f : 0.001f;
 		if (ray->side == 0)
 			ray->dir.x = -ray->dir.x;
 		else
 			ray->dir.y = -ray->dir.y;
-		calc_ray(ray);
-		hit->side[ray->bounce] = ray->side;
+		calc_trace(ray);
 		ray->bounce++;
 	}
 	else
 	{
-		hit->dist[ray->bounce] = ray->precise_dist;
-		if (ray->bounce != 0)
-			hit->dist[ray->bounce] += hit->dist[ray->bounce - 1];
-		hit->side[ray->bounce] = ray->side;
-		hit->texture = texture.img;
 		ray->running = 0;
-		hit->bounces = ray->bounce;
+		*(map->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION) = ray->emittance;
 	}
+	ray->emittance -= (1 - texture.reflectance);
 }
 
-void	init_ray(t_ray *ray, t_vec dir, t_player player)
+void	init_trace(t_trace *ray, t_vec dir, t_vec origin, float emittance)
 {
 	ray->step.x = 1;
 	if (dir.x < 0)
@@ -105,31 +98,36 @@ void	init_ray(t_ray *ray, t_vec dir, t_player player)
 	if (dir.y != 0)
 		ray->slope.y = fabs(1.0f / dir.y);
 	if (dir.x < 0)
-		ray->dist.x = (player.x - floorf(player.x)) * ray->slope.x;
+		ray->dist.x = (origin.x - floorf(origin.x)) * ray->slope.x;
 	else
-		ray->dist.x = (ceilf(player.x) - player.x) * ray->slope.x;
+		ray->dist.x = (ceilf(origin.x) - origin.x) * ray->slope.x;
 	if (dir.y < 0)
-		ray->dist.y = (player.y - floorf(player.y)) * ray->slope.y;
+		ray->dist.y = (origin.y - floorf(origin.y)) * ray->slope.y;
 	else
-		ray->dist.y = (ceilf(player.y) - player.y) * ray->slope.y;
-	ray->curr.x = floorf(player.x);
-	ray->curr.y = floorf(player.y);
+		ray->dist.y = (ceilf(origin.y) - origin.y) * ray->slope.y;
+	ray->curr.x = floorf(origin.x * LMAP_PRECISION);
+	ray->curr.y = floorf(origin.y * LMAP_PRECISION);
 	ray->bounce = 0;
-	ray->origin.x = player.x;
-	ray->origin.y = player.y;
+	ray->origin = origin;
 	ray->dir = dir;
 	ray->running = 1;
 	ray->precise_dist = 0;
+	ray->emittance = emittance;
 }
 
-t_hit	raycast(t_data *data, t_vec dir, t_player player)
+void	handle_attenuation(t_data *data, t_lmap *lmap, t_trace *ray)
 {
-	t_ray	ray;
-	t_hit	hit = (t_hit){0};
+	*(lmap->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION) = ray->emittance;
+}
 
-	init_ray(&ray, dir, player);
+void	raytrace(t_data *data, t_vec origin, t_vec dir, float emittance)
+{
+	t_trace	ray;
+
+	init_trace(&ray, dir, origin, emittance);
 	while (ray.running)
 	{
+		handle_attenuation(data, &data->lmap, &ray);
 		if (ray.dist.x < ray.dist.y)
 		{
 			ray.precise_dist = ray.dist.x;
@@ -144,8 +142,9 @@ t_hit	raycast(t_data *data, t_vec dir, t_player player)
 			ray.dist.y += ray.slope.y;
 			ray.side = 1;
 		}
-		if (get_tile_dict()[*(data->map->matrix + ray.curr.y * data->map->wid + ray.curr.x)]->is_wall) //seg possible on this line. ray.curr.y or ray.curr.x can be outside I think ?
-			handle_hit(data, &ray, &hit);
+		ray.real.x = ray.curr.x / LMAP_PRECISION;
+		ray.real.y = ray.curr.y / LMAP_PRECISION;
+		if (get_tile_dict()[*(data->map->matrix + ray.real.y * data->map->wid + ray.real.x)]->is_wall)
+			handle_reflexion(data, &data->lmap, &ray);
 	}
-	return (hit);
 }
