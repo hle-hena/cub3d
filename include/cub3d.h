@@ -6,11 +6,12 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/27 19:37:05 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/28 13:46:13 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CUB3D_H
+
 # define CUB3D_H
 
 # include "libft.h"
@@ -184,11 +185,18 @@ typedef struct s_trace
 	float	emittance;
 }	t_trace;
 
+typedef struct s_light
+{
+	t_vec	pos;
+	t_col	color;
+	float	emittance;
+}	t_light;
+
 typedef struct s_light_map
 {
 	float	*lmap;
-	t_vec	*light_sources;
-	int		nb_l_sources;
+	t_light	*lights;
+	int		nb_ls;
 }	t_lmap;
 
 typedef struct s_data
@@ -244,6 +252,7 @@ t_img	*get_img_hash(char *path, int *err);
 void	retrieve_player(t_map *map, char *line, int *err);
 int		is_dict_full(t_map *map, int err);
 void	retrieve_map(t_map *map, char *line, int map_fd, int *err);
+void	retrieve_light(char *line, int *err);
 int		retrieve_lonely(t_map *map, char *line, int *err);
 int		is_map_valid(t_map *map, t_tile **tiles, int err);
 
@@ -262,6 +271,7 @@ int		calc_color(t_col col);
 int		interpolate_color(int col1, int col2, float percent);
 int		ft_get_pixel_color(t_data *data, t_point point);
 
+float	ft_atof_err(char *str, float min, float max, char **last);
 void	cast_rays(t_data *data);
 
 int		point_is_in_fov(t_data *data, t_point point);

@@ -20,6 +20,7 @@ SRCS = $(addprefix srcs/, \
 			retrieve_texture.c retrieve_tile_dict.c retrieve_tile_info.c \
 			retrieve_value.c)\
 		$(addprefix map/, is_map_valid.c retrieve_map.c)\
+		$(addprefix lmap/, load.c raytrace.c retrieve_light.c)\
 	)\
 	$(addprefix mlx_utils/, color.c loop.c put_pixel.c)\
 	$(addprefix game/, \
@@ -29,7 +30,6 @@ SRCS = $(addprefix srcs/, \
 			$(addprefix raycast/, draw_line.c draw_map.c lookup.c raycast.c)\
 		)\
 		$(addprefix hooks/, key.c loop.c mouse.c)\
-		$(addprefix lmap/, load.c raytrace.c)\
 		$(addprefix status/, fps.c)\
 	)\
 	main.c debug.c\

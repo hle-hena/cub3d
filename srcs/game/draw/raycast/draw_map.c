@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/27 19:36:10 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/28 10:50:07 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 	// long ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
 	// printf("Took %ldns\n", ms);
 
-t_vec reflect_across_mirror(t_vec point, t_hit *hit, t_point curr)
+static inline t_vec	reflect_across_mirror(t_vec point, t_hit *hit, t_point curr)
 {
 	float	offset;
 	t_vec	final;

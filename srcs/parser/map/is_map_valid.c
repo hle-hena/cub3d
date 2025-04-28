@@ -6,11 +6,30 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 18:45:08 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/24 11:08:35 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/28 12:05:41 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
+
+int	light_check(t_map *map)
+{
+	t_data	*data;
+	int		i;
+
+	data = get_data();
+	if (data->lmap.lights)
+	{
+		i = -1;
+		while (++i < data->lmap.nb_ls)
+		{
+			if (data->lmap.lights[i].pos.x >= map->wid
+				|| data->lmap.lights[i].pos.y >= map->len)
+				return (1);
+		}
+	}
+	return (0);
+}
 
 void	print_map_open(int x, int y)
 {
@@ -78,5 +97,5 @@ int	is_map_valid(t_map *mp, t_tile **tiles, int err)
 				return (print_map_open(x + 1, y + 1), 1);
 		}
 	}
-	return (0);
+	return (light_check(mp));
 }

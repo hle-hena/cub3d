@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 10:37:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/27 11:21:45 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/28 11:43:07 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,8 @@ int	retrieve_lonely(t_map *map, char *line, int *err)
 		return (0);
 	if (ft_strncmp(line, "P=", 2) == 0)
 		return (retrieve_player(map, line, err), 0);
+	if (ft_strncmp(line, "L (", 3) == 0)
+		return (retrieve_light(line + 3, err), 0);
 	if (is_end(line))
 		return (1);
 	if (!tiles['1'])
