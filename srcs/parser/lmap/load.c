@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:08:29 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/28 13:52:24 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:05:35 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,10 @@ void	add_lmap(t_data *data, float **final, float *temp)
 
 	y = -1;
 	i = 0;
-	while (++y < data->map->len * LMAP_PRECISION)
+	while (++y < data->lmap.len)
 	{
 		x = -1;
-		while (++x < data->map->wid * LMAP_PRECISION)
+		while (++x < data->lmap.wid)
 		{
 			*(*final + i) = *(*final + i) + *(temp + i);
 			if (*(*final + i) > 1)
@@ -56,10 +56,10 @@ int	create_lmap(t_data *data)
 	float	*temp;
 
 	lmap = &data->lmap;
-	data->lmap.lmap = ft_calloc(data->map->wid * data->map->len * LMAP_PRECISION
-		* LMAP_PRECISION, sizeof(float));
-	temp = ft_calloc(data->map->wid * data->map->len * LMAP_PRECISION
-		* LMAP_PRECISION, sizeof(float));
+	lmap->wid = data->map->wid * LMAP_PRECISION;
+	lmap->len = data->map->len * LMAP_PRECISION;
+	data->lmap.lmap = ft_calloc(lmap->wid * lmap->len, sizeof(float));
+	temp = ft_calloc(lmap->wid * lmap->len, sizeof(float));
 	if (!lmap->lmap || !temp)
 		return (1);
 	if (!lmap->lights)
@@ -69,8 +69,7 @@ int	create_lmap(t_data *data)
 	{
 		raytrace_source(data, lmap->lights[i]);
 		add_lmap(data, &temp, data->lmap.lmap);
-		ft_bzero(data->lmap.lmap, data->map->wid * data->map->len
-			* LMAP_PRECISION * LMAP_PRECISION * sizeof(float));
+		ft_bzero(data->lmap.lmap, lmap->wid * lmap->len * sizeof(float));
 	}
 	ft_del((void **)&data->lmap.lmap);
 	data->lmap.lmap = temp;

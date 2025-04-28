@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/28 13:46:13 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:04:01 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -197,6 +197,8 @@ typedef struct s_light_map
 	float	*lmap;
 	t_light	*lights;
 	int		nb_ls;
+	int		wid;
+	int		len;
 }	t_lmap;
 
 typedef struct s_data

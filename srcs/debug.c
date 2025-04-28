@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 15:18:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/27 18:42:28 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/28 15:36:44 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,7 @@ void	print_map(t_data *data)
 void	print_lline(t_data *data, float *map, int fp)
 {
 	dprintf(fp, "\t| ");
-	for (int i = 0; i < data->map->wid * LMAP_PRECISION; i++)
+	for (int i = 0; i < data->lmap.wid; i++)
 		dprintf(fp, "%0.2f ", (*(map + i)));
 	dprintf(fp, "|\n");
 }
@@ -113,15 +113,15 @@ void	print_lmap(t_data *data)
 	int	y = -1;
 	dprintf(fp, "Light map is :\n");
 	dprintf(fp, "\t.");
-	for (int i = 0; i < data->map->wid * LMAP_PRECISION * 5 + 1; i++)
+	for (int i = 0; i < data->lmap.wid * 5 + 1; i++)
 		dprintf(fp, "-");
 	dprintf(fp, ".\n");
-	dprintf(fp, "\t| %*s |\n", data->map->wid * LMAP_PRECISION * 5 - 1, "");
-	while (++y < data->map->len * LMAP_PRECISION)
-		print_lline(data, data->lmap.lmap + y * data->map->wid * LMAP_PRECISION, fp);
-	dprintf(fp, "\t| %*s |\n", data->map->wid * LMAP_PRECISION * 5 - 1, "");
+	dprintf(fp, "\t| %*s |\n", data->lmap.wid * 5 - 1, "");
+	while (++y < data->lmap.len)
+		print_lline(data, data->lmap.lmap + y * data->lmap.wid, fp);
+	dprintf(fp, "\t| %*s |\n", data->lmap.wid * 5 - 1, "");
 	dprintf(fp, "\t*");
-	for (int i = 0; i < data->map->wid * LMAP_PRECISION * 5 + 1; i++)
+	for (int i = 0; i < data->lmap.wid * 5 + 1; i++)
 		dprintf(fp, "-");
 	dprintf(fp, "*\n");
 	close(fp); // Always close the file!
