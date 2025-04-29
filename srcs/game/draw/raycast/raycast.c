@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 18:51:23 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/29 15:35:18 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/29 15:51:25 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,14 @@ void	handle_hit(t_data *data, t_ray *ray, t_hit *hit)
 			ray->origin.x += ray->dir.x > 0 ? -0.001f : 0.001f;
 		else
 			ray->origin.y += ray->dir.y > 0 ? -0.001f : 0.001f;
+		if (ray->origin.x < 0.001f)
+			ray->origin.x = 0.001f;
+		else if (ray->origin.x > data->map->wid - 0.001f)
+			ray->origin.x = data->map->wid - 0.001f;
+		if (ray->origin.y < 0.001f)
+			ray->origin.y = 0.001f;
+		else if (ray->origin.y > data->map->len - 0.001f)
+			ray->origin.y = data->map->len - 0.001f;
 		if (ray->side == 0)
 			ray->dir.x = -ray->dir.x;
 		else
