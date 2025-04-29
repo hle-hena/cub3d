@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:05:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/29 10:00:16 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/29 14:41:47 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ void	init_mlx(t_data *data)
 	data->event = (t_event){0};
 	data->delta_t = 0;
 	data->lmap.nb_ls = 0;
+	data->lmap.lights = NULL;
 }
 
 void	init_utils(t_data *data)

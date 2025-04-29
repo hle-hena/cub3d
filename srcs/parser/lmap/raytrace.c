@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:22:39 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/29 13:03:21 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/29 15:15:16 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,13 +68,21 @@ void	handle_reflexion(t_data *data, t_lmap *map, t_trace *ray, t_light light)
 	texture = hit_text(data, ray);
 	hit.x = ray->origin.x + ray->dir.x * ray->precise_dist;
 	hit.y = ray->origin.y + ray->dir.y * ray->precise_dist;
-	ray->origin = hit;
-	if (ray->side == 0)
-		ray->origin.x += ray->dir.x > 0 ? -0.001f : 0.001f;
-	else
-		ray->origin.y += ray->dir.y > 0 ? -0.001f : 0.001f;
 	if (texture.reflectance && ray->bounce < MAX_BOUNCE - 1 && ray->emittance * pow(0.99, ray->precise_dist) > 0.01)
 	{
+		ray->origin = hit;
+		if (ray->side == 0)
+			ray->origin.x += ray->dir.x > 0 ? -0.001f : 0.001f;
+		else
+			ray->origin.y += ray->dir.y > 0 ? -0.001f : 0.001f;
+		if (ray->origin.x < 0.001f)
+			ray->origin.x = 0.001f;
+		if (ray->origin.y < 0.001f)
+			ray->origin.y = 0.001f;
+		if (ray->origin.x > data->map->wid - 0.001f)
+			ray->origin.x = data->map->wid - 0.001f;
+		if (ray->origin.y > data->map->len - 0.001f)
+			ray->origin.y = data->map->len - 0.001f;
 		if (ray->side == 0)
 			ray->dir.x = -ray->dir.x;
 		else
@@ -87,13 +95,13 @@ void	handle_reflexion(t_data *data, t_lmap *map, t_trace *ray, t_light light)
 		ray->running = 0;
 		if (ray->side == 0)
 		{
-			(map->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->col_no = color_attenuation(light.color, pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION));
-			(map->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->no_so = ray->emittance * pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION);
+			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->col_no = color_attenuation(light.color, pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION));
+			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->no_so = ray->emittance * pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION);
 		}
 		else
 		{
-			(map->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->col_we = color_attenuation(light.color, pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION));
-			(map->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->we_ea = ray->emittance * pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION);
+			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->col_we = color_attenuation(light.color, pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION));
+			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->we_ea = ray->emittance * pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION);
 		}
 	}
 	ray->emittance -= (1 - texture.reflectance);
@@ -101,6 +109,8 @@ void	handle_reflexion(t_data *data, t_lmap *map, t_trace *ray, t_light light)
 
 void	init_trace(t_trace *ray, t_vec dir, t_vec origin, float emittance)
 {
+	origin.x *= LMAP_PRECISION;
+	origin.y *= LMAP_PRECISION;
 	ray->step.x = 1;
 	if (dir.x < 0)
 		ray->step.x = -1;
@@ -121,8 +131,8 @@ void	init_trace(t_trace *ray, t_vec dir, t_vec origin, float emittance)
 		ray->dist.y = (origin.y - floorf(origin.y)) * ray->slope.y;
 	else
 		ray->dist.y = (ceilf(origin.y) - origin.y) * ray->slope.y;
-	ray->curr.x = floorf(origin.x * LMAP_PRECISION);
-	ray->curr.y = floorf(origin.y * LMAP_PRECISION);
+	ray->curr.x = floorf(origin.x);
+	ray->curr.y = floorf(origin.y);
 	ray->bounce = 0;
 	ray->origin = origin;
 	ray->dir = dir;

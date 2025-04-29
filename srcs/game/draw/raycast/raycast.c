@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 18:51:23 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/27 19:05:32 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/29 15:35:18 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,7 @@ void	handle_hit(t_data *data, t_ray *ray, t_hit *hit)
 		hit->texture = texture.img;
 		ray->running = 0;
 		hit->bounces = ray->bounce;
+		hit->ray_dir = ray->dir;
 	}
 }
 

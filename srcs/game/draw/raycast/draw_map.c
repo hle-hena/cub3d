@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/29 11:48:34 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/29 15:34:39 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,26 +19,25 @@
 	// long ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
 	// printf("Took %ldns\n", ms);
 
-static inline t_vec	reflect_across_mirror(t_vec point, t_hit *hit, t_point curr)
+static inline t_vec	reflect_across_mirror(t_vec point, t_hit *hit, t_point curr, int *bounce)
 {
 	float	offset;
 	t_vec	final;
-	int		bounce;
 
-	bounce = 0;
-	while (++bounce <= hit->bounces)
+	*bounce = 0;
+	while (++(*bounce) <= hit->bounces)
 	{
-		if (curr.y < hit->draw_start[bounce - 1] || curr.y > hit->draw_end[bounce - 1])
+		if (curr.y < hit->draw_start[*bounce - 1] || curr.y > hit->draw_end[*bounce - 1])
 			return (point);
-		if (hit->side[bounce - 1] == 0)
+		if (hit->side[*bounce - 1] == 0)
 		{
-			offset = point.x - hit->hit[bounce - 1].x;
+			offset = point.x - hit->hit[*bounce - 1].x;
 			final.x = point.x - (2 * offset);
 			final.y = point.y;
 		}
 		else
 		{
-			offset = point.y - hit->hit[bounce - 1].y;
+			offset = point.y - hit->hit[*bounce - 1].y;
 			final.x = point.x;
 			final.y = point.y - (2 * offset);
 		}
@@ -78,11 +77,12 @@ static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, 
 	t_point		pix;
 	t_img		*tex;
 	int			offset;
+	int			bounce;
 
 	cast = *(ray.cast_table + curr.y * data->win_wid + curr.x);
 	world.x = data->map->player.x + cast.y * (ray.l.x + cast.x * ray.r.x);
 	world.y = data->map->player.y + cast.y * (ray.l.y + cast.x * ray.r.y);
-	world =  reflect_across_mirror(world, hit, curr);
+	world =  reflect_across_mirror(world, hit, curr, &bounce);
 	iworld.x = (int)world.x;
 	iworld.y = (int)world.y;
 	if (world.y < 0 || world.y >= data->map->len || world.x < 0
@@ -101,8 +101,8 @@ static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, 
 	offset = pix.y * tex->size_line + pix.x * tex->bpp;
 	iworld.x = world.x * LMAP_PRECISION;
 	iworld.y = world.y * LMAP_PRECISION;
-	light = (data->lmap.lmap + iworld.x + iworld.y * data->map->wid * LMAP_PRECISION);
-	*(int *)img = color_blend(*(int *)(tex->data + offset), light->col_ce, light->ce_fl);
+	light = (data->lmap.lmap + iworld.x + iworld.y * data->lmap.wid);
+	*(int *)img = color_blend(*(int *)(tex->data + offset), light->col_ce, light->ce_fl / bounce);
 }
 
 static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img, t_hit *hit)
@@ -115,11 +115,12 @@ static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img,
 	t_point		iworld;
 	t_img		*tex;
 	int			offset;
+	int			bounce;
 
 	cast = *(ray.cast_table + curr.y * data->win_wid + curr.x);
 	world.x = data->map->player.x + cast.y * (ray.l.x + cast.x * ray.r.x);
 	world.y = data->map->player.y + cast.y * (ray.l.y + cast.x * ray.r.y);
-	world =  reflect_across_mirror(world, hit, curr);
+	world =  reflect_across_mirror(world, hit, curr, &bounce);
 	iworld.x = (int)world.x;
 	iworld.y = (int)world.y;
 	if (world.y < 0 || world.y >= data->map->len || world.x < 0
@@ -138,8 +139,8 @@ static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img,
 	offset = pix.y * tex->size_line + pix.x * tex->bpp;
 	iworld.x = world.x * LMAP_PRECISION;
 	iworld.y = world.y * LMAP_PRECISION;
-	light = (data->lmap.lmap + iworld.x + iworld.y * data->map->wid * LMAP_PRECISION);
-	*(int *)img = color_blend(*(int *)(tex->data + offset), light->col_ce, light->ce_fl);
+	light = (data->lmap.lmap + iworld.x + iworld.y * data->lmap.wid);
+	*(int *)img = color_blend(*(int *)(tex->data + offset), light->col_ce, light->ce_fl / bounce);
 }
 
 static inline void	draw_wall(t_data *data, char *img, t_hit *hit)
@@ -147,14 +148,14 @@ static inline void	draw_wall(t_data *data, char *img, t_hit *hit)
 	t_tlight	*light;
 	t_point		light_point;
 
-	light_point.x = (float)(hit->hit[hit->bounces].x + (hit->ray_dir.x > 0 ? 0.001 : -0.001) * !hit->side[hit->bounces]) * LMAP_PRECISION;
-	light_point.y = (float)(hit->hit[hit->bounces].y + (hit->ray_dir.y > 0 ? 0.001 : -0.001) * hit->side[hit->bounces]) * LMAP_PRECISION;
-	light = (data->lmap.lmap + light_point.x + light_point.y * data->map->wid * LMAP_PRECISION);
+	light_point.x = (hit->hit[hit->bounces].x + (hit->ray_dir.x > 0 ? 0.001 : -0.001) * !hit->side[hit->bounces]) * LMAP_PRECISION;
+	light_point.y = (hit->hit[hit->bounces].y + (hit->ray_dir.y > 0 ? 0.001 : -0.001) * hit->side[hit->bounces]) * LMAP_PRECISION;
+	light = (data->lmap.lmap + light_point.x + light_point.y * data->lmap.wid);
 	hit->tex_y = hit->tex_pos_fp >> 16;
 	if (hit->side[hit->bounces] == 0)
-		*(int *)img = color_blend(*(int *)(hit->tex_col + hit->tex_y * hit->texture->size_line), light->col_no, light->no_so);
+		*(int *)img = color_blend(*(int *)(hit->tex_col + hit->tex_y * hit->texture->size_line), light->col_no, light->no_so / (hit->bounces + 1));
 	else
-		*(int *)img = color_blend(*(int *)(hit->tex_col + hit->tex_y * hit->texture->size_line), light->col_we, light->we_ea);
+		*(int *)img = color_blend(*(int *)(hit->tex_col + hit->tex_y * hit->texture->size_line), light->col_we, light->we_ea / (hit->bounces + 1));
 	hit->tex_pos_fp += hit->step_fp;
 }
 
@@ -253,7 +254,6 @@ t_hit cast_ray(t_data *data, t_vec ray_dir)
 	int		line_height;
 
 	hit = raycast(data, ray_dir, data->map->player);
-	hit.ray_dir = ray_dir;
 	line_height = init_line_heights(data, &hit, ray_dir);
 	if (line_height == 0)
 		line_height = 1;
