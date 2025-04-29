@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:05:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/28 12:03:03 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/29 10:00:16 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ int	main(int ac, char **av)
 			clean_data();
 			return (0);
 		}
-		print_dict(data);
+		// print_dict(data);
 		init_mlx(data);
 		init_utils(data);
 		loop();

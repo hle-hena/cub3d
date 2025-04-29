@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/28 10:50:07 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/29 11:48:34 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,16 +47,37 @@ static inline t_vec	reflect_across_mirror(t_vec point, t_hit *hit, t_point curr)
 	return (point);
 }
 
+static inline int	color_blend(int base_color, int light_color, float emittance)
+{
+	t_col	base;
+	t_col	light;
+	t_col	final;
+
+	base = rev_calc_color(base_color);
+	light = rev_calc_color(light_color);
+	final.re = (int)((base.re * light.re / 255.0f) * emittance);
+	final.gr = (int)((base.gr * light.gr / 255.0f) * emittance);
+	final.bl = (int)((base.bl * light.bl / 255.0f) * emittance);
+	if (final.re > 255)
+		final.re = 255;
+	if (final.gr > 255)
+		final.gr = 255;
+	if (final.bl > 255)
+		final.bl = 255;
+	return (calc_color(final));
+}
+
+
 static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, t_hit *hit)
 {
-	t_tile	*tile;
-	t_vec	cast;
-	t_vec	world;
-	t_point	iworld;
-	t_point	pix;
-	t_img	*tex;
-	int		offset;
-	int		color;
+	t_tile		*tile;
+	t_tlight	*light;
+	t_vec		cast;
+	t_vec		world;
+	t_point		iworld;
+	t_point		pix;
+	t_img		*tex;
+	int			offset;
 
 	cast = *(ray.cast_table + curr.y * data->win_wid + curr.x);
 	world.x = data->map->player.x + cast.y * (ray.l.x + cast.x * ray.r.x);
@@ -80,19 +101,20 @@ static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, 
 	offset = pix.y * tex->size_line + pix.x * tex->bpp;
 	iworld.x = world.x * LMAP_PRECISION;
 	iworld.y = world.y * LMAP_PRECISION;
-	color = interpolate_color(0, *(int *)(tex->data + offset), *(data->lmap.lmap + iworld.x + iworld.y * data->map->wid * LMAP_PRECISION));
-	*(int *)img = color;}
+	light = (data->lmap.lmap + iworld.x + iworld.y * data->map->wid * LMAP_PRECISION);
+	*(int *)img = color_blend(*(int *)(tex->data + offset), light->col_ce, light->ce_fl);
+}
 
 static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img, t_hit *hit)
 {
-	t_tile	*tile;
-	t_vec	cast;
-	t_vec	world;
-	t_point	pix;
-	t_point	iworld;
-	t_img	*tex;
-	int		offset;
-	int		color;
+	t_tile		*tile;
+	t_tlight	*light;
+	t_vec		cast;
+	t_vec		world;
+	t_point		pix;
+	t_point		iworld;
+	t_img		*tex;
+	int			offset;
 
 	cast = *(ray.cast_table + curr.y * data->win_wid + curr.x);
 	world.x = data->map->player.x + cast.y * (ray.l.x + cast.x * ray.r.x);
@@ -116,22 +138,23 @@ static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img,
 	offset = pix.y * tex->size_line + pix.x * tex->bpp;
 	iworld.x = world.x * LMAP_PRECISION;
 	iworld.y = world.y * LMAP_PRECISION;
-	color = interpolate_color(0, *(int *)(tex->data + offset), *(data->lmap.lmap + iworld.x + iworld.y * data->map->wid * LMAP_PRECISION));
-	*(int *)img = color;
+	light = (data->lmap.lmap + iworld.x + iworld.y * data->map->wid * LMAP_PRECISION);
+	*(int *)img = color_blend(*(int *)(tex->data + offset), light->col_ce, light->ce_fl);
 }
 
 static inline void	draw_wall(t_data *data, char *img, t_hit *hit)
 {
-	float	light;
-	int		color;
-	t_point	light_point;
+	t_tlight	*light;
+	t_point		light_point;
 
 	light_point.x = (float)(hit->hit[hit->bounces].x + (hit->ray_dir.x > 0 ? 0.001 : -0.001) * !hit->side[hit->bounces]) * LMAP_PRECISION;
 	light_point.y = (float)(hit->hit[hit->bounces].y + (hit->ray_dir.y > 0 ? 0.001 : -0.001) * hit->side[hit->bounces]) * LMAP_PRECISION;
-	light = *(data->lmap.lmap + light_point.x + light_point.y * data->map->wid * LMAP_PRECISION);
+	light = (data->lmap.lmap + light_point.x + light_point.y * data->map->wid * LMAP_PRECISION);
 	hit->tex_y = hit->tex_pos_fp >> 16;
-	color = interpolate_color(0x000000, *(int *)(hit->tex_col + hit->tex_y * hit->texture->size_line), light);
-	*(int *)img = color;
+	if (hit->side[hit->bounces] == 0)
+		*(int *)img = color_blend(*(int *)(hit->tex_col + hit->tex_y * hit->texture->size_line), light->col_no, light->no_so);
+	else
+		*(int *)img = color_blend(*(int *)(hit->tex_col + hit->tex_y * hit->texture->size_line), light->col_we, light->we_ea);
 	hit->tex_pos_fp += hit->step_fp;
 }
 

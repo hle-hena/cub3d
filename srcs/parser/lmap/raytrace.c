@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:22:39 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/28 14:07:24 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/29 13:03:21 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,14 @@ static inline t_text	hit_text(t_data *data, t_trace *ray)
 		return (get_tile_dict()[*(data->map->matrix + ray->real.y * data->map->wid + ray->real.x)]->tex_no);
 	else
 		return (get_tile_dict()[*(data->map->matrix + ray->real.y * data->map->wid + ray->real.x)]->tex_so);
+}
 
+static inline int	color_attenuation(t_col col, float emittance)
+{
+	col.re *= emittance;
+	col.gr *= emittance;
+	col.bl *= emittance;
+	return (calc_color(col));
 }
 
 void	calc_trace(t_trace *ray)
@@ -53,7 +60,7 @@ void	calc_trace(t_trace *ray)
 	ray->precise_dist = 0;
 }
 
-void	handle_reflexion(t_data *data, t_lmap *map, t_trace *ray)
+void	handle_reflexion(t_data *data, t_lmap *map, t_trace *ray, t_light light)
 {
 	t_text	texture;
 	t_vec	hit;
@@ -66,7 +73,7 @@ void	handle_reflexion(t_data *data, t_lmap *map, t_trace *ray)
 		ray->origin.x += ray->dir.x > 0 ? -0.001f : 0.001f;
 	else
 		ray->origin.y += ray->dir.y > 0 ? -0.001f : 0.001f;
-	if (texture.reflectance && ray->bounce < MAX_BOUNCE - 1 && ray->emittance > 0.01)
+	if (texture.reflectance && ray->bounce < MAX_BOUNCE - 1 && ray->emittance * pow(0.99, ray->precise_dist) > 0.01)
 	{
 		if (ray->side == 0)
 			ray->dir.x = -ray->dir.x;
@@ -78,7 +85,16 @@ void	handle_reflexion(t_data *data, t_lmap *map, t_trace *ray)
 	else
 	{
 		ray->running = 0;
-		*(map->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION) = ray->emittance * pow(0.99, ray->precise_dist);
+		if (ray->side == 0)
+		{
+			(map->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->col_no = color_attenuation(light.color, pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION));
+			(map->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->no_so = ray->emittance * pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION);
+		}
+		else
+		{
+			(map->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->col_we = color_attenuation(light.color, pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION));
+			(map->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->we_ea = ray->emittance * pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION);
+		}
 	}
 	ray->emittance -= (1 - texture.reflectance);
 }
@@ -115,19 +131,20 @@ void	init_trace(t_trace *ray, t_vec dir, t_vec origin, float emittance)
 	ray->emittance = emittance;
 }
 
-void	handle_attenuation(t_data *data, t_lmap *lmap, t_trace *ray)
+void	handle_attenuation(t_data *data, t_lmap *lmap, t_trace *ray, t_light light)
 {
-	*(lmap->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION) = ray->emittance * pow(0.99, ray->precise_dist);
+	(lmap->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->col_ce = color_attenuation(light.color, pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION));
+	(lmap->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->ce_fl = ray->emittance * pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION);
 }
 
-void	raytrace(t_data *data, t_vec origin, t_vec dir, float emittance)
+void	raytrace(t_data *data, t_light light, t_vec dir)
 {
 	t_trace	ray;
 
-	init_trace(&ray, dir, origin, emittance);
+	init_trace(&ray, dir, light.pos, light.emittance);
 	while (ray.running)
 	{
-		handle_attenuation(data, &data->lmap, &ray);
+		handle_attenuation(data, &data->lmap, &ray, light);
 		if (ray.dist.x < ray.dist.y)
 		{
 			ray.precise_dist = ray.dist.x;
@@ -145,6 +162,6 @@ void	raytrace(t_data *data, t_vec origin, t_vec dir, float emittance)
 		ray.real.x = ray.curr.x / LMAP_PRECISION;
 		ray.real.y = ray.curr.y / LMAP_PRECISION;
 		if (get_tile_dict()[*(data->map->matrix + ray.real.y * data->map->wid + ray.real.x)]->is_wall)
-			handle_reflexion(data, &data->lmap, &ray);
+			handle_reflexion(data, &data->lmap, &ray, light);
 	}
 }

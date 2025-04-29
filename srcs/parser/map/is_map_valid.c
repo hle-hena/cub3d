@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 18:45:08 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/28 12:05:41 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/29 11:00:40 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,17 +15,23 @@
 int	light_check(t_map *map)
 {
 	t_data	*data;
+	t_lmap	lmap;
 	int		i;
 
 	data = get_data();
-	if (data->lmap.lights)
+	lmap = data->lmap;
+	if (lmap.lights)
 	{
 		i = -1;
-		while (++i < data->lmap.nb_ls)
+		while (++i < lmap.nb_ls)
 		{
-			if (data->lmap.lights[i].pos.x >= map->wid
-				|| data->lmap.lights[i].pos.y >= map->len)
-				return (1);
+			if (lmap.lights[i].pos.x >= map->wid
+				|| lmap.lights[i].pos.y >= map->len)
+				return (ft_perror(0, "A light is outsided the map.", 0), 1);
+			// if (get_tile_dict()[*(data->map->matrix
+			// 			+ (int)lmap.lights[i].pos.x + (int)lmap.lights[i].pos.y
+			// 			* data->map->wid)]->is_wall)
+			// 	return (ft_perror(0, "Don't put a light in a wall.", 0), 1);
 		}
 	}
 	return (0);

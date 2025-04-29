@@ -6,13 +6,11 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 10:55:35 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/28 12:24:28 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/29 11:18:15 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
-
-// get_data()->lmap.lights[get_data()->lmap.nb_ls]
 
 t_vec	retrieve_light_pos(char **line, int *err)
 {
@@ -32,6 +30,34 @@ t_vec	retrieve_light_pos(char **line, int *err)
 	return (pos);
 }
 
+t_col	retrieve_light_color(char **line, int *err)
+{
+	t_col	color;
+	int		i;
+
+	i = 1;
+	color.re = ft_atoi_err(&(*line)[i], &i);
+	if (color.re == -1 || (*line)[i] != ',')
+		return (ft_perror(-1, ft_strsjoin((char *[]){"Unexpected char in '\
+", *line, "'. Expected ',' after the red value.", NULL}), 1),
+			*err = 1, (t_col){0});
+	i++;
+	color.gr = ft_atoi_err(&(*line)[i], &i);
+	if (color.gr == -1 || (*line)[i] != ',')
+		return (ft_perror(-1, ft_strsjoin((char *[]){"Unexpected char in '\
+", *line, "'. Expected ',' after the blue value.", NULL}), 1),
+			*err = 1, (t_col){0});
+	i++;
+	color.bl = ft_atoi_err(&(*line)[i], &i);
+	if (color.bl == -1 || (*line)[i] != '}')
+		return (ft_perror(-1, ft_strsjoin((char *[]){"Unexpected char in '\
+", *line, "'. Expected '}' after the green value.", NULL}), 1),
+			*err = 1, (t_col){0});
+	i++;
+	*line += i;
+	return (color);
+}
+
 int	retrieve_light_info(t_lmap *lmap, char **line, int *err)
 {
 	if (**line == '(')
@@ -40,6 +66,13 @@ int	retrieve_light_info(t_lmap *lmap, char **line, int *err)
 			return (ft_perror(-1, "Duplicated coordinates in a light \
 definition.", 0), *err = 1, 0);
 		lmap->lights[lmap->nb_ls].pos = retrieve_light_pos(line, err);
+	}
+	else if (**line == '{')
+	{
+		if (lmap->lights[lmap->nb_ls].color.re != -1)
+		return (ft_perror(-1, "Duplicated color in a light \
+definition.", 0), *err = 1, 0);
+		lmap->lights[lmap->nb_ls].color = retrieve_light_color(line, err);
 	}
 	else
 	{
@@ -65,13 +98,22 @@ void	retrieve_light(char *line, int *err)
 	lmap->lights = ft_realloc(lmap->lights, (lmap->nb_ls + 1) * sizeof(t_light));
 	lmap->lights[lmap->nb_ls].pos.y = -1;
 	lmap->lights[lmap->nb_ls].emittance = -1;
-	lmap->lights[lmap->nb_ls].color = (t_col){255, 255, 255};
+	lmap->lights[lmap->nb_ls].color = (t_col){-1, -1, -1};
 	while (retrieve_light_info(lmap, &line, err))
 	{
 		if (*err)
 			return ;
 		line++;
+		while (ft_isspace(*line))
+			line++;
 	}
+	if (lmap->lights[lmap->nb_ls].pos.y == -1)
+		return (ft_perror(0, "A light is missing its coordinates.", 0),
+			*err = 1, VOID);
+	if (lmap->lights[lmap->nb_ls].emittance == -1)
+		lmap->lights[lmap->nb_ls].emittance = 1;
+	if (lmap->lights[lmap->nb_ls].color.bl == -1)
+		lmap->lights[lmap->nb_ls].color = (t_col){255, 255, 255};
 	lmap->nb_ls++;
 	return ;
 }

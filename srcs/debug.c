@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 15:18:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/28 15:36:44 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/29 10:12:47 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,11 +96,11 @@ void	print_map(t_data *data)
 
 #include <stdio.h> // Don't forget this for FILE and functions like fopen, fprintf, fclose
 
-void	print_lline(t_data *data, float *map, int fp)
+void	print_lline(t_data *data, t_tlight *map, int fp)
 {
 	dprintf(fp, "\t| ");
 	for (int i = 0; i < data->lmap.wid; i++)
-		dprintf(fp, "%0.2f ", (*(map + i)));
+		dprintf(fp, "%0.2f ", ((map + i)->ce_fl));
 	dprintf(fp, "|\n");
 }
 
