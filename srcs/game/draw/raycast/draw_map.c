@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/30 17:18:18 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/30 18:42:23 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,8 @@ static inline int	color_blend(int base_color, int light_color, float emittance)
 	t_col	light;
 	t_col	final;
 
+	if (emittance < 0.01)
+		return (0);
 	em = (int)(emittance * 256.0f);
 	base = (t_col){(base_color >> 16) & 0xFF,
 		(base_color >> 8) & 0xFF,
@@ -73,8 +75,8 @@ static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, 
 	t_flight	light;
 	t_vec		cast;
 	t_vec		world;
-	t_point		iworld;
 	t_point		pix;
+	t_point		iworld;
 	t_img		*tex;
 	int			offset;
 	int			bounce;
@@ -121,8 +123,8 @@ static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img,
 	world.x = data->map->player.x + cast.y * (ray.l.x + cast.x * ray.r.x);
 	world.y = data->map->player.y + cast.y * (ray.l.y + cast.x * ray.r.y);
 	world =  reflect_across_mirror(world, hit, curr, &bounce);
-	iworld.x = (int)world.x;
-	iworld.y = (int)world.y;
+	iworld.x = world.x;
+	iworld.y = world.y;
 	if (world.y < 0 || world.y >= data->map->len || world.x < 0
 		|| world.x >= data->map->wid)
 		return (*(int *)img = 0, VOID);
@@ -148,8 +150,8 @@ static inline void	draw_wall(t_data *data, char *img, t_hit *hit)
 	t_flight	light;
 	t_point		light_point;
 
-	light_point.x = (hit->hit[hit->bounces].x) * LMAP_PRECISION;
-	light_point.y = (hit->hit[hit->bounces].y) * LMAP_PRECISION;
+	light_point.x = (hit->hit[hit->bounces].x + (hit->ray_dir.x > 0 ? 0.001 : -0.001) * !hit->side[hit->bounces]) * LMAP_PRECISION;
+	light_point.y = (hit->hit[hit->bounces].y + (hit->ray_dir.y > 0 ? 0.001 : -0.001) * hit->side[hit->bounces]) * LMAP_PRECISION;
 	hit->tex_y = hit->tex_pos_fp >> 16;
 	if (hit->side[hit->bounces] == 0)
 		light = (data->lmap.lmap + light_point.x + light_point.y * data->lmap.wid)->no_so;
@@ -262,8 +264,6 @@ t_hit cast_ray(t_data *data, t_vec ray_dir)
 	else
 		wall_x = hit.hit[hit.bounces].x;
 	wall_x -= (int)wall_x;
-	hit.hit[hit.bounces].x += (hit.ray_dir.x > 0 ? 0.001 : -0.001) * !hit.side[hit.bounces];
-	hit.hit[hit.bounces].y += (hit.ray_dir.y > 0 ? 0.001 : -0.001) * hit.side[hit.bounces];
 	hit.step_fp = (hit.texture->height << 16) / line_height;
 	hit.tex_pos_fp = (hit.draw_start[hit.bounces] - data->win_len / 2 + line_height / 2) * hit.step_fp;
 	hit.tex_col = hit.texture->data + (int)(wall_x * hit.texture->width) * hit.texture->bpp;

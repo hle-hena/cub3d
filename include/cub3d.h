@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/30 17:20:13 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/30 19:05:25 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -230,8 +230,8 @@ typedef struct s_data
 }	t_data;
 
 # define DRAW_THREADS 4
-# define LMAP_PRECISION 512
-// # define LMAP_PRECISION 256
+// # define LMAP_PRECISION 512
+# define LMAP_PRECISION 64
 
 typedef struct s_thread_draw
 {
