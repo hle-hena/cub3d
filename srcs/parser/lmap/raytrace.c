@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:22:39 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/29 15:15:16 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/30 17:13:53 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,13 +95,13 @@ void	handle_reflexion(t_data *data, t_lmap *map, t_trace *ray, t_light light)
 		ray->running = 0;
 		if (ray->side == 0)
 		{
-			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->col_no = color_attenuation(light.color, pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION));
-			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->no_so = ray->emittance * pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION);
+			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->no_so.color = color_attenuation(light.color, pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION));
+			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->no_so.emittance = ray->emittance * pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION);
 		}
 		else
 		{
-			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->col_we = color_attenuation(light.color, pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION));
-			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->we_ea = ray->emittance * pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION);
+			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->we_ea.color = color_attenuation(light.color, pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION));
+			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->we_ea.emittance = ray->emittance * pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION);
 		}
 	}
 	ray->emittance -= (1 - texture.reflectance);
@@ -143,8 +143,8 @@ void	init_trace(t_trace *ray, t_vec dir, t_vec origin, float emittance)
 
 void	handle_attenuation(t_data *data, t_lmap *lmap, t_trace *ray, t_light light)
 {
-	(lmap->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->col_ce = color_attenuation(light.color, pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION));
-	(lmap->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->ce_fl = ray->emittance * pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION);
+	(lmap->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->ce_fl.color = color_attenuation(light.color, pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION));
+	(lmap->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->ce_fl.emittance = ray->emittance * pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION);
 }
 
 void	raytrace(t_data *data, t_light light, t_vec dir)

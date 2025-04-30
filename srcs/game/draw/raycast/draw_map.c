@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/30 10:25:43 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/30 17:18:18 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,29 +48,29 @@ static inline t_vec	reflect_across_mirror(t_vec point, t_hit *hit, t_point curr,
 
 static inline int	color_blend(int base_color, int light_color, float emittance)
 {
+	int		em;
 	t_col	base;
 	t_col	light;
 	t_col	final;
 
-	base = rev_calc_color(base_color);
-	light = rev_calc_color(light_color);
-	final.re = (int)((base.re * light.re / 255.0f) * emittance);
-	final.gr = (int)((base.gr * light.gr / 255.0f) * emittance);
-	final.bl = (int)((base.bl * light.bl / 255.0f) * emittance);
-	if (final.re > 255)
-		final.re = 255;
-	if (final.gr > 255)
-		final.gr = 255;
-	if (final.bl > 255)
-		final.bl = 255;
-	return (calc_color(final));
+	em = (int)(emittance * 256.0f);
+	base = (t_col){(base_color >> 16) & 0xFF,
+		(base_color >> 8) & 0xFF,
+		base_color & 0xFF};
+	light = (t_col){(light_color >> 16) & 0xFF,
+		(light_color >> 8) & 0xFF,
+		light_color & 0xFF};
+	final = (t_col){(base.re * ((light.re * em) >> 8)) >> 8,
+		(base.gr * ((light.gr * em) >> 8)) >> 8,
+		(base.bl * ((light.bl * em) >> 8)) >> 8,
+	};
+	return ((final.re << 16) | (final.gr << 8) | final.bl);
 }
-
 
 static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, t_hit *hit)
 {
 	t_tile		*tile;
-	t_tlight	*light;
+	t_flight	light;
 	t_vec		cast;
 	t_vec		world;
 	t_point		iworld;
@@ -101,14 +101,14 @@ static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, 
 	offset = pix.y * tex->size_line + pix.x * tex->bpp;
 	iworld.x = world.x * LMAP_PRECISION;
 	iworld.y = world.y * LMAP_PRECISION;
-	light = (data->lmap.lmap + iworld.x + iworld.y * data->lmap.wid);
-	*(int *)img = color_blend(*(int *)(tex->data + offset), light->col_ce, light->ce_fl / bounce);
+	light = (data->lmap.lmap + iworld.x + iworld.y * data->lmap.wid)->ce_fl;
+	*(int *)img = color_blend(*(int *)(tex->data + offset), light.color, light.emittance / bounce);
 }
 
 static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img, t_hit *hit)
 {
 	t_tile		*tile;
-	t_tlight	*light;
+	t_flight	light;
 	t_vec		cast;
 	t_vec		world;
 	t_point		pix;
@@ -139,23 +139,23 @@ static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img,
 	offset = pix.y * tex->size_line + pix.x * tex->bpp;
 	iworld.x = world.x * LMAP_PRECISION;
 	iworld.y = world.y * LMAP_PRECISION;
-	light = (data->lmap.lmap + iworld.x + iworld.y * data->lmap.wid);
-	*(int *)img = color_blend(*(int *)(tex->data + offset), light->col_ce, light->ce_fl / bounce);
+	light = (data->lmap.lmap + iworld.x + iworld.y * data->lmap.wid)->ce_fl;
+	*(int *)img = color_blend(*(int *)(tex->data + offset), light.color, light.emittance / bounce);
 }
 
 static inline void	draw_wall(t_data *data, char *img, t_hit *hit)
 {
-	t_tlight	*light;
+	t_flight	light;
 	t_point		light_point;
 
-	light_point.x = (hit->hit[hit->bounces].x + (hit->ray_dir.x > 0 ? 0.001 : -0.001) * !hit->side[hit->bounces]) * LMAP_PRECISION;
-	light_point.y = (hit->hit[hit->bounces].y + (hit->ray_dir.y > 0 ? 0.001 : -0.001) * hit->side[hit->bounces]) * LMAP_PRECISION;
-	light = (data->lmap.lmap + light_point.x + light_point.y * data->lmap.wid);
+	light_point.x = (hit->hit[hit->bounces].x) * LMAP_PRECISION;
+	light_point.y = (hit->hit[hit->bounces].y) * LMAP_PRECISION;
 	hit->tex_y = hit->tex_pos_fp >> 16;
 	if (hit->side[hit->bounces] == 0)
-		*(int *)img = color_blend(*(int *)(hit->tex_col + hit->tex_y * hit->texture->size_line), light->col_no, light->no_so / (hit->bounces + 1));
+		light = (data->lmap.lmap + light_point.x + light_point.y * data->lmap.wid)->no_so;
 	else
-		*(int *)img = color_blend(*(int *)(hit->tex_col + hit->tex_y * hit->texture->size_line), light->col_we, light->we_ea / (hit->bounces + 1));
+		light = (data->lmap.lmap + light_point.x + light_point.y * data->lmap.wid)->we_ea;
+	*(int *)img = color_blend(*(int *)(hit->tex_col + hit->tex_y * hit->texture->size_line), light.color, light.emittance / (hit->bounces + 1));
 	hit->tex_pos_fp += hit->step_fp;
 }
 
@@ -262,6 +262,8 @@ t_hit cast_ray(t_data *data, t_vec ray_dir)
 	else
 		wall_x = hit.hit[hit.bounces].x;
 	wall_x -= (int)wall_x;
+	hit.hit[hit.bounces].x += (hit.ray_dir.x > 0 ? 0.001 : -0.001) * !hit.side[hit.bounces];
+	hit.hit[hit.bounces].y += (hit.ray_dir.y > 0 ? 0.001 : -0.001) * hit.side[hit.bounces];
 	hit.step_fp = (hit.texture->height << 16) / line_height;
 	hit.tex_pos_fp = (hit.draw_start[hit.bounces] - data->win_len / 2 + line_height / 2) * hit.step_fp;
 	hit.tex_col = hit.texture->data + (int)(wall_x * hit.texture->width) * hit.texture->bpp;

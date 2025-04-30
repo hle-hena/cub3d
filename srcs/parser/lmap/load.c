@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:08:29 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/29 15:29:28 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/30 17:13:30 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,15 @@
 
 static inline void	add_emittance(t_tlight *final, t_tlight *temp, int i)
 {
-	(final + i)->ce_fl += (temp + i)->ce_fl;
-	if ((final + i)->ce_fl > 1)
-		(final + i)->ce_fl = 1;
-	(final + i)->no_so += (temp + i)->no_so;
-	if ((final + i)->no_so > 1)
-		(final + i)->no_so = 1;
-	(final + i)->we_ea += (temp + i)->we_ea;
-	if ((final + i)->we_ea > 1)
-		(final + i)->we_ea = 1;
+	(final + i)->ce_fl.emittance += (temp + i)->ce_fl.emittance;
+	if ((final + i)->ce_fl.emittance > 1)
+		(final + i)->ce_fl.emittance = 1;
+	(final + i)->no_so.emittance += (temp + i)->no_so.emittance;
+	if ((final + i)->no_so.emittance > 1)
+		(final + i)->no_so.emittance = 1;
+	(final + i)->we_ea.emittance += (temp + i)->we_ea.emittance;
+	if ((final + i)->we_ea.emittance > 1)
+		(final + i)->we_ea.emittance = 1;
 }
 
 static inline float	to_linear(float c)
@@ -57,13 +57,13 @@ static inline int	add_col_val_physical(int col1, int col2, float weight)
 
 static inline void add_color(t_tlight *final, t_tlight *temp, int i)
 {
-	float weight_ce = (temp + i)->ce_fl;
-	float weight_we = (temp + i)->we_ea;
-	float weight_no = (temp + i)->no_so;
+	float weight_ce = (temp + i)->ce_fl.emittance;
+	float weight_we = (temp + i)->we_ea.emittance;
+	float weight_no = (temp + i)->no_so.emittance;
 
-	(final + i)->col_ce = add_col_val_physical((final + i)->col_ce, (temp + i)->col_ce, weight_ce);
-	(final + i)->col_we = add_col_val_physical((final + i)->col_we, (temp + i)->col_we, weight_we);
-	(final + i)->col_no = add_col_val_physical((final + i)->col_no, (temp + i)->col_no, weight_no);
+	(final + i)->ce_fl.color = add_col_val_physical((final + i)->ce_fl.color, (temp + i)->ce_fl.color, weight_ce);
+	(final + i)->we_ea.color = add_col_val_physical((final + i)->we_ea.color, (temp + i)->we_ea.color, weight_we);
+	(final + i)->no_so.color = add_col_val_physical((final + i)->no_so.color, (temp + i)->no_so.color, weight_no);
 }
 
 void	add_lmap(t_data *data, t_tlight *final, t_tlight *temp)

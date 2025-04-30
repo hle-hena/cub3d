@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/29 15:26:52 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/30 17:20:13 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,7 +122,7 @@ typedef struct s_events
 	int		echap;
 }	t_event;
 
-# define MAX_BOUNCE 124
+# define MAX_BOUNCE 32
 
 typedef struct s_hit
 {
@@ -192,14 +192,17 @@ typedef struct s_light
 	float	emittance;
 }	t_light;
 
+typedef struct s_light_face
+{
+	float	emittance;
+	int		color;
+}	t_flight;
+
 typedef struct s_light_tile
 {
-	float	no_so;
-	float	we_ea;
-	float	ce_fl;
-	int		col_no;
-	int		col_we;
-	int		col_ce;
+	t_flight	no_so;
+	t_flight	we_ea;
+	t_flight	ce_fl;
 }	t_tlight;
 
 typedef struct s_light_map
@@ -227,8 +230,8 @@ typedef struct s_data
 }	t_data;
 
 # define DRAW_THREADS 4
-// # define LMAP_PRECISION 512
 # define LMAP_PRECISION 512
+// # define LMAP_PRECISION 256
 
 typedef struct s_thread_draw
 {

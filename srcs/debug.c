@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 15:18:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/29 10:12:47 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/30 17:20:21 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,7 @@ void	print_lline(t_data *data, t_tlight *map, int fp)
 {
 	dprintf(fp, "\t| ");
 	for (int i = 0; i < data->lmap.wid; i++)
-		dprintf(fp, "%0.2f ", ((map + i)->ce_fl));
+		dprintf(fp, "%0.2f ", ((map + i)->ce_fl.emittance));
 	dprintf(fp, "|\n");
 }
 
