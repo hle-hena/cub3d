@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/29 15:34:39 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/30 10:25:43 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -241,7 +241,7 @@ int	init_line_heights(t_data *data, t_hit *hit, t_vec ray_dir)
 		tex_start = -line_height / 2 + data->win_len / 2;
 		tex_end = line_height / 2 + data->win_len / 2;
 		hit->draw_start[i] = ft_max(tex_start, 0);
-		hit->draw_end[i] = ft_min(tex_end, data->win_len - 1);
+		hit->draw_end[i] = ft_min(tex_end, data->win_len);
 	}
 	return (tex_end - tex_start);
 }
