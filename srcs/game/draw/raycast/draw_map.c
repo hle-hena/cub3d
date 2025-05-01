@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/01 13:40:05 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/01 16:56:04 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,7 @@ static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, 
 	iworld.x = world.x * LMAP_PRECISION;
 	iworld.y = world.y * LMAP_PRECISION;
 	light = (data->lmap.lmap + iworld.x + iworld.y * data->lmap.wid)->ce_fl;
-	color = color_blend(*(int *)(tex->data + offset), light.color, light.emittance / bounce);
+	color = color_blend(*(int *)(tex->data + offset), light.color, light.emittance / fmax((float)bounce * 0.75, 1));
 	*(int *)(img) = color;
 	*(int *)(img + data->img.bpp) = color;
 	*(int *)(img + data->img.size_line) = color;
@@ -148,7 +148,7 @@ static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img,
 	iworld.x = world.x * LMAP_PRECISION;
 	iworld.y = world.y * LMAP_PRECISION;
 	light = (data->lmap.lmap + iworld.x + iworld.y * data->lmap.wid)->ce_fl;
-	color = color_blend(*(int *)(tex->data + offset), light.color, light.emittance / bounce);
+	color = color_blend(*(int *)(tex->data + offset), light.color, light.emittance / fmax((float)bounce * 0.75, 1));
 	*(int *)(img) = color;
 	*(int *)(img + data->img.bpp) = color;
 	*(int *)(img + data->img.size_line) = color;
@@ -168,7 +168,7 @@ static inline void	draw_wall(t_data *data, char *img, t_hit *hit)
 		light = (data->lmap.lmap + light_point.x + light_point.y * data->lmap.wid)->no_so;
 	else
 		light = (data->lmap.lmap + light_point.x + light_point.y * data->lmap.wid)->we_ea;
-	color = color_blend(*(int *)(hit->tex_col + hit->tex_y * hit->texture->size_line), light.color, light.emittance / (hit->bounces + 1));
+	color = color_blend(*(int *)(hit->tex_col + hit->tex_y * hit->texture->size_line), light.color, light.emittance / fmax(((float)(hit->bounces + 1) * 0.75), 1));
 	*(int *)(img) = color;
 	*(int *)(img + data->img.bpp) = color;
 	*(int *)(img + data->img.size_line) = color;
