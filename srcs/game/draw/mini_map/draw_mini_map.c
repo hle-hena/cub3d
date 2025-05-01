@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 22:36:25 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/27 11:30:36 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/01 11:54:19 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ int	point_is_in_mini_map(t_data *data, t_point point)
 
 	dx = point.x - data->map->mini_map.x;
 	dy = point.y - data->map->mini_map.y;
-	radius = data->win_len / 8;
+	radius = data->win_h / 8;
 	return (dx * dx + dy * dy < radius * radius);
 }
 
@@ -54,5 +54,5 @@ void	draw_mini_map(t_data *data)
 {
 	draw_tiles(data);
 	draw_player(data, data->map->mini_map, -PI / 2);
-	draw_circle(data, data->map->mini_map, data->win_len / 8, 0xFFFFFF);
+	draw_circle(data, data->map->mini_map, data->win_h / 8, 0xFFFFFF);
 }

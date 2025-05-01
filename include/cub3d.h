@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/30 19:05:25 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/01 13:26:29 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -219,8 +219,10 @@ typedef struct s_data
 	void	*mlx;
 	void	*win;
 	t_img	img;
-	int		win_len;
-	int		win_wid;
+	int		win_h;
+	int		win_w;
+	int		render_h;
+	int		render_w;
 	float	delta_t;
 	t_lmap	lmap;
 	t_cam	cam;
@@ -231,7 +233,7 @@ typedef struct s_data
 
 # define DRAW_THREADS 4
 // # define LMAP_PRECISION 512
-# define LMAP_PRECISION 64
+# define LMAP_PRECISION 128
 
 typedef struct s_thread_draw
 {

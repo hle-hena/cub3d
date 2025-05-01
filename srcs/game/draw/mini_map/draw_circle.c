@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 23:18:32 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/23 14:22:50 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/01 12:21:27 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,11 @@ void	draw_disk(t_data *data, t_point center, int rad, int color)
 
 	current.y = center.y - rad;
 	while (current.y != center.y + rad
-		&& current.y >= 0 && current.y < data->win_len)
+		&& current.y >= 0 && current.y < data->win_h)
 	{
 		current.x = center.x - rad;
 		while (current.x != center.x + rad
-			&& current.x >= 0 && current.x < data->win_wid)
+			&& current.x >= 0 && current.x < data->win_w)
 		{
 			if (sqrt(pow(current.x - center.x, 2)
 					+ pow(current.y - center.y, 2)) <= rad)
