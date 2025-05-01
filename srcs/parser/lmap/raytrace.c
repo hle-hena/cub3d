@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:22:39 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/01 15:52:45 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/01 17:06:19 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,13 +95,13 @@ void	handle_reflexion(t_data *data, t_lmap *map, t_trace *ray, t_light light)
 		ray->running = 0;
 		if (ray->side == 0)
 		{
-			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->no_so.color = color_attenuation(light.color, pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION));
-			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->no_so.emittance = ray->emittance * pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION);
+			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->no_so.color = color_attenuation(light.color, pow(ATT_COEF, (ray->precise_dist * 64) / LMAP_PRECISION));
+			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->no_so.emittance = ray->emittance * pow(ATT_COEF, (ray->precise_dist * 64) / LMAP_PRECISION);
 		}
 		else
 		{
-			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->we_ea.color = color_attenuation(light.color, pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION));
-			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->we_ea.emittance = ray->emittance * pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION);
+			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->we_ea.color = color_attenuation(light.color, pow(ATT_COEF, (ray->precise_dist * 64) / LMAP_PRECISION));
+			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->we_ea.emittance = ray->emittance * pow(ATT_COEF, (ray->precise_dist * 64) / LMAP_PRECISION);
 		}
 	}
 	ray->emittance -= (1 - texture.reflectance);
@@ -145,10 +145,10 @@ void	handle_attenuation(t_data *data, t_lmap *lmap, t_trace *ray, t_light light)
 {
 	float	new;
 
-	new = ray->emittance * pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION);
+	new = ray->emittance * pow(ATT_COEF, (ray->precise_dist * 64) / LMAP_PRECISION);
 	if (new < (lmap->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->ce_fl.emittance)
 		return ;
-	(lmap->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->ce_fl.color = color_attenuation(light.color, pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION));
+	(lmap->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->ce_fl.color = color_attenuation(light.color, pow(ATT_COEF, (ray->precise_dist * 64) / LMAP_PRECISION));
 	(lmap->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->ce_fl.emittance = new;
 }
 

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/01 16:56:04 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/01 17:08:33 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ static inline int	color_blend(int base_color, int light_color, float emittance)
 	t_col	light;
 	t_col	final;
 
-	if (emittance < 0.05)
+	if (emittance < 0.001)
 		return (0);
 	em = (int)(emittance * 256.0f);
 	base = (t_col){(base_color >> 16) & 0xFF,
@@ -67,6 +67,14 @@ static inline int	color_blend(int base_color, int light_color, float emittance)
 		(base.bl * ((light.bl * em) >> 8)) >> 8,
 	};
 	return ((final.re << 16) | (final.gr << 8) | final.bl);
+}
+
+static inline void	set_pixels(t_data *data, char *img, int color)
+{
+	*(int *)(img) = color;
+	*(int *)(img + data->img.bpp) = color;
+	*(int *)(img + data->img.size_line) = color;
+	*(int *)(img + data->img.size_line + data->img.bpp) = color;
 }
 
 static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, t_hit *hit)
@@ -90,10 +98,10 @@ static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, 
 	iworld.y = (int)world.y;
 	if (world.y < 0 || world.y >= data->map->len || world.x < 0
 		|| world.x >= data->map->wid)
-		return (*(int *)img = 0, VOID);
+		return (set_pixels(data, img, 0), VOID);
 	tile = *(ray.tile_dict + *(data->map->matrix + iworld.y * data->map->wid + iworld.x));
 	if (!tile)
-		return (*(int *)img = 0, VOID);
+		return (set_pixels(data, img, 0), VOID);
 	tex = tile->tex_ce.img;
 	pix.x = ((world.x - iworld.x) * tex->width);
 	pix.y = ((world.y - iworld.y) * tex->height);
@@ -133,10 +141,10 @@ static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img,
 	iworld.y = world.y;
 	if (world.y < 0 || world.y >= data->map->len || world.x < 0
 		|| world.x >= data->map->wid)
-		return (*(int *)img = 0, VOID);
+		return (set_pixels(data, img, 0), VOID);
 	tile = *(ray.tile_dict + *(data->map->matrix + iworld.y * data->map->wid + iworld.x));
 	if (!tile)
-		return (*(int *)img = 0, VOID);
+		return (set_pixels(data, img, 0), VOID);
 	tex = tile->tex_fl.img;
 	pix.x = ((world.x - iworld.x) * tex->width);
 	pix.y = ((world.y - iworld.y) * tex->height);
@@ -252,7 +260,7 @@ int	init_line_heights(t_data *data, t_hit *hit, t_vec ray_dir)
 		hit->dist[i] = hit->dist[i] * (ray_dir.x * data->cam.dir.x + ray_dir.y * data->cam.dir.y);
 		if (hit->dist[i] <= 0.0f)
 			hit->dist[i] = 0.0001f;
-		line_height = (int)(data->render_h * 2 / hit->dist[i]) + 2;
+		line_height = (int)(data->render_h * 2 / hit->dist[i]);
 		if (line_height == 0)
 			line_height = 1;
 		tex_start = -line_height / 2 + data->render_h / 2;
