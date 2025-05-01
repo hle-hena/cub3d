@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:22:39 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/30 17:13:53 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/01 15:52:45 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,8 +143,13 @@ void	init_trace(t_trace *ray, t_vec dir, t_vec origin, float emittance)
 
 void	handle_attenuation(t_data *data, t_lmap *lmap, t_trace *ray, t_light light)
 {
+	float	new;
+
+	new = ray->emittance * pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION);
+	if (new < (lmap->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->ce_fl.emittance)
+		return ;
 	(lmap->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->ce_fl.color = color_attenuation(light.color, pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION));
-	(lmap->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->ce_fl.emittance = ray->emittance * pow(0.995, (ray->precise_dist * 64) / LMAP_PRECISION);
+	(lmap->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->ce_fl.emittance = new;
 }
 
 void	raytrace(t_data *data, t_light light, t_vec dir)
