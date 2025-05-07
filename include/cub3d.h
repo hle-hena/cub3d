@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/01 17:06:36 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/07 15:34:21 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,7 +122,7 @@ typedef struct s_events
 	int		echap;
 }	t_event;
 
-# define MAX_BOUNCE 16
+# define MAX_BOUNCE 64
 
 typedef struct s_hit
 {

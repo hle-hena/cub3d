@@ -9,19 +9,6 @@
 	FH 1
 	W 1
 }
-
-5 {
-	NO textures/simonkraft/bookshelf_01.xpm
-	SO textures/simonkraft/bookshelf_02.xpm
-	WE textures/simonkraft/bookshelf_03.xpm
-	EA textures/simonkraft/bookshelf.xpm
-	C 0,0,0
-	F 0,0,0
-	CH 100
-	FH 0
-	W 1
-}
-
 0 {
 	NO 120,120,120
 	SO 120,120,120
@@ -33,14 +20,15 @@
 	FH 0
 	W 0
 }
-L ((1.5, 1.5), {255, 0, 0}, 1)
-L ((3, 3), {0, 255, 0}, 1)
+L ((2.5, 2.5), {255, 0, 0}, 1)
+L ((2.5, 4.5), {0, 255, 0}, 1)
 L ((4.5, 4.5), {0, 0, 255}, 1)
 P=0
 
-444444
-400044
-400004
-40N004
-440004
-444444
+4444444
+4400044
+4000004
+400N004
+4000004
+4400044
+4444444
