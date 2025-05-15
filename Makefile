@@ -2,7 +2,7 @@ MAKEFLAGS += --no-print-directory
 
 NAME = cub3d
 CC = cc
-FLAGS = -Wall -Wextra -Werror -I./include -Imlx -O3
+FLAGS = -Wall -Wextra -Werror -I./include -Imlx -O3 -g
 RM = rm -f
 
 FRAMEDIR = ./mlx
@@ -16,19 +16,21 @@ SRCS = $(addprefix srcs/, \
 	$(addprefix utils/, add_link.c)\
 	$(addprefix parser/, parser.c\
 		$(addprefix tile_dict/, hash_map.c is_dict_full.c retrieve_lonely.c \
-			retrieve_player.c retrieve_texture_color.c retrieve_texture.c \
-			retrieve_tile_dict.c retrieve_tile_info.c retrieve_value.c)\
+			retrieve_player.c retrieve_texture_color.c retrieve_texture_val.c \
+			retrieve_texture.c retrieve_tile_dict.c retrieve_tile_info.c \
+			retrieve_value.c)\
 		$(addprefix map/, is_map_valid.c retrieve_map.c)\
+		$(addprefix lmap/, load.c raytrace.c retrieve_light.c)\
 	)\
 	$(addprefix mlx_utils/, color.c loop.c put_pixel.c)\
 	$(addprefix game/, \
 		$(addprefix draw/, \
-			$(addprefix mini_map/, draw_circle.c draw_line.c draw_map.c \
+			$(addprefix mini_map/, draw_circle.c draw_line.c draw_mini_map.c \
 				draw_player.c draw_square.c)\
 			$(addprefix raycast/, draw_line.c draw_map.c lookup.c raycast.c)\
 		)\
-		$(addprefix status/, fps.c)\
 		$(addprefix hooks/, key.c loop.c mouse.c)\
+		$(addprefix status/, fps.c)\
 	)\
 	main.c debug.c\
 )

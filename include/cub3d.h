@@ -6,11 +6,12 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/24 14:45:36 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/07 15:34:21 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CUB3D_H
+
 # define CUB3D_H
 
 # include "libft.h"
@@ -70,6 +71,12 @@ typedef struct s_img
 	int		height;
 }	t_img;
 
+typedef struct s_texture
+{
+	t_img	*img;
+	float	reflectance;
+}	t_text;
+
 # define MOVE_SPEED 0.075f
 # define ROT_SPEED 0.2f
 
@@ -82,12 +89,12 @@ typedef struct s_player
 
 typedef	struct s_tile
 {
-	t_img		*tex_no;
-	t_img		*tex_so;
-	t_img		*tex_we;
-	t_img		*tex_ea;
-	t_img		*tex_ce;
-	t_img		*tex_fl;
+	t_text		tex_no;
+	t_text		tex_so;
+	t_text		tex_we;
+	t_text		tex_ea;
+	t_text		tex_ce;
+	t_text		tex_fl;
 	int			ceil_height;
 	int			floor_height;
 	int			is_wall;
@@ -115,28 +122,36 @@ typedef struct s_events
 	int		echap;
 }	t_event;
 
+# define MAX_BOUNCE 64
+
 typedef struct s_hit
 {
-	float	dist;
-	t_vec	ray_hit;
-	t_vec	ray_dir;
 	t_img	*texture;
-	int		side;
-	int		draw_start;
-	int		draw_end;
-	char	*tex_col;
+	t_vec	ray_dir;
+	t_vec	hit[MAX_BOUNCE];
+	float	dist[MAX_BOUNCE];
+	int		draw_start[MAX_BOUNCE];
+	int		draw_end[MAX_BOUNCE];
+	int		side[MAX_BOUNCE];
+	int		bounces;
 	int		tex_y;
 	int		tex_pos_fp;
 	int		step_fp;
+	char	*tex_col;
 }	t_hit;
 
 typedef struct s_ray
 {
 	t_vec	dist;
 	t_vec	slope;
+	t_vec	origin;
+	t_vec	dir;
 	t_point	curr;
 	t_point	step;
 	int		side;
+	int		bounce;
+	int		running;
+	float	precise_dist;
 }	t_ray;
 
 typedef	struct s_ray_dir
@@ -154,14 +169,64 @@ typedef	struct s_cam
 	float	plane_len;
 }	t_cam;
 
+typedef struct s_trace
+{
+	t_vec	dist;
+	t_vec	slope;
+	t_vec	origin;
+	t_vec	dir;
+	t_point	curr;
+	t_point	real;
+	t_point	step;
+	int		side;
+	int		bounce;
+	int		running;
+	float	precise_dist;
+	float	emittance;
+}	t_trace;
+
+# define ATT_COEF 0.996
+
+typedef struct s_light
+{
+	t_vec	pos;
+	t_col	color;
+	float	emittance;
+}	t_light;
+
+typedef struct s_light_face
+{
+	float	emittance;
+	int		color;
+}	t_flight;
+
+typedef struct s_light_tile
+{
+	t_flight	no_so;
+	t_flight	we_ea;
+	t_flight	ce_fl;
+}	t_tlight;
+
+typedef struct s_light_map
+{
+	t_tlight	*lmap;
+	t_light		*lights;
+	int			nb_ls;
+	int			wid;
+	int			len;
+}	t_lmap;
+
 typedef struct s_data
 {
 	void	*mlx;
 	void	*win;
 	t_img	img;
-	int		win_len;
-	int		win_wid;
+	int		win_h;
+	int		win_w;
+	int		render_h;
+	int		render_w;
 	float	delta_t;
+	t_lmap	lmap;
 	t_cam	cam;
 	t_map	*map;
 	t_hit	*hits;
@@ -169,6 +234,8 @@ typedef struct s_data
 }	t_data;
 
 # define DRAW_THREADS 4
+// # define LMAP_PRECISION 512
+# define LMAP_PRECISION 128
 
 typedef struct s_thread_draw
 {
@@ -197,13 +264,15 @@ t_tile	**get_tile_dict(void);
 char	*retrieve_tile_dict(t_map *map, int map_fd, int *err);
 void	retrieve_tile(t_tile **tiles, int map_fd, char *line, int *err);
 void	retrieve_value(int *value, char *arg, int *err, char *id);
-void	retrieve_texture(t_img **texture, char *arg, int *err, char *id);
+void	retrieve_texture(t_text *texture, char *arg, int *err, char *id);
+void	retrieve_texture_val(t_text *texture, char *arg, int *err);
 void	retrieve_texture_color(t_img **img, char *line, int *err);
 t_img	**get_hash_table(void);
 t_img	*get_img_hash(char *path, int *err);
 void	retrieve_player(t_map *map, char *line, int *err);
 int		is_dict_full(t_map *map, int err);
 void	retrieve_map(t_map *map, char *line, int map_fd, int *err);
+void	retrieve_light(char *line, int *err);
 int		retrieve_lonely(t_map *map, char *line, int *err);
 int		is_map_valid(t_map *map, t_tile **tiles, int err);
 
@@ -219,8 +288,10 @@ int		mouse_up(int button, int x, int y, t_data *data);
 int		mouse_move(int x, int y, t_data *data);
 t_col	rev_calc_color(int col);
 int		calc_color(t_col col);
+int		interpolate_color(int col1, int col2, float percent);
 int		ft_get_pixel_color(t_data *data, t_point point);
 
+float	ft_atof_err(char *str, float min, float max, char **last);
 void	cast_rays(t_data *data);
 
 int		point_is_in_fov(t_data *data, t_point point);
@@ -237,10 +308,12 @@ t_vec	**get_cast_table(void);
 void	draw_line_in_direction(t_data *data, t_point start, t_vec dir,
 	float dist);
 
+int	ft_atoi_err(char *arg, int *index);
 
 void	fps_counter(t_data *data);
 
-
+int		create_lmap(t_data *data);
+void	raytrace(t_data *data, t_light light, t_vec dir);
 
 void	print_dict(t_data *data);
 

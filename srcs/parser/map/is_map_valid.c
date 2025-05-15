@@ -6,11 +6,36 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 18:45:08 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/24 11:08:35 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/29 11:00:40 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
+
+int	light_check(t_map *map)
+{
+	t_data	*data;
+	t_lmap	lmap;
+	int		i;
+
+	data = get_data();
+	lmap = data->lmap;
+	if (lmap.lights)
+	{
+		i = -1;
+		while (++i < lmap.nb_ls)
+		{
+			if (lmap.lights[i].pos.x >= map->wid
+				|| lmap.lights[i].pos.y >= map->len)
+				return (ft_perror(0, "A light is outsided the map.", 0), 1);
+			// if (get_tile_dict()[*(data->map->matrix
+			// 			+ (int)lmap.lights[i].pos.x + (int)lmap.lights[i].pos.y
+			// 			* data->map->wid)]->is_wall)
+			// 	return (ft_perror(0, "Don't put a light in a wall.", 0), 1);
+		}
+	}
+	return (0);
+}
 
 void	print_map_open(int x, int y)
 {
@@ -78,5 +103,5 @@ int	is_map_valid(t_map *mp, t_tile **tiles, int err)
 				return (print_map_open(x + 1, y + 1), 1);
 		}
 	}
-	return (0);
+	return (light_check(mp));
 }

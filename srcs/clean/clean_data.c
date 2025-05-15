@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 10:18:57 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/24 11:32:09 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/30 10:14:02 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,10 @@ int	clean_data(void)
 		ft_del((void **)&data->hits);
 	if (*get_cast_table())
 		ft_del((void **)get_cast_table());
+	if (data->lmap.lmap)
+		ft_del((void **)&data->lmap.lmap);
+	if (data->lmap.lights)
+		ft_del((void **)&data->lmap.lights);
 	ft_del((void **)&data->mlx);
 	return (0);
 }

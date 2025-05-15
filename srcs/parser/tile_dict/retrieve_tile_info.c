@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:28:34 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/23 14:19:07 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/25 09:52:46 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,12 +60,18 @@ t_tile	*new_tile(void)
 	new = malloc(sizeof(t_tile));
 	if (!new)
 		return (NULL);
-	new->tex_ce = NULL;
-	new->tex_ea = NULL;
-	new->tex_fl = NULL;
-	new->tex_no = NULL;
-	new->tex_so = NULL;
-	new->tex_we = NULL;
+	new->tex_ce.img = NULL;
+	new->tex_ea.img = NULL;
+	new->tex_fl.img = NULL;
+	new->tex_no.img = NULL;
+	new->tex_so.img = NULL;
+	new->tex_we.img = NULL;
+	new->tex_ce.reflectance = 0;
+	new->tex_ea.reflectance = 0;
+	new->tex_fl.reflectance = 0;
+	new->tex_no.reflectance = 0;
+	new->tex_so.reflectance = 0;
+	new->tex_we.reflectance = 0;
 	new->ceil_height = -1;
 	new->floor_height = -1;
 	new->is_wall = -1;

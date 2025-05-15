@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:17:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/24 10:52:28 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/25 09:38:59 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,12 +58,12 @@ int	clean_map(void)
 	{
 		if (tiles[i])
 		{
-			remove_img(data, tiles[i]->tex_no);
-			remove_img(data, tiles[i]->tex_so);
-			remove_img(data, tiles[i]->tex_ea);
-			remove_img(data, tiles[i]->tex_we);
-			remove_img(data, tiles[i]->tex_ce);
-			remove_img(data, tiles[i]->tex_fl);
+			remove_img(data, tiles[i]->tex_no.img);
+			remove_img(data, tiles[i]->tex_so.img);
+			remove_img(data, tiles[i]->tex_ea.img);
+			remove_img(data, tiles[i]->tex_we.img);
+			remove_img(data, tiles[i]->tex_ce.img);
+			remove_img(data, tiles[i]->tex_fl.img);
 			ft_del((void **)&tiles[i]);
 		}
 	}

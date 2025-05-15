@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 15:18:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/24 11:06:24 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/04/30 17:20:21 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,40 @@ void	print_map(t_data *data)
 	printf("*\n");
 }
 
+#include <stdio.h> // Don't forget this for FILE and functions like fopen, fprintf, fclose
+
+void	print_lline(t_data *data, t_tlight *map, int fp)
+{
+	dprintf(fp, "\t| ");
+	for (int i = 0; i < data->lmap.wid; i++)
+		dprintf(fp, "%0.2f ", ((map + i)->ce_fl.emittance));
+	dprintf(fp, "|\n");
+}
+
+void	print_lmap(t_data *data)
+{
+	int fp = open("lmap.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (!fp)
+		return;
+
+	int	y = -1;
+	dprintf(fp, "Light map is :\n");
+	dprintf(fp, "\t.");
+	for (int i = 0; i < data->lmap.wid * 5 + 1; i++)
+		dprintf(fp, "-");
+	dprintf(fp, ".\n");
+	dprintf(fp, "\t| %*s |\n", data->lmap.wid * 5 - 1, "");
+	while (++y < data->lmap.len)
+		print_lline(data, data->lmap.lmap + y * data->lmap.wid, fp);
+	dprintf(fp, "\t| %*s |\n", data->lmap.wid * 5 - 1, "");
+	dprintf(fp, "\t*");
+	for (int i = 0; i < data->lmap.wid * 5 + 1; i++)
+		dprintf(fp, "-");
+	dprintf(fp, "*\n");
+	close(fp); // Always close the file!
+}
+
+
 #define EXPORT_TEXTURE(tex, label, id_char)                                       \
 	do {                                                                          \
 		if ((tex).img) {                                                          \
@@ -119,14 +153,15 @@ void	print_dict(t_data *data)
 		if (tile)
 		{
 			printf("\tId : %c\n", (char)i);
-			EXPORT_TEXTURE(*tile->tex_no, "tex_no", (char)i);
-			EXPORT_TEXTURE(*tile->tex_so, "tex_so", (char)i);
-			EXPORT_TEXTURE(*tile->tex_we, "tex_we", (char)i);
-			EXPORT_TEXTURE(*tile->tex_ea, "tex_ea", (char)i);
-			EXPORT_TEXTURE(*tile->tex_ce, "tex_ce", (char)i);
-			EXPORT_TEXTURE(*tile->tex_fl, "tex_fl", (char)i);
+			EXPORT_TEXTURE(*tile->tex_no.img, "tex_no", (char)i);
+			EXPORT_TEXTURE(*tile->tex_so.img, "tex_so", (char)i);
+			EXPORT_TEXTURE(*tile->tex_we.img, "tex_we", (char)i);
+			EXPORT_TEXTURE(*tile->tex_ea.img, "tex_ea", (char)i);
+			EXPORT_TEXTURE(*tile->tex_ce.img, "tex_ce", (char)i);
+			EXPORT_TEXTURE(*tile->tex_fl.img, "tex_fl", (char)i);
 		}
 	}
 	printf("\nYou can look them up at print/id/name_of_texture.bmp !\n\n");
 	print_map(data);
+	print_lmap(data);
 }
