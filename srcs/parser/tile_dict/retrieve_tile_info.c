@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:28:34 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/25 09:52:46 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/15 10:51:27 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,34 @@ identifier at ", line, ".", NULL}), 1), *err = 1, VOID);
 		return (*err = 1, VOID);
 	type_switch(tile, line, arg, err);
 	ft_del((void **)&arg);
+}
+
+void	add_wpath(t_tile *tile, int *err)
+{
+	t_line	*wpath;
+
+	if (tile->wpath)
+		return ;
+	wpath = malloc(sizeof(t_line));
+	if (!wpath)
+		return (*err = 1, VOID);
+	*wpath = (t_line){(t_vec){0, 0}, (t_vec){0, 1}};
+	add_link(&tile->wpath, wpath);
+	wpath = malloc(sizeof(t_line));
+	if (!wpath)
+		return (*err = 1, VOID);
+	*wpath = (t_line){(t_vec){0, 0}, (t_vec){1, 0}};
+	add_link(&tile->wpath, wpath);
+	wpath = malloc(sizeof(t_line));
+	if (!wpath)
+		return (*err = 1, VOID);
+	*wpath = (t_line){(t_vec){1, 1}, (t_vec){0, 1}};
+	add_link(&tile->wpath, wpath);
+	wpath = malloc(sizeof(t_line));
+	if (!wpath)
+		return (*err = 1, VOID);
+	*wpath = (t_line){(t_vec){1, 1}, (t_vec){1, 0}};
+	add_link(&tile->wpath, wpath);
 }
 
 t_tile	*new_tile(void)
@@ -98,7 +126,7 @@ void	retrieve_tile(t_tile **tiles, int map_fd, char *line, int *err)
 		if (!line)
 			return (ft_perror(-1, "Internal error: malloc.", 0), *err = 1, VOID);
 		if (ft_strncmp("}", line, 2) == 0)
-			return (ft_del((void **)&line), VOID);
+			return (ft_del((void **)&line), add_wpath(*tiles, err), VOID);
 		retrieve_switch(*tiles, line, err);
 		ft_del((void **)&line);
 		if (*err)

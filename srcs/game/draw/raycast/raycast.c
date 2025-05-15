@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 18:51:23 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/01 13:46:50 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/15 12:42:50 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,11 @@ static inline t_text	hit_text(t_data *data, t_ray *ray)
 	else
 		return (get_tile_dict()[*(data->map->matrix + ray->curr.y * data->map->wid + ray->curr.x)]->tex_so);
 
+}
+
+static inline t_tile	*hit_tile(t_data *data, t_ray *ray)
+{
+	return (get_tile_dict()[*(data->map->matrix + ray->curr.y * data->map->wid + ray->curr.x)]);
 }
 
 void	calc_ray(t_ray *ray)
@@ -53,11 +58,63 @@ void	calc_ray(t_ray *ray)
 	ray->precise_dist = 0;
 }
 
+float	cross(t_vec a, t_vec b)
+{
+	return (a.x * b.y - a.y * b.x);
+}
+
+float	intersect_segment(t_vec origin, t_vec dir, t_vec seg_a, t_vec seg_b) {
+	t_vec r = dir;
+	t_vec s = (t_vec){ seg_b.x - seg_a.x, seg_b.y - seg_a.y };
+	t_vec qp = (t_vec){ seg_a.x - origin.x, seg_a.y - origin.y };
+
+	float rxs = cross(r, s);
+	float qpxr = cross(qp, r);
+	if (rxs == 0.0f)
+		return (-1.0f);
+	float t = cross(qp, s) / rxs;
+	float u = qpxr / rxs;
+	if (t >= 0.0f && u >= 0.0f && u <= 1.0f)
+		return (t);
+	return (-1.0f);
+}
+
+static inline int	does_hit(t_list	*wpath, t_ray *ray, t_vec start)
+{
+	float	dist;
+	float	temp;
+
+	dist = -1;
+	while (wpath)
+	{
+		temp = intersect_segment(start, ray->dir,
+			((t_line *)wpath->content)->start, ((t_line *)wpath->content)->end);
+		if (temp < 0)
+		{
+			wpath = wpath->next;
+			continue ;
+		}
+		if (temp < dist || dist == -1)
+			dist = temp;
+		wpath = wpath->next;
+	}
+	if (dist < 0)
+		return (0);
+	ray->precise_dist = dist;
+	return (1);
+}
+
 void	handle_hit(t_data *data, t_ray *ray, t_hit *hit)
 {
 	t_text	texture;
+	t_tile	*tile;
 
 	texture = hit_text(data, ray);
+	tile = hit_tile(data, ray);
+	hit->hit[ray->bounce].x = ray->origin.x + ray->dir.x * ray->precise_dist;
+	hit->hit[ray->bounce].y = ray->origin.y + ray->dir.y * ray->precise_dist;
+	if (!does_hit(tile->wpath, ray, (t_vec){data->map->player.x, data->map->player.y}))
+		return ;
 	hit->hit[ray->bounce].x = ray->origin.x + ray->dir.x * ray->precise_dist;
 	hit->hit[ray->bounce].y = ray->origin.y + ray->dir.y * ray->precise_dist;
 	if (texture.reflectance && ray->bounce < MAX_BOUNCE - 1)

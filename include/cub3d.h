@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/07 15:34:21 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/15 10:44:51 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 # include <stdio.h>
 
 # include <pthread.h>
+# include <float.h>
 
 # define PI 3.1415926535897932384
 # define VOID (void)0
@@ -87,8 +88,15 @@ typedef struct s_player
 	int		rot;
 }	t_player;
 
+typedef struct s_line
+{
+	t_vec	start;
+	t_vec	end;
+}	t_line;
+
 typedef	struct s_tile
 {
+	t_list		*wpath;
 	t_text		tex_no;
 	t_text		tex_so;
 	t_text		tex_we;
@@ -276,7 +284,7 @@ void	retrieve_light(char *line, int *err);
 int		retrieve_lonely(t_map *map, char *line, int *err);
 int		is_map_valid(t_map *map, t_tile **tiles, int err);
 
-void	add_link(t_list **lst, char *content);
+void	add_link(t_list **lst, void *content);
 
 void	loop(void);
 int		mlx_close(t_data *data);
