@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 18:51:23 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/15 12:42:50 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/15 17:28:05 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,23 +63,29 @@ float	cross(t_vec a, t_vec b)
 	return (a.x * b.y - a.y * b.x);
 }
 
-float	intersect_segment(t_vec origin, t_vec dir, t_vec seg_a, t_vec seg_b) {
-	t_vec r = dir;
-	t_vec s = (t_vec){ seg_b.x - seg_a.x, seg_b.y - seg_a.y };
-	t_vec qp = (t_vec){ seg_a.x - origin.x, seg_a.y - origin.y };
+float	intersect_segment(t_vec origin, t_vec dir, t_line d)
+{
+	t_vec seg = {d.end.x - d.start.x, d.end.y - d.start.y};
 
-	float rxs = cross(r, s);
-	float qpxr = cross(qp, r);
-	if (rxs == 0.0f)
-		return (-1.0f);
-	float t = cross(qp, s) / rxs;
-	float u = qpxr / rxs;
-	if (t >= 0.0f && u >= 0.0f && u <= 1.0f)
-		return (t);
-	return (-1.0f);
+	float det = -dir.x * seg.y + dir.y * seg.x;
+	if (fabsf(det) < 1e-6f)
+		return -1;
+
+	t_vec delta = {d.start.x - origin.x, d.start.y - origin.y};
+	float t = (delta.x * -seg.y + delta.y * seg.x) / det;
+	float u = (-dir.y * delta.x + dir.x * delta.y) / det;
+	if (t >= 0 && u >= 0 && u <= 1)
+		return t;
+	return -1;
 }
 
-static inline int	does_hit(t_list	*wpath, t_ray *ray, t_vec start)
+static inline t_line	line(t_point curr, t_line base)
+{
+	return ((t_line){(t_vec){base.start.x + curr.x, base.start.y + curr.y},
+		(t_vec){base.end.x + curr.x, base.end.y + curr.y}});
+}
+
+static inline int	does_hit(t_list	*wpath, t_ray *ray)
 {
 	float	dist;
 	float	temp;
@@ -87,9 +93,9 @@ static inline int	does_hit(t_list	*wpath, t_ray *ray, t_vec start)
 	dist = -1;
 	while (wpath)
 	{
-		temp = intersect_segment(start, ray->dir,
-			((t_line *)wpath->content)->start, ((t_line *)wpath->content)->end);
-		if (temp < 0)
+		temp = intersect_segment(ray->origin, ray->dir,
+			line(ray->curr, *(t_line *)wpath->content));
+		if (temp < -0.5f)
 		{
 			wpath = wpath->next;
 			continue ;
@@ -111,9 +117,7 @@ void	handle_hit(t_data *data, t_ray *ray, t_hit *hit)
 
 	texture = hit_text(data, ray);
 	tile = hit_tile(data, ray);
-	hit->hit[ray->bounce].x = ray->origin.x + ray->dir.x * ray->precise_dist;
-	hit->hit[ray->bounce].y = ray->origin.y + ray->dir.y * ray->precise_dist;
-	if (!does_hit(tile->wpath, ray, (t_vec){data->map->player.x, data->map->player.y}))
+	if (!does_hit(tile->wpath, ray))
 		return ;
 	hit->hit[ray->bounce].x = ray->origin.x + ray->dir.x * ray->precise_dist;
 	hit->hit[ray->bounce].y = ray->origin.y + ray->dir.y * ray->precise_dist;

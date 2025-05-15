@@ -6,15 +6,48 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:28:34 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/15 10:51:27 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/15 17:31:49 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
+void	retrieve_wall(t_tile *tile, char *arg, int *err)
+{
+	//This func need to be more well done.
+	t_line	*line;
+
+	line = malloc(sizeof(t_line));
+	if (!line)
+		return (*err = 1, VOID);
+	arg++;
+	arg++;
+	line->start.x = ft_atoi(arg);
+	while (ft_isdigit(*arg))
+		arg++;
+	arg++;
+	arg++;
+	line->start.x = ft_atoi(arg);
+	while (ft_isdigit(*arg))
+		arg++;
+	arg++;
+	arg++;
+	arg++;
+	arg++;
+	line->end.x = ft_atoi(arg);
+	while (ft_isdigit(*arg))
+		arg++;
+	arg++;
+	arg++;
+	line->end.x = ft_atoi(arg);
+	add_link(&tile->wpath, line);
+}
+
 void	type_switch(t_tile *tile, char *line, char *arg, int *err)
 {
-	if (ft_strncmp("NO ", line, 3) == 0)
+	if (ft_strncmp("wl ", line, 3) == 0)
+		retrieve_wall(tile, arg, err);
+	else if (ft_strncmp("NO ", line, 3) == 0)
 		retrieve_texture(&tile->tex_no, arg, err, "NO");
 	else if (ft_strncmp("SO ", line, 3) == 0)
 		retrieve_texture(&tile->tex_so, arg, err, "SO");
