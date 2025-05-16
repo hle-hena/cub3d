@@ -6,23 +6,52 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 18:51:23 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/16 09:33:06 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/16 20:04:42 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-static inline t_text	hit_text(t_data *data, t_ray *ray)
+static inline int	get_wall_direction(t_vec wall_start, t_vec wall_end, t_vec ray_dir)
 {
-	if (ray->side == 0 && ray->step.x == 1)
-		return (get_tile_dict()[*(data->map->matrix + ray->curr.y * data->map->wid + ray->curr.x)]->tex_ea);
-	else if (ray->side == 0)
-		return (get_tile_dict()[*(data->map->matrix + ray->curr.y * data->map->wid + ray->curr.x)]->tex_we);
-	else if (ray->step.y == 1)
-		return (get_tile_dict()[*(data->map->matrix + ray->curr.y * data->map->wid + ray->curr.x)]->tex_no);
-	else
-		return (get_tile_dict()[*(data->map->matrix + ray->curr.y * data->map->wid + ray->curr.x)]->tex_so);
+	double dx = wall_end.x - wall_start.x;
+	double dy = wall_end.y - wall_start.y;
+	double nx = -dy;
+	double ny = dx;
+	double dot = nx * ray_dir.x + ny * ray_dir.y;
 
+	if (dot > 0)
+	{
+		nx = -nx;
+		ny = -ny;
+	}
+	if (fabs(nx) > fabs(ny))
+		return (nx > 0) ? 0 : 2;
+	else
+		return (ny > 0) ? 3 : 1;
+}
+
+static inline t_text	hit_text(t_data *data, t_ray *ray, t_hit *hit, t_line wall)
+{
+	int			dir;
+	t_tile		*tile;
+	t_point		light_point;
+	t_tlight	*tlight;
+
+	dir = get_wall_direction(wall.start, wall.end, ray->dir);
+	tile = get_tile_dict()[*(data->map->matrix
+		+ ray->curr.y * data->map->wid + ray->curr.x)];
+	light_point.x = (hit->hit[ray->bounce].x + (ray->dir.x > 0 ? 0.001 : -0.001) * !ray->side) * LMAP_PRECISION;
+	light_point.y = (hit->hit[ray->bounce].y + (ray->dir.y > 0 ? 0.001 : -0.001) * ray->side) * LMAP_PRECISION;
+	tlight = (data->lmap.lmap + light_point.x + light_point.y * data->lmap.wid);
+	if (dir == 0)
+		return (hit->light = &tlight->ea, tile->tex_ea);
+	else if (dir == 2)
+		return (hit->light = &tlight->we, tile->tex_we);
+	else if (dir == 1)
+		return (hit->light = &tlight->no, tile->tex_no);
+	else
+		return (hit->light = &tlight->so, tile->tex_so);
 }
 
 static inline t_tile	*hit_tile(t_data *data, t_ray *ray)
@@ -85,7 +114,7 @@ static inline t_line	line(t_point curr, t_line base)
 		(t_vec){base.end.x + curr.x, base.end.y + curr.y}});
 }
 
-static inline int	does_hit(t_list	*wpath, t_ray *ray)
+static inline int	does_hit(t_list	*wpath, t_ray *ray, t_line *wall)
 {
 	float	dist;
 	float	temp;
@@ -101,7 +130,10 @@ static inline int	does_hit(t_list	*wpath, t_ray *ray)
 			continue ;
 		}
 		if (temp < dist || dist == -1)
+		{
+			*wall = *(t_line *)wpath->content;
 			dist = temp;
+		}
 		wpath = wpath->next;
 	}
 	if (dist < 0)
@@ -114,13 +146,15 @@ void	handle_hit(t_data *data, t_ray *ray, t_hit *hit)
 {
 	t_text	texture;
 	t_tile	*tile;
+	t_line	wall;
 
-	texture = hit_text(data, ray);
 	tile = hit_tile(data, ray);
-	if (!does_hit(tile->wpath, ray))
+	wall = (t_line){0};
+	if (!does_hit(tile->wpath, ray, &wall))
 		return ;
 	hit->hit[ray->bounce].x = ray->origin.x + ray->dir.x * ray->precise_dist;
 	hit->hit[ray->bounce].y = ray->origin.y + ray->dir.y * ray->precise_dist;
+	texture = hit_text(data, ray, hit, wall);
 	if (texture.reflectance && ray->bounce < MAX_BOUNCE - 1)
 	{
 		hit->dist[ray->bounce] = ray->precise_dist;
@@ -137,6 +171,7 @@ void	handle_hit(t_data *data, t_ray *ray, t_hit *hit)
 			ray->dir.y = -ray->dir.y;
 		calc_ray(ray);
 		hit->side[ray->bounce] = ray->side;
+		hit->ray_dir[ray->bounce] = ray->dir;
 		ray->bounce++;
 		if (get_tile_dict()[*(data->map->matrix + ray->curr.y * data->map->wid + ray->curr.x)]->is_wall)
 		{
@@ -153,7 +188,7 @@ void	handle_hit(t_data *data, t_ray *ray, t_hit *hit)
 		hit->texture = texture.img;
 		ray->running = 0;
 		hit->bounces = ray->bounce;
-		hit->ray_dir = ray->dir;
+		hit->ray_dir[ray->bounce] = ray->dir;
 	}
 }
 

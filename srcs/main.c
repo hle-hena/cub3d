@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:05:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/16 09:30:00 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/16 20:06:28 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@ void	init_mlx(t_data *data)
 {
 	mlx_get_screen_size(data->mlx, &data->render_w, &data->render_h);
 	data->render_h *= 0.9;
+	// data->render_h *= 2;
+	// data->render_w *= 2;
 	data->render_h += (data->render_h % 2);
 	data->render_w += (data->render_w % 2);
 	data->win_h = data->render_h;

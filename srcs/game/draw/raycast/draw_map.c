@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/01 17:08:33 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/16 20:05:41 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,18 +165,9 @@ static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img,
 
 static inline void	draw_wall(t_data *data, char *img, t_hit *hit)
 {
-	t_flight	light;
-	t_point		light_point;
 	int			color;
 
-	light_point.x = (hit->hit[hit->bounces].x + (hit->ray_dir.x > 0 ? 0.001 : -0.001) * !hit->side[hit->bounces]) * LMAP_PRECISION;
-	light_point.y = (hit->hit[hit->bounces].y + (hit->ray_dir.y > 0 ? 0.001 : -0.001) * hit->side[hit->bounces]) * LMAP_PRECISION;
-	hit->tex_y = hit->tex_pos_fp >> 16;
-	if (hit->side[hit->bounces] == 0)
-		light = (data->lmap.lmap + light_point.x + light_point.y * data->lmap.wid)->no_so;
-	else
-		light = (data->lmap.lmap + light_point.x + light_point.y * data->lmap.wid)->we_ea;
-	color = color_blend(*(int *)(hit->tex_col + hit->tex_y * hit->texture->size_line), light.color, light.emittance / fmax(((float)(hit->bounces + 1) * 0.75), 1));
+	color = color_blend(*(int *)(hit->tex_col + hit->tex_y * hit->texture->size_line), hit->light->color, hit->light->emittance / fmax(((float)(hit->bounces + 1) * 0.75), 1));
 	*(int *)(img) = color;
 	*(int *)(img + data->img.bpp) = color;
 	*(int *)(img + data->img.size_line) = color;

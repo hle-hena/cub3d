@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/15 10:44:51 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/16 19:04:31 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,55 @@ typedef struct s_line
 	t_vec	end;
 }	t_line;
 
+typedef struct s_trace
+{
+	t_vec	dist;
+	t_vec	slope;
+	t_vec	origin;
+	t_vec	dir;
+	t_point	curr;
+	t_point	real;
+	t_point	step;
+	int		side;
+	int		bounce;
+	int		running;
+	float	precise_dist;
+	float	emittance;
+}	t_trace;
+
+# define ATT_COEF 0.996
+
+typedef struct s_light
+{
+	t_vec	pos;
+	t_col	color;
+	float	emittance;
+}	t_light;
+
+typedef struct s_light_face
+{
+	float	emittance;
+	int		color;
+}	t_flight;
+
+typedef struct s_light_tile
+{
+	t_flight	no;
+	t_flight	so;
+	t_flight	we;
+	t_flight	ea;
+	t_flight	ce_fl;
+}	t_tlight;
+
+typedef struct s_light_map
+{
+	t_tlight	*lmap;
+	t_light		*lights;
+	int			nb_ls;
+	int			wid;
+	int			len;
+}	t_lmap;
+
 typedef	struct s_tile
 {
 	t_list		*wpath;
@@ -134,18 +183,19 @@ typedef struct s_events
 
 typedef struct s_hit
 {
-	t_img	*texture;
-	t_vec	ray_dir;
-	t_vec	hit[MAX_BOUNCE];
-	float	dist[MAX_BOUNCE];
-	int		draw_start[MAX_BOUNCE];
-	int		draw_end[MAX_BOUNCE];
-	int		side[MAX_BOUNCE];
-	int		bounces;
-	int		tex_y;
-	int		tex_pos_fp;
-	int		step_fp;
-	char	*tex_col;
+	t_img		*texture;
+	t_flight	*light;
+	t_vec		ray_dir[MAX_BOUNCE];
+	t_vec		hit[MAX_BOUNCE];
+	float		dist[MAX_BOUNCE];
+	int			draw_start[MAX_BOUNCE];
+	int			draw_end[MAX_BOUNCE];
+	int			side[MAX_BOUNCE];
+	int			bounces;
+	int			tex_y;
+	int			tex_pos_fp;
+	int			step_fp;
+	char		*tex_col;
 }	t_hit;
 
 typedef struct s_ray
@@ -176,53 +226,6 @@ typedef	struct s_cam
 	t_vec	plane;
 	float	plane_len;
 }	t_cam;
-
-typedef struct s_trace
-{
-	t_vec	dist;
-	t_vec	slope;
-	t_vec	origin;
-	t_vec	dir;
-	t_point	curr;
-	t_point	real;
-	t_point	step;
-	int		side;
-	int		bounce;
-	int		running;
-	float	precise_dist;
-	float	emittance;
-}	t_trace;
-
-# define ATT_COEF 0.996
-
-typedef struct s_light
-{
-	t_vec	pos;
-	t_col	color;
-	float	emittance;
-}	t_light;
-
-typedef struct s_light_face
-{
-	float	emittance;
-	int		color;
-}	t_flight;
-
-typedef struct s_light_tile
-{
-	t_flight	no_so;
-	t_flight	we_ea;
-	t_flight	ce_fl;
-}	t_tlight;
-
-typedef struct s_light_map
-{
-	t_tlight	*lmap;
-	t_light		*lights;
-	int			nb_ls;
-	int			wid;
-	int			len;
-}	t_lmap;
 
 typedef struct s_data
 {

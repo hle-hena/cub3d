@@ -6,22 +6,49 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:22:39 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/16 10:16:06 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/16 20:04:47 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-static inline t_text	hit_text(t_data *data, t_trace *ray)
+static inline int	get_wall_direction(t_vec wall_start, t_vec wall_end, t_vec ray_dir)
 {
-	if (ray->side == 0 && ray->step.x == 1)
-		return (get_tile_dict()[*(data->map->matrix + ray->real.y * data->map->wid + ray->real.x)]->tex_ea);
-	else if (ray->side == 0)
-		return (get_tile_dict()[*(data->map->matrix + ray->real.y * data->map->wid + ray->real.x)]->tex_we);
-	else if (ray->step.y == 1)
-		return (get_tile_dict()[*(data->map->matrix + ray->real.y * data->map->wid + ray->real.x)]->tex_no);
+	double dx = wall_end.x - wall_start.x;
+	double dy = wall_end.y - wall_start.y;
+	double nx = -dy;
+	double ny = dx;
+	double dot = nx * ray_dir.x + ny * ray_dir.y;
+
+	if (dot > 0)
+	{
+		nx = -nx;
+		ny = -ny;
+	}
+	if (fabs(nx) > fabs(ny))
+		return (nx > 0) ? 0 : 2;
 	else
-		return (get_tile_dict()[*(data->map->matrix + ray->real.y * data->map->wid + ray->real.x)]->tex_so);
+		return (ny > 0) ? 3 : 1;
+}
+
+static inline t_text	hit_text(t_data *data, t_trace *ray, t_flight **flight, t_line wall)
+{
+	int			dir;
+	t_tile		*tile;
+	t_tlight	*tlight;
+
+	dir = get_wall_direction(wall.start, wall.end, ray->dir);
+	tile = get_tile_dict()[*(data->map->matrix
+		+ ray->real.y * data->map->wid + ray->real.x)];
+	tlight = (data->lmap.lmap + ray->curr.x + ray->curr.y * data->lmap.wid);
+	if (dir == 0)
+		return (*flight = &tlight->ea, tile->tex_ea);
+	else if (dir == 2)
+		return (*flight = &tlight->we, tile->tex_we);
+	else if (dir == 1)
+		return (*flight = &tlight->no, tile->tex_no);
+	else
+		return (*flight = &tlight->so, tile->tex_so);
 }
 
 static inline t_tile	*hit_tile(t_data *data, t_trace *ray)
@@ -92,7 +119,7 @@ static inline t_line	line(t_point curr, t_line base)
 		(t_vec){(base.end.x + curr.x) * LMAP_PRECISION, (base.end.y + curr.y) * LMAP_PRECISION}});
 }
 
-static inline int	does_hit(t_list	*wpath, t_trace *ray)
+static inline int	does_hit(t_list	*wpath, t_trace *ray, t_line *wall)
 {
 	float	dist;
 	float	temp;
@@ -108,25 +135,31 @@ static inline int	does_hit(t_list	*wpath, t_trace *ray)
 			continue ;
 		}
 		if (temp < dist || dist == -1)
+		{
+			*wall = *(t_line *)wpath->content;
 			dist = temp;
+		}
 		wpath = wpath->next;
 	}
-	if (dist < 0 || dist - 0.5 > ray->precise_dist)
+	if (dist < 0 || dist - 0.2 > ray->precise_dist)
 		return (0);
 	ray->precise_dist = dist;
 	return (1);
 }
 
-void	handle_reflexion(t_data *data, t_lmap *map, t_trace *ray, t_light light)
+void	handle_reflexion(t_data *data, t_trace *ray, t_light light)
 {
-	t_text	texture;
-	t_tile	*tile;
-	t_vec	hit;
+	t_text		texture;
+	t_tile		*tile;
+	t_flight	*flight;
+	t_vec		hit;
+	t_line		wall;
 
-	texture = hit_text(data, ray);
 	tile = hit_tile(data, ray);
-	if (!does_hit(tile->wpath, ray))
+	wall = (t_line){0};
+	if (!does_hit(tile->wpath, ray, &wall))
 		return ;
+	texture = hit_text(data, ray, &flight, wall);
 	hit.x = ray->origin.x + ray->dir.x * ray->precise_dist;
 	hit.y = ray->origin.y + ray->dir.y * ray->precise_dist;
 	if (texture.reflectance && ray->bounce < MAX_BOUNCE - 1 && ray->emittance * pow(0.99, ray->precise_dist) > 0.01)
@@ -154,16 +187,8 @@ void	handle_reflexion(t_data *data, t_lmap *map, t_trace *ray, t_light light)
 	else
 	{
 		ray->running = 0;
-		// if (ray->side == 0)
-		// {
-			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->no_so.color = color_attenuation(light.color, pow(ATT_COEF, (ray->precise_dist * 64) / LMAP_PRECISION));
-			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->no_so.emittance = ray->emittance * pow(ATT_COEF, (ray->precise_dist * 64) / LMAP_PRECISION);
-		// }
-		// else
-		// {
-			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->we_ea.color = color_attenuation(light.color, pow(ATT_COEF, (ray->precise_dist * 64) / LMAP_PRECISION));
-			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->we_ea.emittance = ray->emittance * pow(ATT_COEF, (ray->precise_dist * 64) / LMAP_PRECISION);
-		// }
+		flight->color = color_attenuation(light.color, pow(ATT_COEF, (ray->precise_dist * 64) / LMAP_PRECISION));
+		flight->emittance = ray->emittance * pow(ATT_COEF, (ray->precise_dist * 64) / LMAP_PRECISION);
 	}
 	ray->emittance -= (1 - texture.reflectance);
 }
@@ -238,6 +263,6 @@ void	raytrace(t_data *data, t_light light, t_vec dir)
 		ray.real.x = ray.curr.x / LMAP_PRECISION;
 		ray.real.y = ray.curr.y / LMAP_PRECISION;
 		if (get_tile_dict()[*(data->map->matrix + ray.real.y * data->map->wid + ray.real.x)]->is_wall)
-			handle_reflexion(data, &data->lmap, &ray, light);
+			handle_reflexion(data, &ray, light);
 	}
 }
