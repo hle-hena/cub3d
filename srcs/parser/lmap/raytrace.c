@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:22:39 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/16 10:12:25 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/16 10:16:06 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,16 +154,16 @@ void	handle_reflexion(t_data *data, t_lmap *map, t_trace *ray, t_light light)
 	else
 	{
 		ray->running = 0;
-		if (ray->side == 0)
-		{
+		// if (ray->side == 0)
+		// {
 			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->no_so.color = color_attenuation(light.color, pow(ATT_COEF, (ray->precise_dist * 64) / LMAP_PRECISION));
 			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->no_so.emittance = ray->emittance * pow(ATT_COEF, (ray->precise_dist * 64) / LMAP_PRECISION);
-		}
-		else
-		{
+		// }
+		// else
+		// {
 			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->we_ea.color = color_attenuation(light.color, pow(ATT_COEF, (ray->precise_dist * 64) / LMAP_PRECISION));
 			(map->lmap + ray->curr.x + ray->curr.y * data->lmap.wid)->we_ea.emittance = ray->emittance * pow(ATT_COEF, (ray->precise_dist * 64) / LMAP_PRECISION);
-		}
+		// }
 	}
 	ray->emittance -= (1 - texture.reflectance);
 }
