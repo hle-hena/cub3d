@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:05:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/01 12:49:43 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/16 09:30:00 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,12 @@ void	init_mlx(t_data *data)
 {
 	mlx_get_screen_size(data->mlx, &data->render_w, &data->render_h);
 	data->render_h *= 0.9;
-	data->win_h = data->render_h + (data->win_h % 2);
-	data->win_w = data->render_w + (data->win_w % 2);
-	if (data->win_w > 2000)
-	{
-		data->render_h /= 2;
-		data->render_w /= 2;
-	}
+	data->render_h += (data->render_h % 2);
+	data->render_w += (data->render_w % 2);
+	data->win_h = data->render_h;
+	data->win_w = data->render_w;
+	data->render_h /= 2;
+	data->render_w /= 2;
 	data->win = mlx_new_window(data->mlx, data->win_w, data->win_h,
 		"Cub3d");
 	data->img.img = mlx_new_image(data->mlx, data->win_w, data->win_h);

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:28:34 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/15 17:31:49 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/16 09:30:50 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	retrieve_wall(t_tile *tile, char *arg, int *err)
 		arg++;
 	arg++;
 	arg++;
-	line->start.x = ft_atoi(arg);
+	line->start.y = ft_atoi(arg);
 	while (ft_isdigit(*arg))
 		arg++;
 	arg++;
@@ -39,7 +39,7 @@ void	retrieve_wall(t_tile *tile, char *arg, int *err)
 		arg++;
 	arg++;
 	arg++;
-	line->end.x = ft_atoi(arg);
+	line->end.y = ft_atoi(arg);
 	add_link(&tile->wpath, line);
 }
 
@@ -121,6 +121,7 @@ t_tile	*new_tile(void)
 	new = malloc(sizeof(t_tile));
 	if (!new)
 		return (NULL);
+	new->wpath = NULL;
 	new->tex_ce.img = NULL;
 	new->tex_ea.img = NULL;
 	new->tex_fl.img = NULL;

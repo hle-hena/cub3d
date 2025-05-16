@@ -14,12 +14,24 @@
 	SO 255,255,255
 	EA 255,255,255
 	WE 255,255,255
-	C 0,0,0
-	F 0,0,0
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
 	CH 100
 	FH 1
 	W 1
 	wl ((0, 0), (1, 1))
+}
+2 {
+	NO 255,255,255
+	SO 255,255,255
+	EA 255,255,255
+	WE 255,255,255
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	CH 100
+	FH 1
+	W 1
+	wl ((0.75, 0.25), (0.25, 0.75))
 }
 
 5 {
@@ -51,8 +63,8 @@ L ((4.5, 4.5), {0, 0, 255}, 1)
 P=0
 
 444444
+400034
 400004
-400304
 40N004
-400004
+430004
 444444

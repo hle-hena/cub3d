@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 18:51:23 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/15 17:28:05 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/16 09:33:06 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,12 +58,12 @@ void	calc_ray(t_ray *ray)
 	ray->precise_dist = 0;
 }
 
-float	cross(t_vec a, t_vec b)
+static inline float	cross(t_vec a, t_vec b)
 {
 	return (a.x * b.y - a.y * b.x);
 }
 
-float	intersect_segment(t_vec origin, t_vec dir, t_line d)
+static inline float	intersect_segment(t_vec origin, t_vec dir, t_line d)
 {
 	t_vec seg = {d.end.x - d.start.x, d.end.y - d.start.y};
 

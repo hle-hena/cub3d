@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:22:39 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/01 17:06:19 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/16 10:12:25 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,11 @@ static inline t_text	hit_text(t_data *data, t_trace *ray)
 		return (get_tile_dict()[*(data->map->matrix + ray->real.y * data->map->wid + ray->real.x)]->tex_no);
 	else
 		return (get_tile_dict()[*(data->map->matrix + ray->real.y * data->map->wid + ray->real.x)]->tex_so);
+}
+
+static inline t_tile	*hit_tile(t_data *data, t_trace *ray)
+{
+	return (get_tile_dict()[*(data->map->matrix + ray->real.y * data->map->wid + ray->real.x)]);
 }
 
 static inline int	color_attenuation(t_col col, float emittance)
@@ -60,12 +65,68 @@ void	calc_trace(t_trace *ray)
 	ray->precise_dist = 0;
 }
 
+static inline float	cross(t_vec a, t_vec b)
+{
+	return (a.x * b.y - a.y * b.x);
+}
+
+static inline float	intersect_segment(t_vec origin, t_vec dir, t_line d)
+{
+	t_vec seg = {d.end.x - d.start.x, d.end.y - d.start.y};
+
+	float det = -dir.x * seg.y + dir.y * seg.x;
+	if (fabsf(det) < 1e-6f)
+		return -1;
+
+	t_vec delta = {d.start.x - origin.x, d.start.y - origin.y};
+	float t = (delta.x * -seg.y + delta.y * seg.x) / det;
+	float u = (-dir.y * delta.x + dir.x * delta.y) / det;
+	if (t >= 0 && u >= 0 && u <= 1)
+		return t;
+	return -1;
+}
+
+static inline t_line	line(t_point curr, t_line base)
+{
+	return ((t_line){(t_vec){(base.start.x + curr.x) * LMAP_PRECISION, (base.start.y + curr.y) * LMAP_PRECISION},
+		(t_vec){(base.end.x + curr.x) * LMAP_PRECISION, (base.end.y + curr.y) * LMAP_PRECISION}});
+}
+
+static inline int	does_hit(t_list	*wpath, t_trace *ray)
+{
+	float	dist;
+	float	temp;
+
+	dist = -1;
+	while (wpath)
+	{
+		temp = intersect_segment(ray->origin, ray->dir,
+			line(ray->real, *(t_line *)wpath->content));
+		if (temp < -0.5f)
+		{
+			wpath = wpath->next;
+			continue ;
+		}
+		if (temp < dist || dist == -1)
+			dist = temp;
+		wpath = wpath->next;
+	}
+	if (dist < 0 || dist - 0.5 > ray->precise_dist)
+		return (0);
+	ray->precise_dist = dist;
+	return (1);
+}
+
 void	handle_reflexion(t_data *data, t_lmap *map, t_trace *ray, t_light light)
 {
 	t_text	texture;
+	t_tile	*tile;
 	t_vec	hit;
 
 	texture = hit_text(data, ray);
+	tile = hit_tile(data, ray);
+	if (!does_hit(tile->wpath, ray))
+		return ;
 	hit.x = ray->origin.x + ray->dir.x * ray->precise_dist;
 	hit.y = ray->origin.y + ray->dir.y * ray->precise_dist;
 	if (texture.reflectance && ray->bounce < MAX_BOUNCE - 1 && ray->emittance * pow(0.99, ray->precise_dist) > 0.01)
