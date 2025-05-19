@@ -6,49 +6,69 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:22:39 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/16 20:04:47 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/19 17:02:08 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-static inline int	get_wall_direction(t_vec wall_start, t_vec wall_end, t_vec ray_dir)
+static inline t_vec	get_wall_direction(t_vec wall_start, t_vec wall_end, t_vec ray_dir)
 {
-	double dx = wall_end.x - wall_start.x;
-	double dy = wall_end.y - wall_start.y;
-	double nx = -dy;
-	double ny = dx;
-	double dot = nx * ray_dir.x + ny * ray_dir.y;
+	float dx = wall_end.x - wall_start.x;
+	float dy = wall_end.y - wall_start.y;
+	float nx = -dy;
+	float ny = dx;
+	float dot = nx * ray_dir.x + ny * ray_dir.y;
 
 	if (dot > 0)
 	{
 		nx = -nx;
 		ny = -ny;
 	}
-	if (fabs(nx) > fabs(ny))
-		return (nx > 0) ? 0 : 2;
-	else
-		return (ny > 0) ? 3 : 1;
+	return ((t_vec){nx, ny});
 }
 
-static inline t_text	hit_text(t_data *data, t_trace *ray, t_flight **flight, t_line wall)
+int	is_correct_flight(void *content, void *to_find)
 {
-	int			dir;
-	t_tile		*tile;
-	t_tlight	*tlight;
+	t_vec	cont_normal;
+	t_vec	find_normal;
 
-	dir = get_wall_direction(wall.start, wall.end, ray->dir);
-	tile = get_tile_dict()[*(data->map->matrix
-		+ ray->real.y * data->map->wid + ray->real.x)];
+	cont_normal = ((t_flight *)content)->normal;
+	find_normal = *(t_vec *)to_find;
+	return (cont_normal.x == find_normal.x && cont_normal.y == find_normal.y);
+}
+
+t_flight	*new_flight(t_vec normal)
+{
+	t_flight	*flight;
+
+	flight = malloc(sizeof(t_flight));
+	if (!flight)
+		return (NULL);
+	flight->color = 0;
+	flight->emittance = 0;
+	flight->normal = normal;
+	return (flight);
+}
+
+static inline t_flight	*hit_light(t_data *data, t_trace *ray, t_wpath wall)
+{
+	t_vec		normal;
+	t_tlight	*tlight;
+	t_list		*lst;
+	t_flight	*flight;
+
+	normal = get_wall_direction(wall.start, wall.end, ray->dir);
 	tlight = (data->lmap.lmap + ray->curr.x + ray->curr.y * data->lmap.wid);
-	if (dir == 0)
-		return (*flight = &tlight->ea, tile->tex_ea);
-	else if (dir == 2)
-		return (*flight = &tlight->we, tile->tex_we);
-	else if (dir == 1)
-		return (*flight = &tlight->no, tile->tex_no);
+	lst = ft_lstchr(tlight->flight, &normal, is_correct_flight);
+	if (!lst)
+	{
+		flight = new_flight(normal);
+		add_link(&tlight->flight, flight);
+	}
 	else
-		return (*flight = &tlight->so, tile->tex_so);
+		flight = (t_flight *)lst->content;
+	return (flight);
 }
 
 static inline t_tile	*hit_tile(t_data *data, t_trace *ray)
@@ -97,12 +117,12 @@ static inline float	cross(t_vec a, t_vec b)
 	return (a.x * b.y - a.y * b.x);
 }
 
-static inline float	intersect_segment(t_vec origin, t_vec dir, t_line d)
+static inline float	intersect_segment(t_vec origin, t_vec dir, t_wpath d)
 {
 	t_vec seg = {d.end.x - d.start.x, d.end.y - d.start.y};
 
 	float det = -dir.x * seg.y + dir.y * seg.x;
-	if (fabsf(det) < 1e-6f)
+	if (fabs(det) < 1e-6f)
 		return -1;
 
 	t_vec delta = {d.start.x - origin.x, d.start.y - origin.y};
@@ -113,13 +133,13 @@ static inline float	intersect_segment(t_vec origin, t_vec dir, t_line d)
 	return -1;
 }
 
-static inline t_line	line(t_point curr, t_line base)
+static inline t_wpath	line(t_point curr, t_wpath base)
 {
-	return ((t_line){(t_vec){(base.start.x + curr.x) * LMAP_PRECISION, (base.start.y + curr.y) * LMAP_PRECISION},
-		(t_vec){(base.end.x + curr.x) * LMAP_PRECISION, (base.end.y + curr.y) * LMAP_PRECISION}});
+	return ((t_wpath){(t_vec){(base.start.x + curr.x) * LMAP_PRECISION, (base.start.y + curr.y) * LMAP_PRECISION},
+		(t_vec){(base.end.x + curr.x) * LMAP_PRECISION, (base.end.y + curr.y) * LMAP_PRECISION}, (t_text){0}});
 }
 
-static inline int	does_hit(t_list	*wpath, t_trace *ray, t_line *wall)
+static inline int	does_hit(t_list	*wpath, t_trace *ray, t_wpath *wall)
 {
 	float	dist;
 	float	temp;
@@ -128,7 +148,7 @@ static inline int	does_hit(t_list	*wpath, t_trace *ray, t_line *wall)
 	while (wpath)
 	{
 		temp = intersect_segment(ray->origin, ray->dir,
-			line(ray->real, *(t_line *)wpath->content));
+			line(ray->real, *(t_wpath *)wpath->content));
 		if (temp < -0.5f)
 		{
 			wpath = wpath->next;
@@ -136,12 +156,12 @@ static inline int	does_hit(t_list	*wpath, t_trace *ray, t_line *wall)
 		}
 		if (temp < dist || dist == -1)
 		{
-			*wall = *(t_line *)wpath->content;
+			*wall = *(t_wpath *)wpath->content;
 			dist = temp;
 		}
 		wpath = wpath->next;
 	}
-	if (dist < 0 || dist - 0.2 > ray->precise_dist)
+	if (dist < 0 || dist - 0.5 > ray->precise_dist)
 		return (0);
 	ray->precise_dist = dist;
 	return (1);
@@ -153,15 +173,28 @@ void	handle_reflexion(t_data *data, t_trace *ray, t_light light)
 	t_tile		*tile;
 	t_flight	*flight;
 	t_vec		hit;
-	t_line		wall;
+	t_wpath		wall;
+	// float		before;
 
 	tile = hit_tile(data, ray);
-	wall = (t_line){0};
+	wall = (t_wpath){0};
+	// before = ray->precise_dist;
+	// int expected_x = floorf(ray->origin.x + ray->dir.x * ray->precise_dist);
+	// int expected_y = floorf(ray->origin.y + ray->dir.y * ray->precise_dist);
 	if (!does_hit(tile->wpath, ray, &wall))
 		return ;
-	texture = hit_text(data, ray, &flight, wall);
 	hit.x = ray->origin.x + ray->dir.x * ray->precise_dist;
 	hit.y = ray->origin.y + ray->dir.y * ray->precise_dist;
+	// if (floorf(hit.x) != expected_x
+	// 	|| floorf(hit.y) != expected_y)
+	// {
+	// 	// printf("The real hit is {%f, %f} and the curr is {%d, %d}\n", hit.x, hit.y, ray->curr.x, ray->curr.y);
+	// 	return ((ray->precise_dist = before), VOID);
+	// }
+	// ray->curr.x = hit.x - (ray->dir.x > 0 ? -0.001f : 0.001f);
+	// ray->curr.y = hit.y - (ray->dir.y > 0 ? -0.001f : 0.001f);
+	texture = wall.texture;
+	flight = hit_light(data, ray, wall);
 	if (texture.reflectance && ray->bounce < MAX_BOUNCE - 1 && ray->emittance * pow(0.99, ray->precise_dist) > 0.01)
 	{
 		ray->origin = hit;
@@ -243,9 +276,9 @@ void	raytrace(t_data *data, t_light light, t_vec dir)
 	t_trace	ray;
 
 	init_trace(&ray, dir, light.pos, light.emittance);
+	handle_attenuation(data, &data->lmap, &ray, light);
 	while (ray.running)
 	{
-		handle_attenuation(data, &data->lmap, &ray, light);
 		if (ray.dist.x < ray.dist.y)
 		{
 			ray.precise_dist = ray.dist.x;
@@ -262,6 +295,10 @@ void	raytrace(t_data *data, t_light light, t_vec dir)
 		}
 		ray.real.x = ray.curr.x / LMAP_PRECISION;
 		ray.real.y = ray.curr.y / LMAP_PRECISION;
+		if (ray.curr.x < 0 || ray.curr.x >= data->lmap.wid || ray.curr.y < 0
+			|| ray.curr.y >= data->lmap.len)
+			return ;
+		handle_attenuation(data, &data->lmap, &ray, light);
 		if (get_tile_dict()[*(data->map->matrix + ray.real.y * data->map->wid + ray.real.x)]->is_wall)
 			handle_reflexion(data, &ray, light);
 	}

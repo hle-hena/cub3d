@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/16 19:04:31 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/19 17:09:33 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,12 +88,6 @@ typedef struct s_player
 	int		rot;
 }	t_player;
 
-typedef struct s_line
-{
-	t_vec	start;
-	t_vec	end;
-}	t_line;
-
 typedef struct s_trace
 {
 	t_vec	dist;
@@ -110,7 +104,8 @@ typedef struct s_trace
 	float	emittance;
 }	t_trace;
 
-# define ATT_COEF 0.996
+// # define ATT_COEF 0.996
+# define ATT_COEF 0.998
 
 typedef struct s_light
 {
@@ -121,16 +116,14 @@ typedef struct s_light
 
 typedef struct s_light_face
 {
+	t_vec	normal;
 	float	emittance;
 	int		color;
 }	t_flight;
 
 typedef struct s_light_tile
 {
-	t_flight	no;
-	t_flight	so;
-	t_flight	we;
-	t_flight	ea;
+	t_list		*flight;
 	t_flight	ce_fl;
 }	t_tlight;
 
@@ -142,6 +135,13 @@ typedef struct s_light_map
 	int			wid;
 	int			len;
 }	t_lmap;
+
+typedef struct s_wpath
+{
+	t_vec	start;
+	t_vec	end;
+	t_text	texture;
+}	t_wpath;
 
 typedef	struct s_tile
 {
@@ -242,11 +242,12 @@ typedef struct s_data
 	t_map	*map;
 	t_hit	*hits;
 	t_event	event;
+	t_flight	*temp;
 }	t_data;
 
 # define DRAW_THREADS 4
 // # define LMAP_PRECISION 512
-# define LMAP_PRECISION 128
+# define LMAP_PRECISION 4
 
 typedef struct s_thread_draw
 {
@@ -289,6 +290,8 @@ int		is_map_valid(t_map *map, t_tile **tiles, int err);
 
 void	add_link(t_list **lst, void *content);
 
+int		is_correct_flight(void *content, void *to_find);
+
 void	loop(void);
 int		mlx_close(t_data *data);
 int		event_loop(t_data *data);
@@ -306,7 +309,7 @@ float	ft_atof_err(char *str, float min, float max, char **last);
 void	cast_rays(t_data *data);
 
 int		point_is_in_fov(t_data *data, t_point point);
-void	draw_player(t_data *data, t_point center, double theta);
+void	draw_player(t_data *data, t_point center, float theta);
 void	ft_put_pixel(t_data *data, t_point point, int color);
 void	draw_tile(t_data *data, t_point start, t_trig vals, int color);
 void	draw_circle(t_data *data, t_point center, int rad, int color);

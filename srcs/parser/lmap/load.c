@@ -6,30 +6,11 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:08:29 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/16 19:25:58 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/19 17:08:56 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
-
-static inline void	add_emittance(t_tlight *final, t_tlight *temp, int i)
-{
-	(final + i)->ce_fl.emittance += (temp + i)->ce_fl.emittance;
-	if ((final + i)->ce_fl.emittance > 1)
-		(final + i)->ce_fl.emittance = 1;
-	(final + i)->no.emittance += (temp + i)->no.emittance;
-	if ((final + i)->no.emittance > 1)
-		(final + i)->no.emittance = 1;
-	(final + i)->so.emittance += (temp + i)->so.emittance;
-	if ((final + i)->so.emittance > 1)
-		(final + i)->so.emittance = 1;
-	(final + i)->ea.emittance += (temp + i)->ea.emittance;
-	if ((final + i)->ea.emittance > 1)
-		(final + i)->ea.emittance = 1;
-	(final + i)->we.emittance += (temp + i)->we.emittance;
-	if ((final + i)->we.emittance > 1)
-		(final + i)->we.emittance = 1;
-}
 
 static inline float	to_linear(float c)
 {
@@ -61,13 +42,34 @@ static inline int	add_col_val_physical(int col1, int col2, float weight)
 	return (ri << 16) | (gi << 8) | bi;
 }
 
-static inline void add_color(t_tlight *final, t_tlight *temp, int i)
+static inline void add_color(t_tlight *final, t_tlight *temp)
 {
-	(final + i)->ce_fl.color = add_col_val_physical((final + i)->ce_fl.color, (temp + i)->ce_fl.color, (temp + i)->ce_fl.emittance);
-	(final + i)->we.color = add_col_val_physical((final + i)->we.color, (temp + i)->we.color, (temp + i)->we.emittance);
-	(final + i)->ea.color = add_col_val_physical((final + i)->ea.color, (temp + i)->ea.color, (temp + i)->ea.emittance);
-	(final + i)->no.color = add_col_val_physical((final + i)->no.color, (temp + i)->no.color, (temp + i)->no.emittance);
-	(final + i)->so.color = add_col_val_physical((final + i)->so.color, (temp + i)->so.color, (temp + i)->so.emittance);
+	t_list		*found;
+	t_flight	*final_flight;
+	t_flight	*temp_flight;
+
+	while (temp->flight)
+	{
+		temp_flight = (t_flight *)temp->flight->content;
+		found = ft_lstchr(final->flight,
+			&temp_flight->normal, is_correct_flight);
+		if (found)
+		{
+			final_flight = (t_flight *)found->content;
+			final_flight->color = add_col_val_physical(final_flight->color,
+				temp_flight->color, temp_flight->emittance);
+			final_flight->emittance += temp_flight->emittance;
+			if (final_flight->emittance > 1)
+				final_flight->emittance = 1;
+		}
+		else
+			add_link(&final->flight, temp_flight);
+		temp->flight = temp->flight->next;
+	}
+	final->ce_fl.color = add_col_val_physical(final->ce_fl.color, temp->ce_fl.color, temp->ce_fl.emittance);
+	final->ce_fl.emittance += temp->ce_fl.emittance;
+	if (final->ce_fl.emittance > 1)
+		final->ce_fl.emittance = 1;
 }
 
 void	add_lmap(t_data *data, t_tlight *final, t_tlight *temp)
@@ -83,8 +85,7 @@ void	add_lmap(t_data *data, t_tlight *final, t_tlight *temp)
 		x = -1;
 		while (++x < data->lmap.wid)
 		{
-			add_emittance(final, temp, i);
-			add_color(final, temp, i);
+			add_color(final + i, temp + i);
 			i++;
 		}
 	}

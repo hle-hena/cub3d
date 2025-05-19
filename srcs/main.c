@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:05:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/16 20:06:28 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/19 13:54:36 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ t_data	*get_data(void)
 
 void	init_mlx(t_data *data)
 {
+	data->temp = ft_calloc(1, sizeof(t_flight));
 	mlx_get_screen_size(data->mlx, &data->render_w, &data->render_h);
 	data->render_h *= 0.9;
 	// data->render_h *= 2;

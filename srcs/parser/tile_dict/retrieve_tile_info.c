@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:28:34 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/16 17:54:15 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/19 13:27:05 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,9 @@
 void	retrieve_wall(t_tile *tile, char *arg, int *err)
 {
 	//This func need to be more well done.
-	t_line	*line;
+	t_wpath	*line;
 
-	line = malloc(sizeof(t_line));
+	line = malloc(sizeof(t_wpath));
 	if (!line)
 		return (*err = 1, VOID);
 	arg++;
@@ -34,6 +34,7 @@ void	retrieve_wall(t_tile *tile, char *arg, int *err)
 	arg++;
 	arg++;
 	line->end.y = ft_atof_err(arg, 0, 1, &arg);
+	line->texture = tile->tex_so;
 	add_link(&tile->wpath, line);
 }
 
@@ -82,29 +83,29 @@ identifier at ", line, ".", NULL}), 1), *err = 1, VOID);
 
 void	add_wpath(t_tile *tile, int *err)
 {
-	t_line	*wpath;
+	t_wpath	*wpath;
 
 	if (tile->wpath)
 		return ;
-	wpath = malloc(sizeof(t_line));
+	wpath = malloc(sizeof(t_wpath));
 	if (!wpath)
 		return (*err = 1, VOID);
-	*wpath = (t_line){(t_vec){0, 0}, (t_vec){0, 1}};
+	*wpath = (t_wpath){(t_vec){0, 0}, (t_vec){0, 1}, tile->tex_we};
 	add_link(&tile->wpath, wpath);
-	wpath = malloc(sizeof(t_line));
+	wpath = malloc(sizeof(t_wpath));
 	if (!wpath)
 		return (*err = 1, VOID);
-	*wpath = (t_line){(t_vec){0, 0}, (t_vec){1, 0}};
+	*wpath = (t_wpath){(t_vec){0, 0}, (t_vec){1, 0}, tile->tex_no};
 	add_link(&tile->wpath, wpath);
-	wpath = malloc(sizeof(t_line));
+	wpath = malloc(sizeof(t_wpath));
 	if (!wpath)
 		return (*err = 1, VOID);
-	*wpath = (t_line){(t_vec){1, 1}, (t_vec){0, 1}};
+	*wpath = (t_wpath){(t_vec){1, 1}, (t_vec){0, 1}, tile->tex_so};
 	add_link(&tile->wpath, wpath);
-	wpath = malloc(sizeof(t_line));
+	wpath = malloc(sizeof(t_wpath));
 	if (!wpath)
 		return (*err = 1, VOID);
-	*wpath = (t_line){(t_vec){1, 1}, (t_vec){1, 0}};
+	*wpath = (t_wpath){(t_vec){1, 1}, (t_vec){1, 0}, tile->tex_ea};
 	add_link(&tile->wpath, wpath);
 }
 

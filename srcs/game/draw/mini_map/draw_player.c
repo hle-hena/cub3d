@@ -6,13 +6,13 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 13:28:24 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/13 13:36:52 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/19 16:57:29 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-void	draw_player_tip(t_data *data, t_point center, double theta)
+void	draw_player_tip(t_data *data, t_point center, float theta)
 {
 	t_point	tip;
 	t_point	base;
@@ -31,13 +31,13 @@ void	draw_player_tip(t_data *data, t_point center, double theta)
 	draw_line(data, tip, base, 0x00FF00);
 }
 
-void	draw_player(t_data *data, t_point center, double theta)
+void	draw_player(t_data *data, t_point center, float theta)
 {
 	t_point	draw;
 	int		i;
-	double	a;
-	double	a_step;
-	double	da;
+	float	a;
+	float	a_step;
+	float	da;
 
 	draw_player_tip(data, center, theta);
 	a_step = 2 * PI / 100;
