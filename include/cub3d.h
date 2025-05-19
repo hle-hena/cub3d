@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/19 17:09:33 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/19 19:18:29 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,8 +104,8 @@ typedef struct s_trace
 	float	emittance;
 }	t_trace;
 
-// # define ATT_COEF 0.996
-# define ATT_COEF 0.998
+# define ATT_COEF 0.996
+// # define ATT_COEF 0.998
 
 typedef struct s_light
 {
@@ -247,7 +247,7 @@ typedef struct s_data
 
 # define DRAW_THREADS 4
 // # define LMAP_PRECISION 512
-# define LMAP_PRECISION 4
+# define LMAP_PRECISION 128
 
 typedef struct s_thread_draw
 {

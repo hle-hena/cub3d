@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:22:39 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/19 17:02:08 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/19 18:56:29 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,7 +161,7 @@ static inline int	does_hit(t_list	*wpath, t_trace *ray, t_wpath *wall)
 		}
 		wpath = wpath->next;
 	}
-	if (dist < 0 || dist - 0.5 > ray->precise_dist)
+	if (dist < 0)
 		return (0);
 	ray->precise_dist = dist;
 	return (1);
@@ -174,25 +174,25 @@ void	handle_reflexion(t_data *data, t_trace *ray, t_light light)
 	t_flight	*flight;
 	t_vec		hit;
 	t_wpath		wall;
-	// float		before;
+	float		before;
 
 	tile = hit_tile(data, ray);
 	wall = (t_wpath){0};
-	// before = ray->precise_dist;
-	// int expected_x = floorf(ray->origin.x + ray->dir.x * ray->precise_dist);
-	// int expected_y = floorf(ray->origin.y + ray->dir.y * ray->precise_dist);
+	before = ray->precise_dist;
+	int expected_x = floorf(ray->origin.x + ray->dir.x * ray->precise_dist);
+	int expected_y = floorf(ray->origin.y + ray->dir.y * ray->precise_dist);
 	if (!does_hit(tile->wpath, ray, &wall))
 		return ;
 	hit.x = ray->origin.x + ray->dir.x * ray->precise_dist;
 	hit.y = ray->origin.y + ray->dir.y * ray->precise_dist;
-	// if (floorf(hit.x) != expected_x
-	// 	|| floorf(hit.y) != expected_y)
-	// {
-	// 	// printf("The real hit is {%f, %f} and the curr is {%d, %d}\n", hit.x, hit.y, ray->curr.x, ray->curr.y);
-	// 	return ((ray->precise_dist = before), VOID);
-	// }
-	// ray->curr.x = hit.x - (ray->dir.x > 0 ? -0.001f : 0.001f);
-	// ray->curr.y = hit.y - (ray->dir.y > 0 ? -0.001f : 0.001f);
+	if ((ray->dir.x > 0 && floorf(hit.x) > expected_x)
+		|| (ray->dir.x < 0 && floorf(hit.x) < expected_x)
+		|| (ray->dir.y > 0 && floorf(hit.y) > expected_y)
+		|| (ray->dir.y < 0 && floorf(hit.y) < expected_y))
+	{
+		// printf("The real hit is {%f, %f} and the curr is {%d, %d}\n", hit.x, hit.y, ray->curr.x, ray->curr.y);
+		return ((ray->precise_dist = before), VOID);
+	}
 	texture = wall.texture;
 	flight = hit_light(data, ray, wall);
 	if (texture.reflectance && ray->bounce < MAX_BOUNCE - 1 && ray->emittance * pow(0.99, ray->precise_dist) > 0.01)
