@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:22:39 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/19 18:56:29 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/20 11:36:21 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,8 +179,8 @@ void	handle_reflexion(t_data *data, t_trace *ray, t_light light)
 	tile = hit_tile(data, ray);
 	wall = (t_wpath){0};
 	before = ray->precise_dist;
-	int expected_x = floorf(ray->origin.x + ray->dir.x * ray->precise_dist);
-	int expected_y = floorf(ray->origin.y + ray->dir.y * ray->precise_dist);
+	int expected_x = floorf(ray->origin.x + ray->dir.x * ray->precise_dist + (ray->dir.x > 0 ? 0.001 : -0.001) * !ray->side);
+	int expected_y = floorf(ray->origin.y + ray->dir.y * ray->precise_dist + (ray->dir.y > 0 ? 0.001 : -0.001) * ray->side);
 	if (!does_hit(tile->wpath, ray, &wall))
 		return ;
 	hit.x = ray->origin.x + ray->dir.x * ray->precise_dist;

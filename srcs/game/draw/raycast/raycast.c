@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 18:51:23 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/19 17:00:59 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/20 11:36:24 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,8 @@ static inline void	hit_light(t_data *data, t_ray *ray, t_hit *hit, t_wpath wall)
 	t_list		*temp;
 
 	normal = get_wall_direction(wall.start, wall.end, ray->dir);
-	light_point.x = (hit->hit[ray->bounce].x + (ray->dir.x > 0 ? 0.001 : -0.001) * !ray->side) * LMAP_PRECISION;
-	light_point.y = (hit->hit[ray->bounce].y + (ray->dir.y > 0 ? 0.001 : -0.001) * ray->side) * LMAP_PRECISION;
+	light_point.x = hit->hit[ray->bounce].x * LMAP_PRECISION + (ray->dir.x > 0 ? 0.001 : -0.001 * !ray->side);
+	light_point.y = hit->hit[ray->bounce].y * LMAP_PRECISION + (ray->dir.y > 0 ? 0.001 : -0.001 * ray->side);
 	tlight = (data->lmap.lmap + light_point.x + light_point.y * data->lmap.wid);
 	temp = ft_lstchr(tlight->flight, &normal, is_correct_flight);
 	// temp = tlight->flight;
