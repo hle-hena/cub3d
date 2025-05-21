@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:22:39 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/20 11:36:21 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/21 19:14:36 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,12 +139,40 @@ static inline t_wpath	line(t_point curr, t_wpath base)
 		(t_vec){(base.end.x + curr.x) * LMAP_PRECISION, (base.end.y + curr.y) * LMAP_PRECISION}, (t_text){0}});
 }
 
-static inline int	does_hit(t_list	*wpath, t_trace *ray, t_wpath *wall)
+static inline float	angle(t_vec ray_dir, t_wpath seg)
+{
+	t_vec	wall_dir;
+	t_vec	wall_normal;
+	float	len;
+	float	dot_val;
+
+	wall_dir.x = seg.end.x - seg.start.x;
+	wall_dir.y = seg.end.y - seg.start.y;
+	len = sqrtf(wall_dir.x * wall_dir.x + wall_dir.y * wall_dir.y);
+	if (len == 0.0f)
+		return (0.0f);
+	wall_dir.x /= len;
+	wall_dir.y /= len;
+	wall_normal.x = -wall_dir.y;
+	wall_normal.y = wall_dir.x;
+	dot_val = ray_dir.x * wall_normal.x + ray_dir.y * wall_normal.y;
+	dot_val = fabs(dot_val);
+	if (dot_val < 0)
+		dot_val = 0;
+	if (dot_val > 1)
+		dot_val = 1;
+	return (sqrtf(sqrtf(dot_val)));
+}
+
+
+static inline int	does_hit(t_list	*wpath, t_trace *ray, t_wpath *wall,
+	float *angle_factor)
 {
 	float	dist;
 	float	temp;
 
 	dist = -1;
+	*angle_factor = 0;
 	while (wpath)
 	{
 		temp = intersect_segment(ray->origin, ray->dir,
@@ -157,6 +185,7 @@ static inline int	does_hit(t_list	*wpath, t_trace *ray, t_wpath *wall)
 		if (temp < dist || dist == -1)
 		{
 			*wall = *(t_wpath *)wpath->content;
+			*angle_factor = angle(ray->dir, *wall);
 			dist = temp;
 		}
 		wpath = wpath->next;
@@ -175,13 +204,15 @@ void	handle_reflexion(t_data *data, t_trace *ray, t_light light)
 	t_vec		hit;
 	t_wpath		wall;
 	float		before;
+	float		emittance;
+	float		angle_factor;
 
 	tile = hit_tile(data, ray);
 	wall = (t_wpath){0};
 	before = ray->precise_dist;
 	int expected_x = floorf(ray->origin.x + ray->dir.x * ray->precise_dist + (ray->dir.x > 0 ? 0.001 : -0.001) * !ray->side);
 	int expected_y = floorf(ray->origin.y + ray->dir.y * ray->precise_dist + (ray->dir.y > 0 ? 0.001 : -0.001) * ray->side);
-	if (!does_hit(tile->wpath, ray, &wall))
+	if (!does_hit(tile->wpath, ray, &wall, &angle_factor))
 		return ;
 	hit.x = ray->origin.x + ray->dir.x * ray->precise_dist;
 	hit.y = ray->origin.y + ray->dir.y * ray->precise_dist;
@@ -189,13 +220,17 @@ void	handle_reflexion(t_data *data, t_trace *ray, t_light light)
 		|| (ray->dir.x < 0 && floorf(hit.x) < expected_x)
 		|| (ray->dir.y > 0 && floorf(hit.y) > expected_y)
 		|| (ray->dir.y < 0 && floorf(hit.y) < expected_y))
-	{
-		// printf("The real hit is {%f, %f} and the curr is {%d, %d}\n", hit.x, hit.y, ray->curr.x, ray->curr.y);
 		return ((ray->precise_dist = before), VOID);
-	}
 	texture = wall.texture;
 	flight = hit_light(data, ray, wall);
-	if (texture.reflectance && ray->bounce < MAX_BOUNCE - 1 && ray->emittance * pow(0.99, ray->precise_dist) > 0.01)
+	angle_factor = angle_factor -pow(2.71828, -angle_factor * 0.1 * (ray->precise_dist / LMAP_PRECISION)) + 1;
+	if (angle_factor > 1)
+		angle_factor = 1;
+	emittance = angle_factor * ray->emittance * 1.06f
+		- 0.06f * pow(2.71828, 0.5f * (ray->precise_dist / LMAP_PRECISION));
+	if (emittance < 0)
+		return (ray->running = 0, VOID);
+	if (texture.reflectance && ray->bounce < MAX_BOUNCE - 1 && emittance > 0.01)
 	{
 		ray->origin = hit;
 		if (ray->side == 0)
@@ -220,8 +255,8 @@ void	handle_reflexion(t_data *data, t_trace *ray, t_light light)
 	else
 	{
 		ray->running = 0;
-		flight->color = color_attenuation(light.color, pow(ATT_COEF, (ray->precise_dist * 64) / LMAP_PRECISION));
-		flight->emittance = ray->emittance * pow(ATT_COEF, (ray->precise_dist * 64) / LMAP_PRECISION);
+		flight->color = color_attenuation(light.color, emittance);
+		flight->emittance = emittance;
 	}
 	ray->emittance -= (1 - texture.reflectance);
 }
@@ -262,13 +297,16 @@ void	init_trace(t_trace *ray, t_vec dir, t_vec origin, float emittance)
 
 void	handle_attenuation(t_data *data, t_lmap *lmap, t_trace *ray, t_light light)
 {
-	float	new;
+	float	emittance;
 
-	new = ray->emittance * pow(ATT_COEF, (ray->precise_dist * 64) / LMAP_PRECISION);
-	if (new < (lmap->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->ce_fl.emittance)
+	emittance = ray->emittance * 1.06f
+		- 0.06f * pow(2.71828, 0.5f * (ray->precise_dist / LMAP_PRECISION));
+	if (emittance < 0)
+		return (ray->running = 0, VOID);
+	if (emittance < (lmap->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->ce_fl.emittance)
 		return ;
-	(lmap->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->ce_fl.color = color_attenuation(light.color, pow(ATT_COEF, (ray->precise_dist * 64) / LMAP_PRECISION));
-	(lmap->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->ce_fl.emittance = new;
+	(lmap->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->ce_fl.color = color_attenuation(light.color, emittance);
+	(lmap->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->ce_fl.emittance = emittance;
 }
 
 void	raytrace(t_data *data, t_light light, t_vec dir)
