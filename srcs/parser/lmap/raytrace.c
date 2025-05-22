@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:22:39 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/21 19:14:36 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/22 15:05:00 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,13 +223,13 @@ void	handle_reflexion(t_data *data, t_trace *ray, t_light light)
 		return ((ray->precise_dist = before), VOID);
 	texture = wall.texture;
 	flight = hit_light(data, ray, wall);
-	angle_factor = angle_factor -pow(2.71828, -angle_factor * 0.1 * (ray->precise_dist / LMAP_PRECISION)) + 1;
+	angle_factor = angle_factor - pow(2.71828, -angle_factor * 0.1 * (ray->precise_dist / LMAP_PRECISION)) + 1;
 	if (angle_factor > 1)
 		angle_factor = 1;
-	emittance = angle_factor * ray->emittance * 1.06f
-		- 0.06f * pow(2.71828, 0.5f * (ray->precise_dist / LMAP_PRECISION));
-	if (emittance < 0)
-		return (ray->running = 0, VOID);
+	// emittance = angle_factor * ray->emittance * 1.06f
+	// 	- 0.06f * pow(2.71828, 0.5f * (ray->precise_dist / LMAP_PRECISION));
+	emittance = (angle_factor * ray->emittance)
+		/ (1 + ATT_COEF * pow((ray->precise_dist / LMAP_PRECISION), 2));
 	if (texture.reflectance && ray->bounce < MAX_BOUNCE - 1 && emittance > 0.01)
 	{
 		ray->origin = hit;
@@ -299,8 +299,12 @@ void	handle_attenuation(t_data *data, t_lmap *lmap, t_trace *ray, t_light light)
 {
 	float	emittance;
 
-	emittance = ray->emittance * 1.06f
-		- 0.06f * pow(2.71828, 0.5f * (ray->precise_dist / LMAP_PRECISION));
+	// emittance = ray->emittance * 1.06f
+	// 	- 0.06f * pow(2.71828, 0.5f * (ray->precise_dist / LMAP_PRECISION));
+	// emittance = 0.06 + ray->emittance - 0.06 * pow(2.71828,
+	// 	(0.5 / ray->emittance) * (ray->precise_dist / LMAP_PRECISION));
+	emittance = (ray->emittance)
+		/ (1 + ATT_COEF * pow((ray->precise_dist / LMAP_PRECISION), 2));
 	if (emittance < 0)
 		return (ray->running = 0, VOID);
 	if (emittance < (lmap->lmap + ray->curr.x + ray->curr.y * data->map->wid * LMAP_PRECISION)->ce_fl.emittance)
