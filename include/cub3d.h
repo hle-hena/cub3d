@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/22 15:05:17 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/25 17:59:49 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,6 +141,7 @@ typedef struct s_wpath
 	t_vec	start;
 	t_vec	end;
 	t_text	texture;
+	t_vec	normal;
 }	t_wpath;
 
 typedef	struct s_tile
@@ -181,17 +182,37 @@ typedef struct s_events
 
 # define MAX_BOUNCE 64
 
+// typedef struct s_hit
+// {
+// 	t_img		*texture;
+// 	t_flight	*light;
+// 	t_vec		ray_dir[MAX_BOUNCE];
+// 	t_vec		hit[MAX_BOUNCE];
+// 	float		dist[MAX_BOUNCE];
+// 	int			draw_start[MAX_BOUNCE];
+// 	int			draw_end[MAX_BOUNCE];
+// 	int			side[MAX_BOUNCE];
+// 	int			bounces;
+// 	int			tex_y;
+// 	int			tex_pos_fp;
+// 	int			step_fp;
+// 	char		*tex_col;
+// }	t_hit;
 typedef struct s_hit
 {
 	t_img		*texture;
 	t_flight	*light;
+	t_wpath		wall[MAX_BOUNCE];
+	// t_vec		normal_hit[MAX_BOUNCE];
 	t_vec		ray_dir[MAX_BOUNCE];
 	t_vec		hit[MAX_BOUNCE];
 	float		dist[MAX_BOUNCE];
 	int			draw_start[MAX_BOUNCE];
 	int			draw_end[MAX_BOUNCE];
-	int			side[MAX_BOUNCE];
 	int			bounces;
+	float		pos;
+
+	// int			side[MAX_BOUNCE];
 	int			tex_y;
 	int			tex_pos_fp;
 	int			step_fp;
@@ -291,6 +312,9 @@ int		is_map_valid(t_map *map, t_tile **tiles, int err);
 void	add_link(t_list **lst, void *content);
 
 int		is_correct_flight(void *content, void *to_find);
+int		does_hit(t_list	*wpath, t_ray *ray, t_wpath *wall, float *hit_percent);
+void	handle_reflexion(t_hit *hit, t_ray *ray, t_wpath wall);
+void	init_ray(t_ray *ray, t_vec dir, t_vec origin);
 
 void	loop(void);
 int		mlx_close(t_data *data);
@@ -317,7 +341,7 @@ void	draw_line(t_data *data, t_point start, t_point end, int color);
 void	draw_mini_map(t_data *data);
 int		point_is_in_mini_map(t_data *data, t_point point);
 
-t_hit	raycast(t_data *data, t_vec dir, t_player player);
+t_hit	raycast(t_data *data, t_vec dir, t_vec origin);
 t_vec	**get_cast_table(void);
 void	draw_line_in_direction(t_data *data, t_point start, t_vec dir,
 	float dist);

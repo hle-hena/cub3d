@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/19 16:57:29 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/25 17:40:44 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,28 +19,27 @@
 	// long ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
 	// printf("Took %ldns\n", ms);
 
-static inline t_vec	reflect_across_mirror(t_vec point, t_hit *hit, t_point curr, int *bounce)
+static inline t_vec reflect_across_mirror(t_vec point, t_hit *hit, t_point curr, int *bounce)
 {
-	float	offset;
 	t_vec	final;
+	t_vec	normal;
+	t_vec	to_point;
+	float	proj_len;
+	float	norm_len2;
 
 	*bounce = 0;
 	while (++(*bounce) <= hit->bounces)
 	{
 		if (curr.y < hit->draw_start[*bounce - 1] || curr.y > hit->draw_end[*bounce - 1])
 			return (point);
-		if (hit->side[*bounce - 1] == 0)
-		{
-			offset = point.x - hit->hit[*bounce - 1].x;
-			final.x = point.x - (2 * offset);
-			final.y = point.y;
-		}
-		else
-		{
-			offset = point.y - hit->hit[*bounce - 1].y;
-			final.x = point.x;
-			final.y = point.y - (2 * offset);
-		}
+		t_vec start = hit->wall[*bounce - 1].start;
+		normal = hit->wall[*bounce - 1].normal;
+		norm_len2 = normal.x * normal.x + normal.y * normal.y;
+		to_point.x = point.x - start.x;
+		to_point.y = point.y - start.y;
+		proj_len = (to_point.x * normal.x + to_point.y * normal.y) / norm_len2;
+		final.x = point.x - 2.0f * proj_len * normal.x;
+		final.y = point.y - 2.0f * proj_len * normal.y;
 		point = final;
 	}
 	return (point);
@@ -167,7 +166,11 @@ static inline void	draw_wall(t_data *data, char *img, t_hit *hit)
 {
 	int			color;
 
-	color = color_blend(*(int *)(hit->tex_col + hit->tex_y * hit->texture->size_line), hit->light->color, hit->light->emittance / fmax(((float)(hit->bounces + 1) * 0.75), 1));
+	hit->tex_y = hit->tex_pos_fp >> 16;
+	color = color_blend(*(int *)(hit->tex_col + hit->tex_y
+				* hit->texture->size_line), hit->light->color,
+			hit->light->emittance / fmax(((float)(hit->bounces + 1)
+				* 0.75), 1));
 	*(int *)(img) = color;
 	*(int *)(img + data->img.bpp) = color;
 	*(int *)(img + data->img.size_line) = color;
@@ -262,22 +265,19 @@ int	init_line_heights(t_data *data, t_hit *hit, t_vec ray_dir)
 	return (tex_end - tex_start);
 }
 
-
 t_hit cast_ray(t_data *data, t_vec ray_dir)
 {
 	t_hit	hit;
 	float	wall_x;
 	int		line_height;
 
-	hit = raycast(data, ray_dir, data->map->player);
+	hit = (t_hit){0};
+	hit = raycast(data, ray_dir, (t_vec){data->map->player.x,
+		data->map->player.y});
 	line_height = init_line_heights(data, &hit, ray_dir);
 	if (line_height == 0)
 		line_height = 1;
-	if (hit.side[hit.bounces] == 0)
-		wall_x = hit.hit[hit.bounces].y;
-	else
-		wall_x = hit.hit[hit.bounces].x;
-	wall_x -= (int)wall_x;
+	wall_x = hit.pos;
 	hit.step_fp = (hit.texture->height << 16) / line_height;
 	hit.tex_pos_fp = (hit.draw_start[hit.bounces] - data->render_h / 2 + line_height / 2) * hit.step_fp;
 	hit.tex_col = hit.texture->data + (int)(wall_x * hit.texture->width) * hit.texture->bpp;

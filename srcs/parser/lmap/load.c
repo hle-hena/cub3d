@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:08:29 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/20 11:28:36 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/22 15:44:15 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,14 +22,15 @@ static inline float	to_srgb(float c)
 	return (sqrtf(c) * 255.0f);
 }
 
-static inline int	add_col_val_physical(int col1, int col2, float weight)
+static inline int	add_col_val_physical(int col1, int col2, float weight1,
+	float weight2)
 {
-	float r1 = to_linear((col1 >> 16) & 0xFF);
-	float g1 = to_linear((col1 >> 8) & 0xFF);
-	float b1 = to_linear(col1 & 0xFF);
-	float r2 = to_linear((col2 >> 16) & 0xFF) * weight;
-	float g2 = to_linear((col2 >> 8) & 0xFF) * weight;
-	float b2 = to_linear(col2 & 0xFF) * weight;
+	float r1 = to_linear((col1 >> 16) & 0xFF) * weight1;
+	float g1 = to_linear((col1 >> 8) & 0xFF) * weight1;
+	float b1 = to_linear(col1 & 0xFF) * weight1;
+	float r2 = to_linear((col2 >> 16) & 0xFF) * weight2;
+	float g2 = to_linear((col2 >> 8) & 0xFF) * weight2;
+	float b2 = to_linear(col2 & 0xFF) * weight2;
 	float r = r1 + r2;
 	float g = g1 + g2;
 	float b = b1 + b2;
@@ -57,7 +58,7 @@ static inline void add_color(t_tlight *final, t_tlight *temp)
 		{
 			final_flight = (t_flight *)found->content;
 			final_flight->color = add_col_val_physical(final_flight->color,
-				temp_flight->color, temp_flight->emittance);
+				temp_flight->color, final_flight->emittance, temp_flight->emittance);
 			final_flight->emittance += temp_flight->emittance;
 			if (final_flight->emittance > 1)
 				final_flight->emittance = 1;
@@ -66,7 +67,8 @@ static inline void add_color(t_tlight *final, t_tlight *temp)
 			add_link(&final->flight, temp_flight);
 		temp->flight = temp->flight->next;
 	}
-	final->ce_fl.color = add_col_val_physical(final->ce_fl.color, temp->ce_fl.color, temp->ce_fl.emittance);
+	final->ce_fl.color = add_col_val_physical(final->ce_fl.color,
+		temp->ce_fl.color, final->ce_fl.emittance, temp->ce_fl.emittance);
 	final->ce_fl.emittance += temp->ce_fl.emittance;
 	if (final->ce_fl.emittance > 1)
 		final->ce_fl.emittance = 1;
