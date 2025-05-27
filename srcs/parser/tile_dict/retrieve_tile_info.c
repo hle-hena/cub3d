@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:28:34 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/25 17:59:42 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/27 19:19:19 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,11 +34,19 @@ void	retrieve_wall(t_tile *tile, char *arg, int *err)
 	arg++;
 	arg++;
 	line->end.y = ft_atof_err(arg, 0, 1, &arg);
+	arg++;
+	arg++;
+	arg++;
+	arg++;
 	line->texture = tile->tex_no;
 	line->normal = (t_vec){
 		-line->end.y + line->start.y,
 		line->end.x - line->start.x
 	};
+	line->normal = normalize(line->normal);
+	line->reflectance = 0;
+	if (*arg)
+		line->reflectance = ft_atof_err(arg, 0, 1, &arg);
 	add_link(&tile->wpath, line);
 }
 
@@ -94,22 +102,26 @@ void	add_wpath(t_tile *tile, int *err)
 	wpath = malloc(sizeof(t_wpath));
 	if (!wpath)
 		return (*err = 1, VOID);
-	*wpath = (t_wpath){(t_vec){0, 0}, (t_vec){0, 1}, tile->tex_we, (t_vec){-1, 0}};
+	*wpath = (t_wpath){(t_vec){0, 0}, (t_vec){0, 1}, tile->tex_we,
+			(t_vec){-1, 0}, tile->tex_we.reflectance};
 	add_link(&tile->wpath, wpath);
 	wpath = malloc(sizeof(t_wpath));
 	if (!wpath)
 		return (*err = 1, VOID);
-	*wpath = (t_wpath){(t_vec){0, 0}, (t_vec){1, 0}, tile->tex_no, (t_vec){0, -1}};
+	*wpath = (t_wpath){(t_vec){0, 0}, (t_vec){1, 0}, tile->tex_no,
+			(t_vec){0, -1}, tile->tex_no.reflectance};
 	add_link(&tile->wpath, wpath);
 	wpath = malloc(sizeof(t_wpath));
 	if (!wpath)
 		return (*err = 1, VOID);
-	*wpath = (t_wpath){(t_vec){1, 1}, (t_vec){0, 1}, tile->tex_so, (t_vec){0, 1}};
+	*wpath = (t_wpath){(t_vec){1, 1}, (t_vec){0, 1}, tile->tex_so,
+			(t_vec){0, 1}, tile->tex_so.reflectance};
 	add_link(&tile->wpath, wpath);
 	wpath = malloc(sizeof(t_wpath));
 	if (!wpath)
 		return (*err = 1, VOID);
-	*wpath = (t_wpath){(t_vec){1, 1}, (t_vec){1, 0}, tile->tex_ea, (t_vec){1, 0}};
+	*wpath = (t_wpath){(t_vec){1, 1}, (t_vec){1, 0}, tile->tex_ea,
+			(t_vec){1, 0}, tile->tex_ea.reflectance};
 	add_link(&tile->wpath, wpath);
 }
 

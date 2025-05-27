@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 13:42:01 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/25 14:24:37 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/27 14:36:39 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,15 +61,23 @@ t_vec	reflect(t_vec dir, t_vec normal)
 	return (reflected);
 }
 
-void	handle_reflexion(t_hit *hit, t_ray *ray, t_wpath wall)
+t_vec	normalize(t_vec v)
 {
-	ray->origin = hit->hit[ray->bounce];
-	// if (ray->side == 0)
-	// 	ray->origin.x += ray->dir.x > 0 ? -0.001f : 0.001f;
-	// else
-	// 	ray->origin.y += ray->dir.y > 0 ? -0.001f : 0.001f;
+	float	len = sqrtf(v.x * v.x + v.y * v.y);
+	if (len == 0.0f)
+		return (t_vec){0, 0};
+	return (t_vec){v.x / len, v.y / len};
+}
+
+void	handle_reflexion(t_data *data, t_hit *hit, t_ray *ray, t_wpath wall)
+{
 	ray->dir = reflect(ray->dir, wall.normal);
-	calc_ray(ray);
-	// hit->ray_dir[ray->bounce] = ray->dir;
+	ray->origin = hit->hit[ray->bounce];
+	// printf("origin is {%.5f %.5f} with side %d\n", ray->origin.x, ray->origin.y, ray->side);
+	ray->origin.x += ray->dir.x * 0.0001;
+	ray->origin.y += ray->dir.y * 0.0001;
+	// printf("After origin is {%.5f %.5f} with side %d\n", ray->origin.x, ray->origin.y, ray->side);
 	ray->bounce++;
+	calc_ray(ray);
+	handle_hit(data, ray, hit);
 }

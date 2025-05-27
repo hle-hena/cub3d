@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/22 18:10:46 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/25 13:52:22 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/27 12:45:17 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,4 +37,5 @@ void	init_ray(t_ray *ray, t_vec dir, t_vec origin)
 	ray->dir = dir;
 	ray->running = 1;
 	ray->precise_dist = 0;
+	ray->start = 1;
 }

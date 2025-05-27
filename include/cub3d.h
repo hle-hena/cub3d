@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/25 17:59:49 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/27 14:30:04 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,6 +142,7 @@ typedef struct s_wpath
 	t_vec	end;
 	t_text	texture;
 	t_vec	normal;
+	float	reflectance;
 }	t_wpath;
 
 typedef	struct s_tile
@@ -180,7 +181,7 @@ typedef struct s_events
 	int		echap;
 }	t_event;
 
-# define MAX_BOUNCE 64
+# define MAX_BOUNCE 32
 
 // typedef struct s_hit
 // {
@@ -227,6 +228,7 @@ typedef struct s_ray
 	t_vec	dir;
 	t_point	curr;
 	t_point	step;
+	int		start;
 	int		side;
 	int		bounce;
 	int		running;
@@ -248,6 +250,12 @@ typedef	struct s_cam
 	float	plane_len;
 }	t_cam;
 
+typedef struct s_void
+{
+	t_text		texture;
+	t_flight	*flight;
+}	t_void;
+
 typedef struct s_data
 {
 	void	*mlx;
@@ -263,7 +271,7 @@ typedef struct s_data
 	t_map	*map;
 	t_hit	*hits;
 	t_event	event;
-	t_flight	*temp;
+	t_void	*empty;
 }	t_data;
 
 # define DRAW_THREADS 4
@@ -313,8 +321,11 @@ void	add_link(t_list **lst, void *content);
 
 int		is_correct_flight(void *content, void *to_find);
 int		does_hit(t_list	*wpath, t_ray *ray, t_wpath *wall, float *hit_percent);
-void	handle_reflexion(t_hit *hit, t_ray *ray, t_wpath wall);
+void	handle_reflexion(t_data *data, t_hit *hit, t_ray *ray, t_wpath wall);
 void	init_ray(t_ray *ray, t_vec dir, t_vec origin);
+t_vec	reflect(t_vec dir, t_vec normal);
+t_vec	normalize(t_vec v);
+void	handle_hit(t_data *data, t_ray *ray, t_hit *hit);
 
 void	loop(void);
 int		mlx_close(t_data *data);

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/22 18:00:35 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/25 17:59:53 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/27 14:29:48 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,18 +20,63 @@ static inline void	hit_light(t_data *data, t_ray *ray, t_hit *hit, t_wpath wall)
 
 	light_point.x = hit->hit[ray->bounce].x * LMAP_PRECISION + (ray->dir.x > 0 ? 0.001 : -0.001 * !ray->side);
 	light_point.y = hit->hit[ray->bounce].y * LMAP_PRECISION + (ray->dir.y > 0 ? 0.001 : -0.001 * ray->side);
+	light_point.x = ft_max(ft_min(light_point.x, data->lmap.wid - 1), 0);
+	light_point.y = ft_max(ft_min(light_point.y, data->lmap.len - 1), 0);
 	tlight = (data->lmap.lmap + light_point.x + light_point.y * data->lmap.wid);
 	temp = ft_lstchr(tlight->flight, &wall.normal, is_correct_flight);
 	if (temp)
 		hit->light = (t_flight *)temp->content;
 	else
-		hit->light = data->temp;
+		hit->light = data->empty->flight;
+}
+
+int	is_still_in(t_data *data, t_ray *ray, t_hit *hit)
+{
+	int	is_out;
+	int	should_stop;
+
+	is_out = 0;
+	should_stop = 0;
+	if (ray->curr.x < 0)
+	{
+		is_out = 1;
+		if (ray->dir.x <= 0)
+			should_stop = 1;
+	}
+	if (ray->curr.y < 0)
+	{
+		is_out = 1;
+		if (ray->dir.y <= 0)
+			should_stop = 1;
+	}
+	if (ray->curr.x >= data->map->wid)
+	{
+		is_out = 1;
+		if (ray->dir.x >= 0)
+			should_stop = 1;
+	}
+	if (ray->curr.y >= data->map->len)
+	{
+		is_out = 1;
+		if (ray->dir.y >= 0)
+			should_stop = 1;
+	}
+	if (should_stop)
+	{
+		hit->dist[ray->bounce] = ray->precise_dist;
+		hit->texture = data->empty->texture.img;
+		hit->light = data->empty->flight;
+		ray->running = 0;
+	}
+	return (!is_out);
 }
 
 void	handle_hit(t_data *data, t_ray *ray, t_hit *hit)
 {
 	t_tile	*tile;
 
+	if (!is_still_in(data, ray, hit))
+		return ;
 	tile = get_tile_dict()[*(data->map->matrix + ray->curr.x +
 		ray->curr.y * data->map->wid)];
 	if (!tile)
@@ -44,13 +89,13 @@ void	handle_hit(t_data *data, t_ray *ray, t_hit *hit)
 	hit->hit[ray->bounce].y = ray->origin.y + ray->dir.y * ray->precise_dist;
 	hit_light(data, ray, hit, hit->wall[ray->bounce]);
 	hit->ray_dir[ray->bounce] = ray->dir;
-	hit->dist[ray->bounce] = ray->precise_dist;
 	hit->texture = tile->tex_ea.img;
 	hit->bounces = ray->bounce;
+	hit->dist[ray->bounce] = ray->precise_dist;
 	if (ray->bounce != 0)
 		hit->dist[ray->bounce] += hit->dist[ray->bounce - 1];
-	if (hit->wall[ray->bounce].texture.reflectance && ray->bounce < MAX_BOUNCE - 1)
-		handle_reflexion(hit, ray, hit->wall[ray->bounce]);
+	if (hit->wall[ray->bounce].reflectance && ray->bounce < MAX_BOUNCE - 1)
+		handle_reflexion(data, hit, ray, hit->wall[ray->bounce]);
 	else
 		ray->running = 0;
 }
@@ -62,6 +107,7 @@ t_hit	raycast(t_data *data, t_vec dir, t_vec origin)
 
 	hit = (t_hit){0};
 	init_ray(&ray, dir, origin);
+	handle_hit(data, &ray, &hit);
 	while (ray.running)
 	{
 		if (ray.dist.x < ray.dist.y)

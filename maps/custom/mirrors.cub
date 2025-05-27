@@ -45,7 +45,7 @@ D {
 F {
 	NO textures/simonkraft/bookshelf_01.xpm 1
 	SO textures/simonkraft/bookshelf_02.xpm 1
-	WE textures/simonkraft/bookshelf_03.xpm
+	WE textures/simonkraft/bookshelf_03.xpm 1
 	EA textures/simonkraft/bookshelf.xpm 1
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
