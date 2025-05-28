@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/22 18:00:35 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/27 14:29:48 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/28 11:31:39 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ static inline void	hit_light(t_data *data, t_ray *ray, t_hit *hit, t_wpath wall)
 		hit->light = data->empty->flight;
 }
 
-int	is_still_in(t_data *data, t_ray *ray, t_hit *hit)
+static inline int	is_outside(t_data *data, t_ray *ray, t_hit *hit)
 {
 	int	is_out;
 	int	should_stop;
@@ -68,14 +68,14 @@ int	is_still_in(t_data *data, t_ray *ray, t_hit *hit)
 		hit->light = data->empty->flight;
 		ray->running = 0;
 	}
-	return (!is_out);
+	return (is_out);
 }
 
 void	handle_hit(t_data *data, t_ray *ray, t_hit *hit)
 {
 	t_tile	*tile;
 
-	if (!is_still_in(data, ray, hit))
+	if (is_outside(data, ray, hit))
 		return ;
 	tile = get_tile_dict()[*(data->map->matrix + ray->curr.x +
 		ray->curr.y * data->map->wid)];

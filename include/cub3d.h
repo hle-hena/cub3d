@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/27 14:30:04 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:09:52 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,11 +101,12 @@ typedef struct s_trace
 	int		bounce;
 	int		running;
 	float	precise_dist;
+	float	last_dist;
 	float	emittance;
+	float	angle_factor;
 }	t_trace;
 
-# define ATT_COEF 0.05
-// # define ATT_COEF 0.998
+# define ATT_COEF 0.0005
 
 typedef struct s_light
 {
@@ -287,82 +288,87 @@ typedef struct s_thread_draw
 	int		add_next_line;
 }	t_th_draw;
 
-t_data	*get_data(void);
-t_map	*get_map(void);
-t_map	*load_map(int ac, char **av);
-int		clean_map(void);
-int		clean_data(void);
+t_data		*get_data(void);
+t_map		*get_map(void);
+t_map		*load_map(int ac, char **av);
+int			clean_map(void);
+int			clean_data(void);
 
 // static inline int	get(t_map *map, int x, int y)
 // {
 // 	return (*(map->matrix + y * map->wid + x));
 // }
 
-void	fill_cast_table(t_data *data, int *err);
+void		fill_cast_table(t_data *data, int *err);
 
-t_tile	*new_tile(void);
-t_tile	**get_tile_dict(void);
-char	*retrieve_tile_dict(t_map *map, int map_fd, int *err);
-void	retrieve_tile(t_tile **tiles, int map_fd, char *line, int *err);
-void	retrieve_value(int *value, char *arg, int *err, char *id);
-void	retrieve_texture(t_text *texture, char *arg, int *err, char *id);
-void	retrieve_texture_val(t_text *texture, char *arg, int *err);
-void	retrieve_texture_color(t_img **img, char *line, int *err);
-t_img	**get_hash_table(void);
-t_img	*get_img_hash(char *path, int *err);
-void	retrieve_player(t_map *map, char *line, int *err);
-int		is_dict_full(t_map *map, int err);
-void	retrieve_map(t_map *map, char *line, int map_fd, int *err);
-void	retrieve_light(char *line, int *err);
-int		retrieve_lonely(t_map *map, char *line, int *err);
-int		is_map_valid(t_map *map, t_tile **tiles, int err);
+t_tile		*new_tile(void);
+t_tile		**get_tile_dict(void);
+char		*retrieve_tile_dict(t_map *map, int map_fd, int *err);
+void		retrieve_tile(t_tile **tiles, int map_fd, char *line, int *err);
+void		retrieve_value(int *value, char *arg, int *err, char *id);
+void		retrieve_texture(t_text *texture, char *arg, int *err, char *id);
+void		retrieve_texture_val(t_text *texture, char *arg, int *err);
+void		retrieve_texture_color(t_img **img, char *line, int *err);
+t_img		**get_hash_table(void);
+t_img		*get_img_hash(char *path, int *err);
+void		retrieve_player(t_map *map, char *line, int *err);
+int			is_dict_full(t_map *map, int err);
+void		retrieve_map(t_map *map, char *line, int map_fd, int *err);
+void		retrieve_light(char *line, int *err);
+int			retrieve_lonely(t_map *map, char *line, int *err);
+int			is_map_valid(t_map *map, t_tile **tiles, int err);
 
-void	add_link(t_list **lst, void *content);
+void		add_link(t_list **lst, void *content);
 
-int		is_correct_flight(void *content, void *to_find);
-int		does_hit(t_list	*wpath, t_ray *ray, t_wpath *wall, float *hit_percent);
-void	handle_reflexion(t_data *data, t_hit *hit, t_ray *ray, t_wpath wall);
-void	init_ray(t_ray *ray, t_vec dir, t_vec origin);
-t_vec	reflect(t_vec dir, t_vec normal);
-t_vec	normalize(t_vec v);
-void	handle_hit(t_data *data, t_ray *ray, t_hit *hit);
+int			is_correct_flight(void *content, void *to_find);
+int			does_hit(t_list	*wpath, t_ray *ray, t_wpath *wall,
+	float *hit_percent);
+void		handle_reflexion(t_data *data, t_hit *hit, t_ray *ray,
+	t_wpath wall);
+void		init_ray(t_ray *ray, t_vec dir, t_vec origin);
+t_vec		normalize(t_vec v);
+void		handle_hit(t_data *data, t_ray *ray, t_hit *hit);
 
-void	loop(void);
-int		mlx_close(t_data *data);
-int		event_loop(t_data *data);
-int		key_down(int keycode, t_data *data);
-int		key_up(int keycode, t_data *data);
-int		mouse_down(int button, int x, int y, t_data *data);
-int		mouse_up(int button, int x, int y, t_data *data);
-int		mouse_move(int x, int y, t_data *data);
-t_col	rev_calc_color(int col);
-int		calc_color(t_col col);
-int		interpolate_color(int col1, int col2, float percent);
-int		ft_get_pixel_color(t_data *data, t_point point);
+void		loop(void);
+int			mlx_close(t_data *data);
+int			event_loop(t_data *data);
+int			key_down(int keycode, t_data *data);
+int			key_up(int keycode, t_data *data);
+int			mouse_down(int button, int x, int y, t_data *data);
+int			mouse_up(int button, int x, int y, t_data *data);
+int			mouse_move(int x, int y, t_data *data);
+t_col		rev_calc_color(int col);
+int			calc_color(t_col col);
+int			interpolate_color(int col1, int col2, float percent);
+int			ft_get_pixel_color(t_data *data, t_point point);
 
-float	ft_atof_err(char *str, float min, float max, char **last);
-void	cast_rays(t_data *data);
+float		ft_atof_err(char *str, float min, float max, char **last);
+void		cast_rays(t_data *data);
 
-int		point_is_in_fov(t_data *data, t_point point);
-void	draw_player(t_data *data, t_point center, float theta);
-void	ft_put_pixel(t_data *data, t_point point, int color);
-void	draw_tile(t_data *data, t_point start, t_trig vals, int color);
-void	draw_circle(t_data *data, t_point center, int rad, int color);
-void	draw_line(t_data *data, t_point start, t_point end, int color);
-void	draw_mini_map(t_data *data);
-int		point_is_in_mini_map(t_data *data, t_point point);
+int			point_is_in_fov(t_data *data, t_point point);
+void		draw_player(t_data *data, t_point center, float theta);
+void		ft_put_pixel(t_data *data, t_point point, int color);
+void		draw_tile(t_data *data, t_point start, t_trig vals, int color);
+void		draw_circle(t_data *data, t_point center, int rad, int color);
+void		draw_line(t_data *data, t_point start, t_point end, int color);
+void		draw_mini_map(t_data *data);
+int			point_is_in_mini_map(t_data *data, t_point point);
 
-t_hit	raycast(t_data *data, t_vec dir, t_vec origin);
-t_vec	**get_cast_table(void);
-void	draw_line_in_direction(t_data *data, t_point start, t_vec dir,
-	float dist);
+t_hit		raycast(t_data *data, t_vec dir, t_vec origin);
+t_vec		**get_cast_table(void);
 
-int	ft_atoi_err(char *arg, int *index);
+int			ft_atoi_err(char *arg, int *index);
 
-void	fps_counter(t_data *data);
+void		fps_counter(t_data *data);
 
-int		create_lmap(t_data *data);
-void	raytrace(t_data *data, t_light light, t_vec dir);
+int			create_lmap(t_data *data);
+void		raytrace(t_data *data, t_light light, t_vec dir);
+void		handle_light(t_data *data, t_trace *ray, t_light light);
+void		reflect_light(t_data *data, t_trace *ray, t_wpath wall,
+	t_light light);
+int			does_light(t_list *wpath, t_trace *ray, t_wpath *wall);
+void		init_trace(t_trace *ray, t_vec dir, t_vec origin, float emittance);
+t_flight	*find_flight(t_data *data, t_point pos, t_wpath wall);
 
 void	print_dict(t_data *data);
 

@@ -20,7 +20,9 @@ SRCS = $(addprefix srcs/, \
 			retrieve_texture.c retrieve_tile_dict.c retrieve_tile_info.c \
 			retrieve_value.c)\
 		$(addprefix map/, is_map_valid.c retrieve_map.c)\
-		$(addprefix lmap/, load.c raytrace.c retrieve_light.c)\
+		$(addprefix lmap/, load.c retrieve_light.c)\
+		$(addprefix raytrace/, find_flight.c handle_light.c raytrace_utils.c\
+			raytrace.c reflect_light.c wall_intersect_light.c)\
 	)\
 	$(addprefix mlx_utils/, color.c loop.c put_pixel.c)\
 	$(addprefix game/, \
