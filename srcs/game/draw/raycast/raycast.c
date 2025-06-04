@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/22 18:00:35 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/28 11:31:39 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/04 22:06:52 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,8 @@ static inline void	hit_light(t_data *data, t_ray *ray, t_hit *hit, t_wpath wall)
 	t_tlight	*tlight;
 	t_list		*temp;
 
-	light_point.x = hit->hit[ray->bounce].x * LMAP_PRECISION + (ray->dir.x > 0 ? 0.001 : -0.001 * !ray->side);
-	light_point.y = hit->hit[ray->bounce].y * LMAP_PRECISION + (ray->dir.y > 0 ? 0.001 : -0.001 * ray->side);
+	light_point.x = hit->hit[ray->bounce].x * LMAP_PRECISION;
+	light_point.y = hit->hit[ray->bounce].y * LMAP_PRECISION;
 	light_point.x = ft_max(ft_min(light_point.x, data->lmap.wid - 1), 0);
 	light_point.y = ft_max(ft_min(light_point.y, data->lmap.len - 1), 0);
 	tlight = (data->lmap.lmap + light_point.x + light_point.y * data->lmap.wid);

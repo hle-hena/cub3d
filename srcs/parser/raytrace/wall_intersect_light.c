@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 11:10:35 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/28 17:47:18 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/04 22:14:54 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,17 +84,19 @@ static inline float	angle(t_vec ray_dir, t_wpath seg)
 	return (sqrtf(sqrtf(dot_val)));
 }
 
-static inline int	is_valid_hit(t_trace *ray, t_vec hit, float dist)
+static inline int	is_valid_hit(t_trace *ray, float dist)
 {
-	if (dist < 0 || (ray->dir.x > 0 && floorf(hit.x) > ray->curr.x)
+	t_vec	hit;
+
+	if (dist < 0)
+		return (0);
+	hit.x = ray->origin.x + ray->dir.x * dist;
+	hit.y = ray->origin.y + ray->dir.y * dist;
+	if ((ray->dir.x > 0 && floorf(hit.x) > ray->curr.x)
 		|| (ray->dir.x < 0 && floorf(hit.x) < ray->curr.x)
 		|| (ray->dir.y > 0 && floorf(hit.y) > ray->curr.y)
 		|| (ray->dir.y < 0 && floorf(hit.y) < ray->curr.y))
-	{
-		ray->angle_factor = 0;
 		return (0);
-	}
-	
 	ray->precise_dist = ray->last_dist + dist;
 	ray->origin = hit;
 	return (1);
@@ -102,7 +104,6 @@ static inline int	is_valid_hit(t_trace *ray, t_vec hit, float dist)
 
 int	does_light(t_list *wpath, t_trace *ray, t_wpath *wall)
 {
-	t_vec	hit;
 	float	dist;
 	float	temp;
 
@@ -124,7 +125,5 @@ int	does_light(t_list *wpath, t_trace *ray, t_wpath *wall)
 		}
 		wpath = wpath->next;
 	}
-	hit.x = ray->origin.x + ray->dir.x * dist;
-	hit.y = ray->origin.y + ray->dir.y * dist;
-	return (is_valid_hit(ray, hit, dist));
+	return (is_valid_hit(ray, dist));
 }

@@ -6,35 +6,58 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 11:32:35 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/28 18:06:01 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/04 22:18:19 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-static inline void	light_wall(t_data *data, t_trace *ray, t_wpath wall,
+static inline void	light_adjacent(t_flight *flight, float emittance,
 	t_light light)
 {
-	t_flight	*flight;
-	float		emittance;
-
-	flight = find_flight(data, ray->curr, wall);
-	ray->angle_factor = ray->angle_factor - pow(2.71828, -ray->angle_factor
-		* 0.1 * (ray->precise_dist / LMAP_PRECISION)) + 1;
-	if (ray->angle_factor > 1)
-		ray->angle_factor = 1;
-	emittance = ray->angle_factor * ray->emittance;
 	if (emittance > flight->emittance)
 	{
 		flight->color = calc_color((t_col){light.color.re * emittance,
 					light.color.gr * emittance, light.color.bl * emittance});
 		flight->emittance = emittance;
 	}
-	if (wall.reflectance && ray->bounce < MAX_BOUNCE - 1
-		&& emittance > 0.001)
-		reflect_light(data, ray, wall, light);
-	else
-		ray->running = 0;
+}
+
+static inline void	light_wall(t_data *data, t_trace *ray, t_wpath wall,
+	t_light light)
+{
+	t_flight	*flight;
+	t_vec		offset;
+	float		emittance;
+
+	ray->angle_factor = ray->angle_factor - pow(2.71828, -ray->angle_factor
+		* 0.1 * (ray->precise_dist / LMAP_PRECISION)) + 1;
+	if (ray->angle_factor > 1)
+		ray->angle_factor = 1;
+	emittance = ray->angle_factor * ray->emittance;
+	ray->curr = (t_point){(int)ray->origin.x, (int)ray->origin.y};
+	flight = find_flight(data, ray->curr, wall);
+	if (emittance > flight->emittance)
+	{
+		flight->color = calc_color((t_col){light.color.re * emittance,
+					light.color.gr * emittance, light.color.bl * emittance});
+		flight->emittance = emittance;
+	}
+	offset.x = ray->origin.x - (int)ray->origin.x;
+	offset.y = ray->origin.y - (int)ray->origin.y;
+	if (offset.x < 0.001)
+		light_adjacent(find_flight(data, (t_point){ray->curr.x - 1, ray->curr.y},
+				wall), emittance, light);
+	if (offset.y < 0.001)
+		light_adjacent(find_flight(data, (t_point){ray->curr.x, ray->curr.y - 1},
+				wall), emittance, light);
+	if (offset.x > 0.999)
+		light_adjacent(find_flight(data, (t_point){ray->curr.x + 1, ray->curr.y},
+				wall), emittance, light);
+	if (offset.y > 0.999)
+		light_adjacent(find_flight(data, (t_point){ray->curr.x, ray->curr.y + 1},
+				wall), emittance, light);
+	ray->running = 0;
 	ray->emittance -= (1 - wall.reflectance);
 }
 
