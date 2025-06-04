@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 11:32:35 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/04 22:18:19 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/04 22:28:05 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,13 +48,13 @@ static inline void	light_wall(t_data *data, t_trace *ray, t_wpath wall,
 	if (offset.x < 0.001)
 		light_adjacent(find_flight(data, (t_point){ray->curr.x - 1, ray->curr.y},
 				wall), emittance, light);
+	else if (offset.x > 0.999)
+		light_adjacent(find_flight(data, (t_point){ray->curr.x + 1, ray->curr.y},
+				wall), emittance, light);
 	if (offset.y < 0.001)
 		light_adjacent(find_flight(data, (t_point){ray->curr.x, ray->curr.y - 1},
 				wall), emittance, light);
-	if (offset.x > 0.999)
-		light_adjacent(find_flight(data, (t_point){ray->curr.x + 1, ray->curr.y},
-				wall), emittance, light);
-	if (offset.y > 0.999)
+	else if (offset.y > 0.999)
 		light_adjacent(find_flight(data, (t_point){ray->curr.x, ray->curr.y + 1},
 				wall), emittance, light);
 	ray->running = 0;
