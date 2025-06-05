@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/28 18:09:52 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/05 11:27:47 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ typedef struct s_trace
 	float	angle_factor;
 }	t_trace;
 
-# define ATT_COEF 0.0005
+# define ATT_COEF 0.0002
 
 typedef struct s_light
 {
@@ -141,9 +141,11 @@ typedef struct s_wpath
 {
 	t_vec	start;
 	t_vec	end;
+	t_vec	center;
 	t_text	texture;
 	t_vec	normal;
 	float	reflectance;
+	int		mode;
 }	t_wpath;
 
 typedef	struct s_tile
@@ -277,7 +279,7 @@ typedef struct s_data
 
 # define DRAW_THREADS 4
 // # define LMAP_PRECISION 512
-# define LMAP_PRECISION 64
+# define LMAP_PRECISION 128
 
 typedef struct s_thread_draw
 {

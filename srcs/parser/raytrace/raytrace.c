@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 10:11:09 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/28 12:26:34 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/05 11:25:06 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,7 @@ static inline void	light_floor(t_data *data, t_trace *ray, t_light light)
 	if (ray->curr.x < 0 || ray->curr.x >= data->lmap.wid || ray->curr.y < 0
 		|| ray->curr.y >= data->lmap.len)
 		return ;
-	emittance = (ray->emittance)
-		/ (1 + ATT_COEF * pow((ray->precise_dist / LMAP_PRECISION), 2));
-	if (emittance < 0)
-		return (ray->running = 0, VOID);
+	emittance = ray->emittance;
 	if (emittance < (data->lmap.lmap + ray->curr.x + ray->curr.y
 			* data->map->wid * LMAP_PRECISION)->ce_fl.emittance)
 		return ;
