@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/27 19:19:51 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/05 15:49:12 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,90 +75,56 @@ static inline void	set_pixels(t_data *data, char *img, int color)
 	*(int *)(img + data->img.size_line + data->img.bpp) = color;
 }
 
-static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, t_hit *hit)
+static inline float	demenish_light(t_wpath *walls, float base_emittance, int max)
 {
-	t_tile		*tile;
-	t_flight	light;
-	t_vec		cast;
-	t_vec		world;
-	t_point		pix;
-	t_point		iworld;
-	t_img		*tex;
-	int			offset;
-	int			bounce;
-	int			color;
+	int	i;
 
-	// set_pixels(data, img, 0);
-	// return ;
-
-	cast = *(ray.cast_table + curr.y * data->render_w + curr.x);
-	world.x = data->map->player.x + cast.y * (ray.l.x + cast.x * ray.r.x);
-	world.y = data->map->player.y + cast.y * (ray.l.y + cast.x * ray.r.y);
-	world =  reflect_across_mirror(world, hit, curr, &bounce);
-	iworld.x = (int)world.x;
-	iworld.y = (int)world.y;
-	if (world.y < 0 || world.y >= data->map->len || world.x < 0
-		|| world.x >= data->map->wid)
-		return (set_pixels(data, img, 0), VOID);
-	tile = *(ray.tile_dict + *(data->map->matrix + iworld.y * data->map->wid + iworld.x));
-	if (!tile)
-		return (set_pixels(data, img, 0), VOID);
-	tex = tile->tex_ce.img;
-	pix.x = ((world.x - iworld.x) * tex->width);
-	pix.y = ((world.y - iworld.y) * tex->height);
-	if (pix.x >= tex->width)
-		pix.x = tex->width - 1;
-	if (pix.y >= tex->height)
-		pix.y = tex->height - 1;
-	offset = pix.y * tex->size_line + pix.x * tex->bpp;
-	iworld.x = world.x * LMAP_PRECISION;
-	iworld.y = world.y * LMAP_PRECISION;
-	light = (data->lmap.lmap + iworld.x + iworld.y * data->lmap.wid)->ce_fl;
-	color = color_blend(*(int *)(tex->data + offset), light.color, light.emittance / fmax((float)bounce * 0.75, 1));
-	set_pixels(data, img, color);
+	i = -1;
+	while (++i < max)
+		base_emittance *= walls[i].reflectance;
+	return (base_emittance);
 }
 
-static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img, t_hit *hit)
+static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, t_hit *hit)
 {
-	t_tile		*tile;
 	t_flight	light;
+	t_point		i_world;
+	t_tile		*tile;
 	t_vec		cast;
 	t_vec		world;
-	t_point		pix;
-	t_point		iworld;
 	t_img		*tex;
-	int			offset;
 	int			bounce;
-	int			color;
+	int			offset;
+	float		emittance;
 
-	// set_pixels(data, img, 0);
-	// return ;
-
-	cast = *(ray.cast_table + curr.y * data->render_w + curr.x);
+	cast = ray.cast_table[curr.y * data->render_w + curr.x];
 	world.x = data->map->player.x + cast.y * (ray.l.x + cast.x * ray.r.x);
 	world.y = data->map->player.y + cast.y * (ray.l.y + cast.x * ray.r.y);
-	world =  reflect_across_mirror(world, hit, curr, &bounce);
-	iworld.x = world.x;
-	iworld.y = world.y;
-	if (world.y < 0 || world.y >= data->map->len || world.x < 0
-		|| world.x >= data->map->wid)
-		return (set_pixels(data, img, 0), VOID);
-	tile = *(ray.tile_dict + *(data->map->matrix + iworld.y * data->map->wid + iworld.x));
+	world = reflect_across_mirror(world, hit, curr, &bounce);
+	if (world.x < 0 || world.x >= data->map->wid || world.y < 0
+		|| world.y >= data->map->len)
+		return set_pixels(data, img, 0), VOID;
+	i_world.x = (int)world.x;
+	i_world.y = (int)world.y;
+	tile = ray.tile_dict[data->map->matrix[i_world.y * data->map->wid + i_world.x]];
 	if (!tile)
-		return (set_pixels(data, img, 0), VOID);
+		return set_pixels(data, img, 0), VOID;
+	tex = tile->tex_ce.img;
+	offset = (int)((world.y - i_world.y) * tex->height) * tex->size_line
+		+ (int)((world.x - i_world.x) * tex->width) * tex->bpp;
+	light = data->lmap.lmap[(int)(world.x * LMAP_PRECISION)
+		+ (int)(world.y * LMAP_PRECISION) * data->lmap.wid].ce_fl;
+	// if (bounce > 1)
+	// 	emittance = light.emittance / (1 + ATT_COEF * pow((hit->dist[bounce]) * 64, 2));
+	// else
+	// 	emittance = light.emittance;
+	emittance = demenish_light(hit->wall, light.emittance, bounce - 1);
+	set_pixels(data, img,
+		color_blend(*(int *)(tex->data + offset), light.color, emittance));
 	tex = tile->tex_fl.img;
-	pix.x = ((world.x - iworld.x) * tex->width);
-	pix.y = ((world.y - iworld.y) * tex->height);
-	if (pix.x >= tex->width)
-		pix.x = tex->width - 1;
-	if (pix.y >= tex->height)
-		pix.y = tex->height - 1;
-	offset = pix.y * tex->size_line + pix.x * tex->bpp;
-	iworld.x = world.x * LMAP_PRECISION;
-	iworld.y = world.y * LMAP_PRECISION;
-	light = (data->lmap.lmap + iworld.x + iworld.y * data->lmap.wid)->ce_fl;
-	color = color_blend(*(int *)(tex->data + offset), light.color, light.emittance / fmax((float)bounce * 0.75, 1));
-	set_pixels(data, img, color);
+	set_pixels(data, data->img_end - curr.y * data->img.size_line * 2
+		- (data->win_w - 1 - curr.x) * data->img.bpp * 2,
+		color_blend(*(int *)(tex->data + offset), light.color, emittance));
 }
 
 static inline void	draw_wall(t_data *data, char *img, t_hit *hit)
@@ -170,8 +136,8 @@ static inline void	draw_wall(t_data *data, char *img, t_hit *hit)
 	// 		* hit->texture->size_line);
 	color = color_blend(*(int *)(hit->tex_col + hit->tex_y
 				* hit->texture->size_line), hit->light->color,
-			hit->light->emittance / fmax(((float)(hit->bounces + 1)
-				* 0.75), 1));
+			// hit->light->emittance / fmax(((float)(hit->bounces + 1) * 0.75), 1));
+			demenish_light(hit->wall, hit->light->emittance, hit->bounces));
 	set_pixels(data, img, color);
 	hit->tex_pos_fp += hit->step_fp;
 }
@@ -199,7 +165,7 @@ void	*draw_walls_thread(void *arg)
 			else if (curr.y < hit->draw_start[hit->bounces])
 				draw_ceil(data, curr, td->ray_dir, img, hit);
 			else if (curr.y >= hit->draw_end[hit->bounces])
-				draw_floor(data, curr, td->ray_dir, img, hit);
+				;
 			img += data->img.bpp * 2;
 		}
 		img += td->add_next_line + data->img.size_line;
@@ -291,7 +257,7 @@ void cast_rays(t_data *data)
 	t_vec	ray_dir;
 	float	look_dir;
 
-	int		debug = 0;//////////////////////////set this
+	int		debug = 1;//////////////////////////set this
 	struct	timespec start, end;
 	long	ms;
 

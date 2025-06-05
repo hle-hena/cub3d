@@ -1,37 +1,25 @@
-5 {
-	NO 255,255,255 1
-	SO 255,255,255 1
-	EA 255,255,255 1
-	WE 255,255,255 1
-	C textures/wolfenstein/wood.xpm
-	F textures/wolfenstein/grey_stone.xpm
+4 {
+	NO textures/simonkraft/bookshelf.xpm
+	SO textures/simonkraft/bookshelf.xpm
+	EA textures/simonkraft/bookshelf.xpm
+	WE textures/simonkraft/bookshelf.xpm
+	C 0,0,0
+	F 0,0,0
 	CH 100
 	FH 1
 	W 1
 }
-1 {
-	NO 255,255,255 1
-	SO 255,255,255 1
-	EA 255,255,255 1
-	WE 255,255,255 1
+6 {
+	NO 255,255,255
+	SO 255,255,255
+	EA 255,255,255
+	WE 255,255,255
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
 	CH 100
 	FH 1
 	W 1
-	wl ((1, 0), (0, 1)), 1
-}
-2 {
-	NO 255,255,255 1
-	SO 255,255,255 1
-	EA 255,255,255 1
-	WE 255,255,255 1
-	C textures/wolfenstein/wood.xpm
-	F textures/wolfenstein/grey_stone.xpm
-	CH 100
-	FH 1
-	W 1
-	wl ((0, 0), (1, 1)), 1
+	wa ((1, 0.5), (0.5, 1), (0.5, 0.5)), 0.76
 }
 0 {
 	NO 120,120,120
@@ -44,28 +32,54 @@
 	FH 0
 	W 0
 }
+L ((2.5, 2.5), {255, 0, 0}, 1)
+L ((6.5, 2.5), {0, 255, 0}, 1)
+L ((2.5, 6.5), {0, 0, 255}, 1)
+L ((6.5, 6.5), 1)
 . {
-	NO textures/simonkraft/bookshelf.xpm
-	SO textures/simonkraft/bookshelf.xpm
-	EA textures/simonkraft/bookshelf.xpm
-	WE textures/simonkraft/bookshelf.xpm
-	C 0,0,0
-	F 0,0,0
+	NO 255,255,255
+	SO 255,255,255
+	EA 255,255,255
+	WE 255,255,255
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
 	CH 100
 	FH 1
 	W 1
+	wa ((0.5, 0), (0.5, 0), (0.5, 0.5))
 }
-L ((2.5, 2.5), {255, 0, 0}, 1)
-L ((2.5, 4.5), {0, 255, 0}, 1)
-L ((4.5, 4.5), {0, 0, 255}, 1)
-#L ((3.5, 3.5), 1)
+# {
+	NO 255,255,255
+	SO 255,255,255
+	EA 255,255,255
+	WE 255,255,255
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	CH 100
+	FH 1
+	W 1
+	wa ((0.5, 0), (0.5, 0), (0.5, 0.5)), 0.75
+}
+C {
+	NO 255,255,255
+	SO 255,255,255
+	EA 255,255,255
+	WE 255,255,255
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	CH 100
+	FH 1
+	W 1
+	wa ((0.5, 0), (0, 0.5), (0.5, 0.5)), 0.75
+}
 P=0
 
-
-5555555
-5100025
-500N005
-500.005
-5000005
-5200015
-5555555
+4..444..4
+.000#000.
+.0000000.
+400#0#004
+4#00N00#4
+400#0#004
+.0000000.
+.000#000.
+4..444..4

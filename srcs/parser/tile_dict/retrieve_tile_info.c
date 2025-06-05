@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:28:34 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/05 10:37:49 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/05 11:46:29 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,10 +78,16 @@ void	retrieve_arc(t_tile *tile, char *arg, int *err)
 	arg++;
 	arg++;
 	arg++;
-	line->center.x = ft_atof_err(arg, 0, 1, &arg);
+	if (*arg == '-')
+		line->center.x = -ft_atof_err(++arg, -100, 100, &arg);
+	else
+		line->center.x = ft_atof_err(arg, -100, 100, &arg);
 	arg++;
 	arg++;
-	line->center.y = ft_atof_err(arg, 0, 1, &arg);
+	if (*arg == '-')
+		line->center.y = -ft_atof_err(++arg, -100, 100, &arg);
+	else
+		line->center.y = ft_atof_err(arg, -100, 100, &arg);
 	arg++;
 	arg++;
 	arg++;

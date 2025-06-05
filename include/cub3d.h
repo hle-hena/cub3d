@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/05 11:27:47 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/05 15:45:49 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -207,7 +207,6 @@ typedef struct s_hit
 	t_img		*texture;
 	t_flight	*light;
 	t_wpath		wall[MAX_BOUNCE];
-	// t_vec		normal_hit[MAX_BOUNCE];
 	t_vec		ray_dir[MAX_BOUNCE];
 	t_vec		hit[MAX_BOUNCE];
 	float		dist[MAX_BOUNCE];
@@ -215,8 +214,6 @@ typedef struct s_hit
 	int			draw_end[MAX_BOUNCE];
 	int			bounces;
 	float		pos;
-
-	// int			side[MAX_BOUNCE];
 	int			tex_y;
 	int			tex_pos_fp;
 	int			step_fp;
@@ -264,6 +261,7 @@ typedef struct s_data
 	void	*mlx;
 	void	*win;
 	t_img	img;
+	char	*img_end;
 	int		win_h;
 	int		win_w;
 	int		render_h;

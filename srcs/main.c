@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:05:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/27 15:44:59 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/05 15:18:36 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,8 @@ void	init_mlx(t_data *data)
 	data->img.data = mlx_get_data_addr(data->img.img, &data->img.bpp,
 		&data->img.size_line, &data->img.endian);
 	data->img.bpp /= 8;
+	data->img_end = data->img.data + (data->win_h - 1) * data->img.size_line
+		+ (data->win_w - 1) * data->img.bpp;
 	data->event = (t_event){0};
 	data->delta_t = 0;
 	data->lmap.nb_ls = 0;
