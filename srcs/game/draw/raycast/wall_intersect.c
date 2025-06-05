@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 13:37:04 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/05 11:07:13 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/05 16:01:18 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,7 +122,7 @@ static inline t_wpath	line(t_point curr, t_wpath base)
 {
 	return ((t_wpath){(t_vec){base.start.x + curr.x, base.start.y + curr.y},
 		(t_vec){base.end.x + curr.x, base.end.y + curr.y}, (t_vec){base.center.x
-			+ curr.x, base.center.y + curr.y}, (t_text){0}, (t_vec){0}, 0, 0});
+			+ curr.x, base.center.y + curr.y}, (t_text){0}, (t_vec){0}, 0, 0, 0});
 }
 
 int	is_invalid_hit(t_ray *ray, t_wpath *wall, float dist)
@@ -149,7 +149,7 @@ int	is_invalid_hit(t_ray *ray, t_wpath *wall, float dist)
 	return (0);
 }
 
-int	does_hit(t_list	*wpath, t_ray *ray, t_wpath *wall, float *hit_percent)
+int	does_hit(t_list	*wpath, t_ray *ray, t_wpath *wall)
 {
 	float	dist;
 	float	temp;
@@ -174,7 +174,7 @@ int	does_hit(t_list	*wpath, t_ray *ray, t_wpath *wall, float *hit_percent)
 		{
 			*wall = *(t_wpath *)wpath->content;
 			dist = temp;
-			*hit_percent = percent;
+			wall->pos = percent;
 			if (((t_wpath *)wpath->content)->mode == 1)
 				wall->normal = normal;
 		}

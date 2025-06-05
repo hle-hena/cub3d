@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:28:34 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/05 11:46:29 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/05 16:07:45 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,25 +156,25 @@ void	add_wpath(t_tile *tile, int *err)
 	if (!wpath)
 		return (*err = 1, VOID);
 	*wpath = (t_wpath){(t_vec){0, 0}, (t_vec){0, 1}, (t_vec){0}, tile->tex_we,
-			(t_vec){-1, 0}, tile->tex_we.reflectance, 0};
+			(t_vec){-1, 0}, tile->tex_we.reflectance, 0, 0};
 	add_link(&tile->wpath, wpath);
 	wpath = malloc(sizeof(t_wpath));
 	if (!wpath)
 		return (*err = 1, VOID);
 	*wpath = (t_wpath){(t_vec){0, 0}, (t_vec){1, 0}, (t_vec){0}, tile->tex_no,
-			(t_vec){0, -1}, tile->tex_no.reflectance, 0};
+			(t_vec){0, -1}, tile->tex_no.reflectance, 0, 0};
 	add_link(&tile->wpath, wpath);
 	wpath = malloc(sizeof(t_wpath));
 	if (!wpath)
 		return (*err = 1, VOID);
 	*wpath = (t_wpath){(t_vec){1, 1}, (t_vec){0, 1}, (t_vec){0}, tile->tex_so,
-			(t_vec){0, 1}, tile->tex_so.reflectance, 0};
+			(t_vec){0, 1}, tile->tex_so.reflectance, 0, 0};
 	add_link(&tile->wpath, wpath);
 	wpath = malloc(sizeof(t_wpath));
 	if (!wpath)
 		return (*err = 1, VOID);
 	*wpath = (t_wpath){(t_vec){1, 1}, (t_vec){1, 0}, (t_vec){0}, tile->tex_ea,
-			(t_vec){1, 0}, tile->tex_ea.reflectance, 0};
+			(t_vec){1, 0}, tile->tex_ea.reflectance, 0, 0};
 	add_link(&tile->wpath, wpath);
 }
 

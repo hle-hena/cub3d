@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/05 15:49:12 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/05 16:22:03 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,10 +114,6 @@ static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, 
 		+ (int)((world.x - i_world.x) * tex->width) * tex->bpp;
 	light = data->lmap.lmap[(int)(world.x * LMAP_PRECISION)
 		+ (int)(world.y * LMAP_PRECISION) * data->lmap.wid].ce_fl;
-	// if (bounce > 1)
-	// 	emittance = light.emittance / (1 + ATT_COEF * pow((hit->dist[bounce]) * 64, 2));
-	// else
-	// 	emittance = light.emittance;
 	emittance = demenish_light(hit->wall, light.emittance, bounce - 1);
 	set_pixels(data, img,
 		color_blend(*(int *)(tex->data + offset), light.color, emittance));
@@ -131,15 +127,11 @@ static inline void	draw_wall(t_data *data, char *img, t_hit *hit)
 {
 	int			color;
 
-	hit->tex_y = hit->tex_pos_fp >> 16;
-	// color = *(int *)(hit->tex_col + hit->tex_y
-	// 		* hit->texture->size_line);
-	color = color_blend(*(int *)(hit->tex_col + hit->tex_y
-				* hit->texture->size_line), hit->light->color,
-			// hit->light->emittance / fmax(((float)(hit->bounces + 1) * 0.75), 1));
-			demenish_light(hit->wall, hit->light->emittance, hit->bounces));
+	color = color_blend(*(int *)(hit->tex_col[hit->bounces]
+		+ (hit->tex_pos_fp[hit->bounces] >> 16) * hit->texture->size_line),
+		hit->light->color, demenish_light(hit->wall, hit->light->emittance, hit->bounces));
 	set_pixels(data, img, color);
-	hit->tex_pos_fp += hit->step_fp;
+	hit->tex_pos_fp[hit->bounces] += hit->step_fp[hit->bounces];
 }
 
 void	*draw_walls_thread(void *arg)
@@ -203,21 +195,14 @@ void	draw_walls(t_data *data)
 		pthread_join(threads[i], NULL);
 }
 
-int	init_line_heights(t_data *data, t_hit *hit)
+void	init_line_heights(t_data *data, t_hit *hit, int tex_start, int tex_end)
 {
 	int		i;
-	int		tex_start;
-	int		tex_end;
 	int		line_height;
 
 	i = -1;
-	tex_end = 0;
-	tex_start = 0;
 	while (++i <= hit->bounces)
 	{
-		// if (i == 0)
-		// 	hit->dist[i] = hit->dist[i] * (hit->ray_dir[0].x * data->cam.dir.x
-		// 		+ hit->ray_dir[0].y * data->cam.dir.y);
 		if (hit->dist[i] <= 0.0f)
 			hit->dist[i] = 0.0001f;
 		line_height = (int)(data->render_h * 2 / hit->dist[i]);
@@ -227,26 +212,25 @@ int	init_line_heights(t_data *data, t_hit *hit)
 		tex_end = line_height / 2 + data->render_h / 2;
 		hit->draw_start[i] = ft_max(tex_start, 0);
 		hit->draw_end[i] = ft_min(tex_end, data->render_h);
+		line_height = tex_end - tex_start;
+		if (line_height == 0)
+			line_height = 1;
+		hit->step_fp[i] = (hit->texture->height << 16) / line_height;
+		hit->tex_pos_fp[i] = (hit->draw_start[i]
+			- data->render_h / 2 + line_height / 2) * hit->step_fp[i];
+		hit->tex_col[i] = hit->wall[i].texture.img->data
+			+ (int)(hit->wall[i].pos * hit->texture->width) * hit->texture->bpp;
 	}
-	return (tex_end - tex_start);
 }
 
 t_hit cast_ray(t_data *data, t_vec ray_dir)
 {
 	t_hit	hit;
-	float	wall_x;
-	int		line_height;
 
 	hit = (t_hit){0};
 	hit = raycast(data, ray_dir, (t_vec){data->map->player.x,
 		data->map->player.y});
-	line_height = init_line_heights(data, &hit);
-	if (line_height == 0)
-		line_height = 1;
-	wall_x = hit.pos;
-	hit.step_fp = (hit.texture->height << 16) / line_height;
-	hit.tex_pos_fp = (hit.draw_start[hit.bounces] - data->render_h / 2 + line_height / 2) * hit.step_fp;
-	hit.tex_col = hit.texture->data + (int)(wall_x * hit.texture->width) * hit.texture->bpp;
+	init_line_heights(data, &hit, 0, 0);
 	return (hit);
 }
 
@@ -257,7 +241,7 @@ void cast_rays(t_data *data)
 	t_vec	ray_dir;
 	float	look_dir;
 
-	int		debug = 1;//////////////////////////set this
+	int		debug = 0;//////////////////////////set this
 	struct	timespec start, end;
 	long	ms;
 

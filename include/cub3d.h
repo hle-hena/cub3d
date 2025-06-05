@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/05 15:45:49 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/05 16:18:40 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,6 +145,7 @@ typedef struct s_wpath
 	t_text	texture;
 	t_vec	normal;
 	float	reflectance;
+	float	pos;
 	int		mode;
 }	t_wpath;
 
@@ -212,12 +213,10 @@ typedef struct s_hit
 	float		dist[MAX_BOUNCE];
 	int			draw_start[MAX_BOUNCE];
 	int			draw_end[MAX_BOUNCE];
+	int			tex_pos_fp[MAX_BOUNCE];
+	int			step_fp[MAX_BOUNCE];
+	char		*tex_col[MAX_BOUNCE];
 	int			bounces;
-	float		pos;
-	int			tex_y;
-	int			tex_pos_fp;
-	int			step_fp;
-	char		*tex_col;
 }	t_hit;
 
 typedef struct s_ray
@@ -321,8 +320,7 @@ int			is_map_valid(t_map *map, t_tile **tiles, int err);
 void		add_link(t_list **lst, void *content);
 
 int			is_correct_flight(void *content, void *to_find);
-int			does_hit(t_list	*wpath, t_ray *ray, t_wpath *wall,
-	float *hit_percent);
+int			does_hit(t_list	*wpath, t_ray *ray, t_wpath *wall);
 void		handle_reflexion(t_data *data, t_hit *hit, t_ray *ray,
 	t_wpath wall);
 void		init_ray(t_ray *ray, t_vec dir, t_vec origin);

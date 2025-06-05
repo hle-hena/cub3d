@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/22 18:00:35 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/04 22:06:52 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/05 16:01:02 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ void	handle_hit(t_data *data, t_ray *ray, t_hit *hit)
 		return ;
 	if (!tile->is_wall)
 		return ;
-	if (!does_hit(tile->wpath, ray, &hit->wall[ray->bounce], &hit->pos))
+	if (!does_hit(tile->wpath, ray, &hit->wall[ray->bounce]))
 		return ;
 	hit->hit[ray->bounce].x = ray->origin.x + ray->dir.x * ray->precise_dist;
 	hit->hit[ray->bounce].y = ray->origin.y + ray->dir.y * ray->precise_dist;
