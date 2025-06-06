@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/22 18:00:35 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/05 16:01:02 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/06 11:05:23 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,9 @@ static inline void	hit_light(t_data *data, t_ray *ray, t_hit *hit, t_wpath wall)
 	tlight = (data->lmap.lmap + light_point.x + light_point.y * data->lmap.wid);
 	temp = ft_lstchr(tlight->flight, &wall.normal, is_correct_flight);
 	if (temp)
-		hit->light = (t_flight *)temp->content;
+		hit->light[ray->bounce] = (t_flight *)temp->content;
 	else
-		hit->light = data->empty->flight;
+		hit->light[ray->bounce] = data->empty->flight;
 }
 
 static inline int	is_outside(t_data *data, t_ray *ray, t_hit *hit)
@@ -64,8 +64,8 @@ static inline int	is_outside(t_data *data, t_ray *ray, t_hit *hit)
 	if (should_stop)
 	{
 		hit->dist[ray->bounce] = ray->precise_dist;
-		hit->texture = data->empty->texture.img;
-		hit->light = data->empty->flight;
+		hit->texture[ray->bounce] = data->empty->texture.img;
+		hit->light[ray->bounce] = data->empty->flight;
 		ray->running = 0;
 	}
 	return (is_out);
@@ -89,7 +89,7 @@ void	handle_hit(t_data *data, t_ray *ray, t_hit *hit)
 	hit->hit[ray->bounce].y = ray->origin.y + ray->dir.y * ray->precise_dist;
 	hit_light(data, ray, hit, hit->wall[ray->bounce]);
 	hit->ray_dir[ray->bounce] = ray->dir;
-	hit->texture = tile->tex_ea.img;
+	hit->texture[ray->bounce] = tile->tex_ea.img;
 	hit->bounces = ray->bounce;
 	hit->dist[ray->bounce] = ray->precise_dist;
 	if (ray->bounce != 0)

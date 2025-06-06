@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/05 16:18:40 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/06 14:04:11 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,28 +185,12 @@ typedef struct s_events
 	int		echap;
 }	t_event;
 
-# define MAX_BOUNCE 32
+# define MAX_BOUNCE 16
 
-// typedef struct s_hit
-// {
-// 	t_img		*texture;
-// 	t_flight	*light;
-// 	t_vec		ray_dir[MAX_BOUNCE];
-// 	t_vec		hit[MAX_BOUNCE];
-// 	float		dist[MAX_BOUNCE];
-// 	int			draw_start[MAX_BOUNCE];
-// 	int			draw_end[MAX_BOUNCE];
-// 	int			side[MAX_BOUNCE];
-// 	int			bounces;
-// 	int			tex_y;
-// 	int			tex_pos_fp;
-// 	int			step_fp;
-// 	char		*tex_col;
-// }	t_hit;
 typedef struct s_hit
 {
-	t_img		*texture;
-	t_flight	*light;
+	t_img		*texture[MAX_BOUNCE];
+	t_flight	*light[MAX_BOUNCE];
 	t_wpath		wall[MAX_BOUNCE];
 	t_vec		ray_dir[MAX_BOUNCE];
 	t_vec		hit[MAX_BOUNCE];

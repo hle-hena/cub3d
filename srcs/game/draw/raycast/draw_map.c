@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/05 16:22:03 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/06 14:16:59 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,39 @@ static inline void	set_pixels(t_data *data, char *img, int color)
 	*(int *)(img + data->img.size_line + data->img.bpp) = color;
 }
 
+static inline float	to_linear(float c)
+{
+	return ((c / 255.0f) * (c / 255.0f));
+}
+
+static inline float	to_srgb(float c)
+{
+	return (sqrtf(c) * 255.0f);
+}
+
+static inline int blend_color(int base_col, int reflected_col, float reflectance)
+{
+	float inv = powf(1.0f - reflectance, 2.2f);
+	reflectance = 1.0f - inv;
+	float r1 = to_linear((base_col >> 16) & 0xFF);
+	float g1 = to_linear((base_col >> 8) & 0xFF);
+	float b1 = to_linear(base_col & 0xFF);
+	float r2 = to_linear((reflected_col >> 16) & 0xFF);
+	float g2 = to_linear((reflected_col >> 8) & 0xFF);
+	float b2 = to_linear(reflected_col & 0xFF);
+	float r = r1 * (1.0f - reflectance) + (r1 * r2) * reflectance;
+	float g = g1 * (1.0f - reflectance) + (g1 * g2) * reflectance;
+	float b = b1 * (1.0f - reflectance) + (b1 * b2) * reflectance;
+	int ri = (int)to_srgb(r);
+	int gi = (int)to_srgb(g);
+	int bi = (int)to_srgb(b);
+	if (ri > 255) ri = 255;
+	if (gi > 255) gi = 255;
+	if (bi > 255) bi = 255;
+	return (ri << 16) | (gi << 8) | bi;
+}
+
+
 static inline float	demenish_light(t_wpath *walls, float base_emittance, int max)
 {
 	int	i;
@@ -83,6 +116,35 @@ static inline float	demenish_light(t_wpath *walls, float base_emittance, int max
 	while (++i < max)
 		base_emittance *= walls[i].reflectance;
 	return (base_emittance);
+}
+
+static inline int	get_color(t_hit *hit, int nb_hit, int fall_back_color, int isnt_wall)
+{
+	int	final_color;
+	int	prev_wall_color;
+	int	wall_color;
+
+	if (isnt_wall)
+		prev_wall_color = fall_back_color;
+	else
+	{	
+		prev_wall_color = color_blend(*(int *)(hit->tex_col[nb_hit]
+			+ (hit->tex_pos_fp[nb_hit] >> 16) * hit->texture[nb_hit]->size_line),
+			hit->light[nb_hit]->color, demenish_light(hit->wall, hit->light[nb_hit]->emittance, nb_hit));
+		hit->tex_pos_fp[nb_hit] += hit->step_fp[nb_hit];
+	}
+	final_color = prev_wall_color;
+	while (--nb_hit >= 0)
+	{
+		wall_color = color_blend(*(int *)(hit->tex_col[nb_hit]
+			+ (hit->tex_pos_fp[nb_hit] >> 16) * hit->texture[nb_hit]->size_line),
+			hit->light[nb_hit]->color, demenish_light(hit->wall, hit->light[nb_hit]->emittance, nb_hit));
+		final_color = blend_color(wall_color, prev_wall_color,
+			hit->wall[nb_hit].reflectance);
+		prev_wall_color = final_color;
+		hit->tex_pos_fp[nb_hit] += hit->step_fp[nb_hit];
+	}
+	return (final_color);
 }
 
 static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, t_hit *hit)
@@ -95,7 +157,6 @@ static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, 
 	t_img		*tex;
 	int			bounce;
 	int			offset;
-	float		emittance;
 
 	cast = ray.cast_table[curr.y * data->render_w + curr.x];
 	world.x = data->map->player.x + cast.y * (ray.l.x + cast.x * ray.r.x);
@@ -114,24 +175,48 @@ static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, 
 		+ (int)((world.x - i_world.x) * tex->width) * tex->bpp;
 	light = data->lmap.lmap[(int)(world.x * LMAP_PRECISION)
 		+ (int)(world.y * LMAP_PRECISION) * data->lmap.wid].ce_fl;
-	emittance = demenish_light(hit->wall, light.emittance, bounce - 1);
-	set_pixels(data, img,
-		color_blend(*(int *)(tex->data + offset), light.color, emittance));
+	set_pixels(data, img, get_color(hit, bounce - 1, color_blend(*(int *)(tex->data + offset),
+			light.color, demenish_light(hit->wall, light.emittance, bounce - 1)), 1));
+}
+
+static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img, t_hit *hit)
+{
+	t_flight	light;
+	t_point		i_world;
+	t_tile		*tile;
+	t_vec		cast;
+	t_vec		world;
+	t_img		*tex;
+	int			bounce;
+	int			offset;
+
+	cast = ray.cast_table[curr.y * data->render_w + curr.x];
+	world.x = data->map->player.x + cast.y * (ray.l.x + cast.x * ray.r.x);
+	world.y = data->map->player.y + cast.y * (ray.l.y + cast.x * ray.r.y);
+	world = reflect_across_mirror(world, hit, curr, &bounce);
+	if (world.x < 0 || world.x >= data->map->wid || world.y < 0
+		|| world.y >= data->map->len)
+		return set_pixels(data, img, 0), VOID;
+	i_world.x = (int)world.x;
+	i_world.y = (int)world.y;
+	tile = ray.tile_dict[data->map->matrix[i_world.y * data->map->wid + i_world.x]];
+	if (!tile)
+		return set_pixels(data, img, 0), VOID;
 	tex = tile->tex_fl.img;
-	set_pixels(data, data->img_end - curr.y * data->img.size_line * 2
-		- (data->win_w - 1 - curr.x) * data->img.bpp * 2,
-		color_blend(*(int *)(tex->data + offset), light.color, emittance));
+	offset = (int)((world.y - i_world.y) * tex->height) * tex->size_line
+		+ (int)((world.x - i_world.x) * tex->width) * tex->bpp;
+	light = data->lmap.lmap[(int)(world.x * LMAP_PRECISION)
+		+ (int)(world.y * LMAP_PRECISION) * data->lmap.wid].ce_fl;
+	set_pixels(data, img, get_color(hit, bounce - 1, color_blend(*(int *)(tex->data + offset),
+			light.color, demenish_light(hit->wall, light.emittance, bounce - 1)), 1));
 }
 
 static inline void	draw_wall(t_data *data, char *img, t_hit *hit)
 {
 	int			color;
 
-	color = color_blend(*(int *)(hit->tex_col[hit->bounces]
-		+ (hit->tex_pos_fp[hit->bounces] >> 16) * hit->texture->size_line),
-		hit->light->color, demenish_light(hit->wall, hit->light->emittance, hit->bounces));
+	color = get_color(hit, hit->bounces, 0, 0);
 	set_pixels(data, img, color);
-	hit->tex_pos_fp[hit->bounces] += hit->step_fp[hit->bounces];
 }
 
 void	*draw_walls_thread(void *arg)
@@ -157,7 +242,7 @@ void	*draw_walls_thread(void *arg)
 			else if (curr.y < hit->draw_start[hit->bounces])
 				draw_ceil(data, curr, td->ray_dir, img, hit);
 			else if (curr.y >= hit->draw_end[hit->bounces])
-				;
+				draw_floor(data, curr, td->ray_dir, img, hit);
 			img += data->img.bpp * 2;
 		}
 		img += td->add_next_line + data->img.size_line;
@@ -215,11 +300,11 @@ void	init_line_heights(t_data *data, t_hit *hit, int tex_start, int tex_end)
 		line_height = tex_end - tex_start;
 		if (line_height == 0)
 			line_height = 1;
-		hit->step_fp[i] = (hit->texture->height << 16) / line_height;
+		hit->step_fp[i] = (hit->texture[i]->height << 16) / line_height;
 		hit->tex_pos_fp[i] = (hit->draw_start[i]
 			- data->render_h / 2 + line_height / 2) * hit->step_fp[i];
-		hit->tex_col[i] = hit->wall[i].texture.img->data
-			+ (int)(hit->wall[i].pos * hit->texture->width) * hit->texture->bpp;
+		hit->tex_col[i] = hit->texture[i]->data
+			+ (int)(hit->wall[i].pos * hit->texture[i]->width) * hit->texture[i]->bpp;
 	}
 }
 

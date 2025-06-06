@@ -10,10 +10,10 @@
 	W 1
 }
 6 {
-	NO 255,255,255
-	SO 255,255,255
-	EA 255,255,255
-	WE 255,255,255
+	NO 125,125,125
+	SO 125,125,125
+	EA 125,125,125
+	WE 125,125,125
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
 	CH 100
@@ -37,10 +37,10 @@ L ((6.5, 2.5), {0, 255, 0}, 1)
 L ((2.5, 6.5), {0, 0, 255}, 1)
 L ((6.5, 6.5), 1)
 . {
-	NO 255,255,255
-	SO 255,255,255
-	EA 255,255,255
-	WE 255,255,255
+	NO 125,125,125
+	SO 125,125,125
+	EA 125,125,125
+	WE 125,125,125
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
 	CH 100
@@ -49,10 +49,10 @@ L ((6.5, 6.5), 1)
 	wa ((0.5, 0), (0.5, 0), (0.5, 0.5))
 }
 # {
-	NO 255,255,255
-	SO 255,255,255
-	EA 255,255,255
-	WE 255,255,255
+	NO 125,125,125
+	SO 125,125,125
+	EA 125,125,125
+	WE 125,125,125
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
 	CH 100
@@ -61,10 +61,10 @@ L ((6.5, 6.5), 1)
 	wa ((0.5, 0), (0.5, 0), (0.5, 0.5)), 0.75
 }
 C {
-	NO 255,255,255
-	SO 255,255,255
-	EA 255,255,255
-	WE 255,255,255
+	NO 125,125,125
+	SO 125,125,125
+	EA 125,125,125
+	WE 125,125,125
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
 	CH 100
