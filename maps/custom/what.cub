@@ -9,18 +9,6 @@
 	FH 1
 	W 1
 }
-6 {
-	NO 125,125,125
-	SO 125,125,125
-	EA 125,125,125
-	WE 125,125,125
-	C textures/wolfenstein/wood.xpm
-	F textures/wolfenstein/grey_stone.xpm
-	CH 100
-	FH 1
-	W 1
-	wa ((1, 0.5), (0.5, 1), (0.5, 0.5)), 0.76
-}
 0 {
 	NO 120,120,120
 	SO 120,120,120
@@ -58,19 +46,7 @@ L ((6.5, 6.5), 1)
 	CH 100
 	FH 1
 	W 1
-	wa ((0.5, 0), (0.5, 0), (0.5, 0.5)), 0.75
-}
-C {
-	NO 125,125,125
-	SO 125,125,125
-	EA 125,125,125
-	WE 125,125,125
-	C textures/wolfenstein/wood.xpm
-	F textures/wolfenstein/grey_stone.xpm
-	CH 100
-	FH 1
-	W 1
-	wa ((0.5, 0), (0, 0.5), (0.5, 0.5)), 0.75
+	wa ((0.5, 0), (0.5, 0), (0.5, 0.5)), 1
 }
 P=0
 
