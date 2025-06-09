@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/09 11:20:42 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/09 15:24:47 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,14 +80,17 @@ static inline void	set_pixels(t_data *data, char *img, int color)
 #define MUL_FP(a, b) (((long long)(a) * (long long)(b)) >> FP_SHIFT)
 #define DIV_FP(a, b) (((long long)(a) << FP_SHIFT) / (long long)(b))
 
+
 static inline short blend_channel(short base, short refl, int refl_fp)
 {
 	int inv = FP_ONE - refl_fp;
-	int blend = (base * inv + ((base * refl) / 255) * refl_fp) >> FP_SHIFT;
+	int base_refl = (base * refl) >> 8;
+	int blend = (base * inv + base_refl * refl_fp) >> FP_SHIFT;
 	if (blend > 255)
 		return (255);
 	return (blend);
 }
+
 
 static inline t_col blend_color_fast(t_col base, t_col refl, int refl_fp)
 {
@@ -109,7 +112,7 @@ static inline int	demenish_light(t_wpath *walls, int base_emittance, int max)
 	return (base_emittance);
 }
 
-static inline int	get_color(t_hit *hit, int nb_hit, t_col fall_back_color, int isnt_wall)
+int	get_color(t_hit *hit, int nb_hit, t_col fall_back_color, int isnt_wall)
 {
 	t_col	final_color;
 	t_col	prev_wall_color;
@@ -213,16 +216,14 @@ static inline void	draw_wall(t_data *data, char *img, t_hit *hit)
 	set_pixels(data, img, get_color(hit, hit->bounces, (t_col){0}, 0));
 }
 
-void	*draw_walls_thread(void *arg)
+void	*draw_walls_section(t_th_draw *td)
 {
-	t_th_draw	*td;
 	t_data		*data;
 	t_hit		*hit;
 	char		*img;
 	t_point		curr;
 
-	td = (t_th_draw *)arg;
-	data = td->data;
+	data = get_data();
 	img = data->img.data + td->start_x * 2 * data->img.bpp;
 	curr.y = -1;
 	while (++curr.y < data->render_h)
@@ -244,34 +245,58 @@ void	*draw_walls_thread(void *arg)
 	return (NULL);
 }
 
+void	*draw_walls_thread(void *arg)
+{
+	t_th_draw	*job;
+
+	job = (t_th_draw *)arg;
+	while (1)
+	{
+		pthread_mutex_lock(&job->mutex);
+		while (!job->ready)
+			pthread_cond_wait(&job->cond_start, &job->mutex);
+		if (job->ready == 2)
+			break ;
+		job->ready = 0;
+		pthread_mutex_unlock(&job->mutex);
+		draw_walls_section(job);
+		pthread_mutex_lock(&job->mutex);
+		job->done = 1;
+		pthread_cond_signal(&job->cond_done);
+		pthread_mutex_unlock(&job->mutex);
+	}
+	return (NULL);
+}
+
 void	draw_walls(t_data *data)
 {
-	pthread_t	threads[DRAW_THREADS];
-	t_th_draw	td[DRAW_THREADS];
-	t_rdir		ray_dir;
-	int			slice;
-	int			i;
+	t_rdir	ray_dir;
+	int		i;
 
-	slice = data->render_w / DRAW_THREADS;
-	i = -1;
 	ray_dir.l.x = data->cam.dir.x - data->cam.plane.x;
 	ray_dir.l.y = data->cam.dir.y - data->cam.plane.y;
 	ray_dir.r.x = data->cam.plane.x * 2;
 	ray_dir.r.y = data->cam.plane.y * 2;
 	ray_dir.cast_table = *get_cast_table();
 	ray_dir.tile_dict = get_tile_dict();
+	i = -1;
 	while (++i < DRAW_THREADS)
 	{
-		td[i].data = data;
-		td[i].start_x = i * slice;
-		td[i].end_x = (i == DRAW_THREADS - 1) ? data->render_w : (i + 1) * slice;
-		td[i].add_next_line = (data->win_w + (td[i].start_x - td[i].end_x) * 2) * data->img.bpp;
-		td[i].ray_dir = ray_dir;
-		pthread_create(&threads[i], NULL, draw_walls_thread, &td[i]);
+		pthread_mutex_lock(&data->thread_pool[i].mutex);
+		data->thread_pool[i].ray_dir = ray_dir;
+		data->thread_pool[i].done = 0;
+		data->thread_pool[i].ready = 1;
+		pthread_cond_signal(&data->thread_pool[i].cond_start);
+		pthread_mutex_unlock(&data->thread_pool[i].mutex);
 	}
 	i = -1;
 	while (++i < DRAW_THREADS)
-		pthread_join(threads[i], NULL);
+	{
+		pthread_mutex_lock(&data->thread_pool[i].mutex);
+		while (!data->thread_pool[i].done)
+			pthread_cond_wait(&data->thread_pool[i].cond_done, &data->thread_pool[i].mutex);
+		pthread_mutex_unlock(&data->thread_pool[i].mutex);
+	}
 }
 
 void	init_line_heights(t_data *data, t_hit *hit, int tex_start, int tex_end)

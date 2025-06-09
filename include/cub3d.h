@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/09 10:41:21 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/09 14:58:02 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -239,38 +239,45 @@ typedef struct s_void
 	t_flight	*flight;
 }	t_void;
 
+# define DRAW_THREADS 12
+typedef struct s_thread_draw
+{
+	t_rdir			ray_dir;
+	int				start_x;
+	int				end_x;
+	int				add_next_line;
+	int				ready;
+	int				done;
+	pthread_mutex_t	mutex;
+	pthread_cond_t	cond_start;
+	pthread_cond_t	cond_done;
+}	t_th_draw;
+
 typedef struct s_data
 {
-	void	*mlx;
-	void	*win;
-	t_img	img;
-	char	*img_end;
-	int		win_h;
-	int		win_w;
-	int		render_h;
-	int		render_w;
-	float	delta_t;
-	t_lmap	lmap;
-	t_cam	cam;
-	t_map	*map;
-	t_hit	*hits;
-	t_event	event;
-	t_void	*empty;
+	void		*mlx;
+	void		*win;
+	t_img		img;
+	char		*img_end;
+	int			win_h;
+	int			win_w;
+	int			render_h;
+	int			render_w;
+	float		delta_t;
+	t_lmap		lmap;
+	t_cam		cam;
+	t_map		*map;
+	t_hit		*hits;
+	t_event		event;
+	t_void		*empty;
+	t_th_draw	thread_pool[DRAW_THREADS];
+	pthread_t	threads[DRAW_THREADS];
 }	t_data;
 
-# define DRAW_THREADS 4
 // # define LMAP_PRECISION 512
 # define LMAP_PRECISION 128
 
-typedef struct s_thread_draw
-{
-	t_data	*data;
-	t_rdir	ray_dir;
-	int		start_x;
-	int		end_x;
-	int		add_next_line;
-}	t_th_draw;
-
+void		*draw_walls_thread(void *arg);
 t_data		*get_data(void);
 t_map		*get_map(void);
 t_map		*load_map(int ac, char **av);

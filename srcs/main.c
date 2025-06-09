@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:05:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/09 11:06:59 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/09 14:58:06 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,13 +69,35 @@ void	init_utils(t_data *data)
 		ft_perror(1, NULL, 0);
 }
 
+void init_draw_threads(t_data *data)
+{
+	int	i;
+	int slice;
+
+	slice = data->render_w / DRAW_THREADS;
+	i = -1;
+	while (++i < DRAW_THREADS)
+	{
+		data->thread_pool[i].start_x = i * slice;
+		data->thread_pool[i].end_x = (i == DRAW_THREADS - 1) ? data->render_w : (i + 1) * slice;
+		data->thread_pool[i].add_next_line = (data->win_w +
+			(data->thread_pool[i].start_x - data->thread_pool[i].end_x) * 2) * data->img.bpp;
+		data->thread_pool[i].ready = 0;
+		data->thread_pool[i].done = 0;
+		pthread_mutex_init(&data->thread_pool[i].mutex, NULL);
+		pthread_cond_init(&data->thread_pool[i].cond_start, NULL);
+		pthread_cond_init(&data->thread_pool[i].cond_done, NULL);
+		pthread_create(&data->threads[i], NULL, draw_walls_thread, &data->thread_pool[i]);
+	}
+}
+
 int	main(int ac, char **av)
 {
 	t_data	*data;
 
 	data = get_data();
 	data->mlx = mlx_init();
-	// mlx_do_key_autorepeatoff(data->mlx);
+	mlx_do_key_autorepeatoff(data->mlx);
 	data->map = load_map(ac, av);
 	if (data->map)
 	{
@@ -87,6 +109,7 @@ int	main(int ac, char **av)
 		// print_dict(data);
 		init_mlx(data);
 		init_utils(data);
+		init_draw_threads(data);
 		loop();
 	}
 	clean_data();
