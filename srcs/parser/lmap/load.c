@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:08:29 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/28 10:10:42 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/09 19:23:21 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,14 +100,12 @@ void	raytrace_source(t_data *data, t_light light)
 
 	deg = 0;
 	printf("Doing (%.2f, %.2f) for %.2f\n", light.pos.x, light.pos.y, light.emittance);
-	light.pos.x += 0.001;
-	light.pos.y += 0.001;
 	while (deg < 360)
 	{
 		dir.x = cos(deg * PI / 180);
 		dir.y = sin(deg * PI / 180);
 		raytrace(data, light, dir);
-		deg += 0.001;
+		deg += 0.002;
 	}
 }
 

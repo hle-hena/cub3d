@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/09 18:07:28 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/09 19:20:32 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -276,7 +276,7 @@ typedef struct s_data
 }	t_data;
 
 // # define LMAP_PRECISION 512
-# define LMAP_PRECISION 128
+# define LMAP_PRECISION 129
 
 void		*draw_walls_thread(void *arg);
 t_data		*get_data(void);
