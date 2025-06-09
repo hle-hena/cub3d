@@ -6,15 +6,108 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:28:34 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/25 09:52:46 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/05 16:07:45 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
+void	retrieve_wall(t_tile *tile, char *arg, int *err)
+{
+	//This func need to be more well done.
+	t_wpath	*line;
+
+	line = malloc(sizeof(t_wpath));
+	if (!line)
+		return (*err = 1, VOID);
+	arg++;
+	arg++;
+	line->start.x = ft_atof_err(arg, 0, 1, &arg);
+	arg++;
+	arg++;
+	line->start.y = ft_atof_err(arg, 0, 1, &arg);
+	arg++;
+	arg++;
+	arg++;
+	arg++;
+	line->end.x = ft_atof_err(arg, 0, 1, &arg);
+	arg++;
+	arg++;
+	line->end.y = ft_atof_err(arg, 0, 1, &arg);
+	arg++;
+	arg++;
+	arg++;
+	arg++;
+	line->texture = tile->tex_no;
+	line->normal = (t_vec){
+		-line->end.y + line->start.y,
+		line->end.x - line->start.x
+	};
+	line->normal = normalize(line->normal);
+	line->reflectance = 0;
+	line->mode = 0;
+	line->center = (t_vec){0};
+	if (*arg)
+		line->reflectance = ft_atof_err(arg, 0, 1, &arg);
+	add_link(&tile->wpath, line);
+}
+
+void	retrieve_arc(t_tile *tile, char *arg, int *err)
+{
+	//This func need to be more well done.
+	t_wpath	*line;
+
+	line = malloc(sizeof(t_wpath));
+	if (!line)
+		return (*err = 1, VOID);
+	arg++;
+	arg++;
+	line->start.x = ft_atof_err(arg, 0, 1, &arg);
+	arg++;
+	arg++;
+	line->start.y = ft_atof_err(arg, 0, 1, &arg);
+	arg++;
+	arg++;
+	arg++;
+	arg++;
+	line->end.x = ft_atof_err(arg, 0, 1, &arg);
+	arg++;
+	arg++;
+	line->end.y = ft_atof_err(arg, 0, 1, &arg);
+	arg++;
+	arg++;
+	arg++;
+	arg++;
+	if (*arg == '-')
+		line->center.x = -ft_atof_err(++arg, -100, 100, &arg);
+	else
+		line->center.x = ft_atof_err(arg, -100, 100, &arg);
+	arg++;
+	arg++;
+	if (*arg == '-')
+		line->center.y = -ft_atof_err(++arg, -100, 100, &arg);
+	else
+		line->center.y = ft_atof_err(arg, -100, 100, &arg);
+	arg++;
+	arg++;
+	arg++;
+	arg++;
+	line->texture = tile->tex_no;
+	line->normal = (t_vec){0};
+	line->reflectance = 0;
+	line->mode = 1;
+	if (*arg)
+		line->reflectance = ft_atof_err(arg, 0, 1, &arg);
+	add_link(&tile->wpath, line);
+}
+
 void	type_switch(t_tile *tile, char *line, char *arg, int *err)
 {
-	if (ft_strncmp("NO ", line, 3) == 0)
+	if (ft_strncmp("wl ", line, 3) == 0)
+		retrieve_wall(tile, arg, err);
+	else if (ft_strncmp("wa ", line, 3) == 0)
+		retrieve_arc(tile, arg, err);
+	else if (ft_strncmp("NO ", line, 3) == 0)
 		retrieve_texture(&tile->tex_no, arg, err, "NO");
 	else if (ft_strncmp("SO ", line, 3) == 0)
 		retrieve_texture(&tile->tex_so, arg, err, "SO");
@@ -53,6 +146,38 @@ identifier at ", line, ".", NULL}), 1), *err = 1, VOID);
 	ft_del((void **)&arg);
 }
 
+void	add_wpath(t_tile *tile, int *err)
+{
+	t_wpath	*wpath;
+
+	if (tile->wpath)
+		return ;
+	wpath = malloc(sizeof(t_wpath));
+	if (!wpath)
+		return (*err = 1, VOID);
+	*wpath = (t_wpath){(t_vec){0, 0}, (t_vec){0, 1}, (t_vec){0}, tile->tex_we,
+			(t_vec){-1, 0}, tile->tex_we.reflectance, 0, 0};
+	add_link(&tile->wpath, wpath);
+	wpath = malloc(sizeof(t_wpath));
+	if (!wpath)
+		return (*err = 1, VOID);
+	*wpath = (t_wpath){(t_vec){0, 0}, (t_vec){1, 0}, (t_vec){0}, tile->tex_no,
+			(t_vec){0, -1}, tile->tex_no.reflectance, 0, 0};
+	add_link(&tile->wpath, wpath);
+	wpath = malloc(sizeof(t_wpath));
+	if (!wpath)
+		return (*err = 1, VOID);
+	*wpath = (t_wpath){(t_vec){1, 1}, (t_vec){0, 1}, (t_vec){0}, tile->tex_so,
+			(t_vec){0, 1}, tile->tex_so.reflectance, 0, 0};
+	add_link(&tile->wpath, wpath);
+	wpath = malloc(sizeof(t_wpath));
+	if (!wpath)
+		return (*err = 1, VOID);
+	*wpath = (t_wpath){(t_vec){1, 1}, (t_vec){1, 0}, (t_vec){0}, tile->tex_ea,
+			(t_vec){1, 0}, tile->tex_ea.reflectance, 0, 0};
+	add_link(&tile->wpath, wpath);
+}
+
 t_tile	*new_tile(void)
 {
 	t_tile	*new;
@@ -60,6 +185,7 @@ t_tile	*new_tile(void)
 	new = malloc(sizeof(t_tile));
 	if (!new)
 		return (NULL);
+	new->wpath = NULL;
 	new->tex_ce.img = NULL;
 	new->tex_ea.img = NULL;
 	new->tex_fl.img = NULL;
@@ -98,7 +224,7 @@ void	retrieve_tile(t_tile **tiles, int map_fd, char *line, int *err)
 		if (!line)
 			return (ft_perror(-1, "Internal error: malloc.", 0), *err = 1, VOID);
 		if (ft_strncmp("}", line, 2) == 0)
-			return (ft_del((void **)&line), VOID);
+			return (ft_del((void **)&line), add_wpath(*tiles, err), VOID);
 		retrieve_switch(*tiles, line, err);
 		ft_del((void **)&line);
 		if (*err)

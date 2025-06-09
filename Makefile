@@ -2,7 +2,7 @@ MAKEFLAGS += --no-print-directory
 
 NAME = cub3d
 CC = cc
-FLAGS = -Wall -Wextra -Werror -I./include -Imlx -O3 -g
+FLAGS = -Wall -Wextra -Werror -I./include -Imlx -O3
 RM = rm -f
 
 FRAMEDIR = ./mlx
@@ -20,14 +20,17 @@ SRCS = $(addprefix srcs/, \
 			retrieve_texture.c retrieve_tile_dict.c retrieve_tile_info.c \
 			retrieve_value.c)\
 		$(addprefix map/, is_map_valid.c retrieve_map.c)\
-		$(addprefix lmap/, load.c raytrace.c retrieve_light.c)\
+		$(addprefix lmap/, load.c retrieve_light.c)\
+		$(addprefix raytrace/, find_flight.c handle_light.c raytrace_utils.c\
+			raytrace.c reflect_light.c wall_intersect_light.c)\
 	)\
 	$(addprefix mlx_utils/, color.c loop.c put_pixel.c)\
 	$(addprefix game/, \
 		$(addprefix draw/, \
 			$(addprefix mini_map/, draw_circle.c draw_line.c draw_mini_map.c \
 				draw_player.c draw_square.c)\
-			$(addprefix raycast/, draw_line.c draw_map.c lookup.c raycast.c)\
+			$(addprefix raycast/, draw_map.c lookup.c raycast_utils.c \
+				raycast.c reflexion.c wall_intersect.c)\
 		)\
 		$(addprefix hooks/, key.c loop.c mouse.c)\
 		$(addprefix status/, fps.c)\

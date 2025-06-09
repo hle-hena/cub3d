@@ -6,11 +6,26 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 10:18:57 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/30 10:14:02 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/09 14:10:42 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
+
+void	close_threads(t_data *data)
+{
+	int	i;
+
+	i = -1;
+	while (++i < DRAW_THREADS)
+	{
+		pthread_mutex_lock(&data->thread_pool[i].mutex);
+		data->thread_pool[i].ready = 2;
+		pthread_cond_signal(&data->thread_pool[i].cond_start);
+		pthread_mutex_unlock(&data->thread_pool[i].mutex);
+		pthread_join(data->threads[i], NULL);
+	}
+}
 
 int	clean_data(void)
 {
@@ -18,7 +33,8 @@ int	clean_data(void)
 
 	data = get_data();
 	clean_map();
-	// mlx_do_key_autorepeaton(data->mlx);
+	close_threads(data);
+	mlx_do_key_autorepeaton(data->mlx);
 	if (data->img.img)
 		mlx_destroy_image(data->mlx, data->img.img);
 	if (data->win)

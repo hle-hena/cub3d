@@ -5,135 +5,109 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/13 18:51:23 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/01 13:46:50 by hle-hena         ###   ########.fr       */
+/*   Created: 2025/05/22 18:00:35 by hle-hena          #+#    #+#             */
+/*   Updated: 2025/06/06 11:05:23 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-static inline t_text	hit_text(t_data *data, t_ray *ray)
+static inline void	hit_light(t_data *data, t_ray *ray, t_hit *hit, t_wpath wall)
 {
-	if (ray->side == 0 && ray->step.x == 1)
-		return (get_tile_dict()[*(data->map->matrix + ray->curr.y * data->map->wid + ray->curr.x)]->tex_ea);
-	else if (ray->side == 0)
-		return (get_tile_dict()[*(data->map->matrix + ray->curr.y * data->map->wid + ray->curr.x)]->tex_we);
-	else if (ray->step.y == 1)
-		return (get_tile_dict()[*(data->map->matrix + ray->curr.y * data->map->wid + ray->curr.x)]->tex_no);
-	else
-		return (get_tile_dict()[*(data->map->matrix + ray->curr.y * data->map->wid + ray->curr.x)]->tex_so);
+	t_point		light_point;
+	t_tlight	*tlight;
+	t_list		*temp;
 
+	light_point.x = hit->hit[ray->bounce].x * LMAP_PRECISION;
+	light_point.y = hit->hit[ray->bounce].y * LMAP_PRECISION;
+	light_point.x = ft_max(ft_min(light_point.x, data->lmap.wid - 1), 0);
+	light_point.y = ft_max(ft_min(light_point.y, data->lmap.len - 1), 0);
+	tlight = (data->lmap.lmap + light_point.x + light_point.y * data->lmap.wid);
+	temp = ft_lstchr(tlight->flight, &wall.normal, is_correct_flight);
+	if (temp)
+		hit->light[ray->bounce] = (t_flight *)temp->content;
+	else
+		hit->light[ray->bounce] = data->empty->flight;
 }
 
-void	calc_ray(t_ray *ray)
+static inline int	is_outside(t_data *data, t_ray *ray, t_hit *hit)
 {
-	ray->step.x = 1;
-	if (ray->dir.x < 0)
-		ray->step.x = -1;
-	ray->step.y = 1;
-	if (ray->dir.y < 0)
-		ray->step.y = -1;
-	ray->slope.x = HUGE_VALF;
-	if (ray->dir.x != 0)
-		ray->slope.x = fabs(1.0f / ray->dir.x);
-	ray->slope.y = HUGE_VALF;
-	if (ray->dir.y != 0)
-		ray->slope.y = fabs(1.0f / ray->dir.y);
-	if (ray->dir.x < 0)
-		ray->dist.x = (ray->origin.x - floorf(ray->origin.x)) * ray->slope.x;
-	else
-		ray->dist.x = (ceilf(ray->origin.x) - ray->origin.x) * ray->slope.x;
-	if (ray->dir.y < 0)
-		ray->dist.y = (ray->origin.y - floorf(ray->origin.y)) * ray->slope.y;
-	else
-		ray->dist.y = (ceilf(ray->origin.y) - ray->origin.y) * ray->slope.y;
-	ray->curr.x = floorf(ray->origin.x);
-	ray->curr.y = floorf(ray->origin.y);
-	ray->running = 1;
-	ray->precise_dist = 0;
+	int	is_out;
+	int	should_stop;
+
+	is_out = 0;
+	should_stop = 0;
+	if (ray->curr.x < 0)
+	{
+		is_out = 1;
+		if (ray->dir.x <= 0)
+			should_stop = 1;
+	}
+	if (ray->curr.y < 0)
+	{
+		is_out = 1;
+		if (ray->dir.y <= 0)
+			should_stop = 1;
+	}
+	if (ray->curr.x >= data->map->wid)
+	{
+		is_out = 1;
+		if (ray->dir.x >= 0)
+			should_stop = 1;
+	}
+	if (ray->curr.y >= data->map->len)
+	{
+		is_out = 1;
+		if (ray->dir.y >= 0)
+			should_stop = 1;
+	}
+	if (should_stop)
+	{
+		hit->dist[ray->bounce] = ray->precise_dist;
+		hit->texture[ray->bounce] = data->empty->texture.img;
+		hit->light[ray->bounce] = data->empty->flight;
+		ray->running = 0;
+	}
+	return (is_out);
 }
 
 void	handle_hit(t_data *data, t_ray *ray, t_hit *hit)
 {
-	t_text	texture;
+	t_tile	*tile;
 
-	texture = hit_text(data, ray);
+	if (is_outside(data, ray, hit))
+		return ;
+	tile = get_tile_dict()[*(data->map->matrix + ray->curr.x +
+		ray->curr.y * data->map->wid)];
+	if (!tile)
+		return ;
+	if (!tile->is_wall)
+		return ;
+	if (!does_hit(tile->wpath, ray, &hit->wall[ray->bounce]))
+		return ;
 	hit->hit[ray->bounce].x = ray->origin.x + ray->dir.x * ray->precise_dist;
 	hit->hit[ray->bounce].y = ray->origin.y + ray->dir.y * ray->precise_dist;
-	if (texture.reflectance && ray->bounce < MAX_BOUNCE - 1)
-	{
-		hit->dist[ray->bounce] = ray->precise_dist;
-		if (ray->bounce != 0)
-			hit->dist[ray->bounce] += hit->dist[ray->bounce - 1];
-		ray->origin = hit->hit[ray->bounce];
-		if (ray->side == 0)
-			ray->origin.x += ray->dir.x > 0 ? -0.001f : 0.001f;
-		else
-			ray->origin.y += ray->dir.y > 0 ? -0.001f : 0.001f;
-		if (ray->side == 0)
-			ray->dir.x = -ray->dir.x;
-		else
-			ray->dir.y = -ray->dir.y;
-		calc_ray(ray);
-		hit->side[ray->bounce] = ray->side;
-		ray->bounce++;
-		if (get_tile_dict()[*(data->map->matrix + ray->curr.y * data->map->wid + ray->curr.x)]->is_wall)
-		{
-			ray->side = !ray->side;
-			handle_hit(data, ray, hit);
-		}
-	}
+	hit_light(data, ray, hit, hit->wall[ray->bounce]);
+	hit->ray_dir[ray->bounce] = ray->dir;
+	hit->texture[ray->bounce] = tile->tex_ea.img;
+	hit->bounces = ray->bounce;
+	hit->dist[ray->bounce] = ray->precise_dist;
+	if (ray->bounce != 0)
+		hit->dist[ray->bounce] += hit->dist[ray->bounce - 1];
+	if (hit->wall[ray->bounce].reflectance && ray->bounce < MAX_BOUNCE - 1)
+		handle_reflexion(data, hit, ray, hit->wall[ray->bounce]);
 	else
-	{
-		hit->dist[ray->bounce] = ray->precise_dist;
-		if (ray->bounce != 0)
-			hit->dist[ray->bounce] += hit->dist[ray->bounce - 1];
-		hit->side[ray->bounce] = ray->side;
-		hit->texture = texture.img;
 		ray->running = 0;
-		hit->bounces = ray->bounce;
-		hit->ray_dir = ray->dir;
-	}
 }
 
-void	init_ray(t_ray *ray, t_vec dir, t_player player)
-{
-	ray->step.x = 1;
-	if (dir.x < 0)
-		ray->step.x = -1;
-	ray->step.y = 1;
-	if (dir.y < 0)
-		ray->step.y = -1;
-	ray->slope.x = HUGE_VALF;
-	if (dir.x != 0)
-		ray->slope.x = fabs(1.0f / dir.x);
-	ray->slope.y = HUGE_VALF;
-	if (dir.y != 0)
-		ray->slope.y = fabs(1.0f / dir.y);
-	if (dir.x < 0)
-		ray->dist.x = (player.x - floorf(player.x)) * ray->slope.x;
-	else
-		ray->dist.x = (ceilf(player.x) - player.x) * ray->slope.x;
-	if (dir.y < 0)
-		ray->dist.y = (player.y - floorf(player.y)) * ray->slope.y;
-	else
-		ray->dist.y = (ceilf(player.y) - player.y) * ray->slope.y;
-	ray->curr.x = floorf(player.x);
-	ray->curr.y = floorf(player.y);
-	ray->bounce = 0;
-	ray->origin.x = player.x;
-	ray->origin.y = player.y;
-	ray->dir = dir;
-	ray->running = 1;
-	ray->precise_dist = 0;
-}
-
-t_hit	raycast(t_data *data, t_vec dir, t_player player)
+t_hit	raycast(t_data *data, t_vec dir, t_vec origin)
 {
 	t_ray	ray;
-	t_hit	hit = (t_hit){0};
+	t_hit	hit;
 
-	init_ray(&ray, dir, player);
+	hit = (t_hit){0};
+	init_ray(&ray, dir, origin);
+	handle_hit(data, &ray, &hit);
 	while (ray.running)
 	{
 		if (ray.dist.x < ray.dist.y)
@@ -150,8 +124,7 @@ t_hit	raycast(t_data *data, t_vec dir, t_player player)
 			ray.dist.y += ray.slope.y;
 			ray.side = 1;
 		}
-		if (get_tile_dict()[*(data->map->matrix + ray.curr.y * data->map->wid + ray.curr.x)]->is_wall)
-			handle_hit(data, &ray, &hit);
+		handle_hit(data, &ray, &hit);
 	}
 	return (hit);
 }

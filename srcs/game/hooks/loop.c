@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 21:49:44 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/01 12:49:08 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/27 17:15:40 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,25 +36,35 @@ void	move_event(t_data *data)
 	{
 		delta.x = (delta.x / len) * MOVE_SPEED * data->delta_t;
 		delta.y = (delta.y / len) * MOVE_SPEED * data->delta_t;
-		int wall_x = (int)(data->map->player.x + delta.x);
-		int wall_y = (int)(data->map->player.y + delta.y);
-		if (!get_tile_dict()[*(data->map->matrix + (int)data->map->player.y * data->map->wid + wall_x)]->is_wall)
+		//no-clip
+		int	no_clip = 1;
+		if (no_clip)
+		{
 			data->map->player.x += delta.x;
-		else
-		{
-			if (delta.x > 0)
-				data->map->player.x = wall_x - 0.01f;
-			else if (delta.x < 0)
-				data->map->player.x = wall_x + 1.01f;
-		}
-		if (!get_tile_dict()[*(data->map->matrix + (int)wall_y * data->map->wid + (int)data->map->player.x)]->is_wall)
 			data->map->player.y += delta.y;
+		}
 		else
 		{
-			if (delta.y > 0)
-				data->map->player.y = wall_y - 0.01f;
-			else if (delta.y < 0)
-				data->map->player.y = wall_y + 1.01f;
+			int wall_x = (int)(data->map->player.x + delta.x);
+			int wall_y = (int)(data->map->player.y + delta.y);
+			if (!get_tile_dict()[*(data->map->matrix + (int)data->map->player.y * data->map->wid + wall_x)]->is_wall)
+				data->map->player.x += delta.x;
+			else
+			{
+				if (delta.x > 0)
+					data->map->player.x = wall_x - 0.01f;
+				else if (delta.x < 0)
+					data->map->player.x = wall_x + 1.01f;
+			}
+			if (!get_tile_dict()[*(data->map->matrix + (int)wall_y * data->map->wid + (int)data->map->player.x)]->is_wall)
+				data->map->player.y += delta.y;
+			else
+			{
+				if (delta.y > 0)
+					data->map->player.y = wall_y - 0.01f;
+				else if (delta.y < 0)
+					data->map->player.y = wall_y + 1.01f;
+			}
 		}
 	}
 }

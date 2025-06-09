@@ -6,13 +6,13 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 13:07:39 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/08 17:02:26 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/05/15 10:24:39 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-void	add_link(t_list **lst, char *content)
+void	add_link(t_list **lst, void *content)
 {
 	t_list	*link;
 
