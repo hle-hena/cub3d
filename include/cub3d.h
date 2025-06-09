@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/06 17:10:57 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/09 10:41:21 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -202,7 +202,6 @@ typedef struct s_hit
 	char		*tex_col[MAX_BOUNCE];
 	int			bounces;
 }	t_hit;
-void init_sqrt_fp_to_srgb(void);
 
 typedef struct s_ray
 {

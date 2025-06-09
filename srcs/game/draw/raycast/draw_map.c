@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/06 17:34:54 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/09 11:20:42 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,27 +21,25 @@
 
 static inline t_vec reflect_across_mirror(t_vec point, t_hit *hit, t_point curr, int *bounce)
 {
-	t_vec	normal;
-	t_vec	to_point;
-	t_vec	reflected;
-	float	proj_len;
+	t_vec reflected = point;
+	int b = 0;
 
-	*bounce = 0;
-	while (++(*bounce) <= hit->bounces)
+	while (++b <= hit->bounces)
 	{
-		if (curr.y < hit->draw_start[*bounce - 1] || curr.y > hit->draw_end[*bounce - 1])
-			return (point);
+		if (curr.y < hit->draw_start[b - 1] || curr.y > hit->draw_end[b - 1])
+			break;
 
-		normal = hit->wall[*bounce - 1].normal;
-		to_point.x = point.x - hit->hit[*bounce - 1].x;
-		to_point.y = point.y - hit->hit[*bounce - 1].y;
-		proj_len = to_point.x * normal.x + to_point.y * normal.y;
-		reflected.x = point.x - 2.0f * proj_len * normal.x;
-		reflected.y = point.y - 2.0f * proj_len * normal.y;
-		point = reflected;
+		t_vec normal = hit->wall[b - 1].normal;
+		float dx = reflected.x - hit->hit[b - 1].x;
+		float dy = reflected.y - hit->hit[b - 1].y;
+		float dot = dx * normal.x + dy * normal.y;
+		reflected.x -= 2.0f * dot * normal.x;
+		reflected.y -= 2.0f * dot * normal.y;
 	}
-	return (point);
+	*bounce = b;
+	return reflected;
 }
+
 
 
 static inline t_col	color_blend(int base_color, int light_color, float emittance)
@@ -82,60 +80,22 @@ static inline void	set_pixels(t_data *data, char *img, int color)
 #define MUL_FP(a, b) (((long long)(a) * (long long)(b)) >> FP_SHIFT)
 #define DIV_FP(a, b) (((long long)(a) << FP_SHIFT) / (long long)(b))
 
-static inline int to_linear(int c)
+static inline short blend_channel(short base, short refl, int refl_fp)
 {
-	int c_fp = DIV_FP(TO_FP(c), TO_FP(255.0f));
-	return MUL_FP(c_fp, c_fp);
+	int inv = FP_ONE - refl_fp;
+	int blend = (base * inv + ((base * refl) / 255) * refl_fp) >> FP_SHIFT;
+	if (blend > 255)
+		return (255);
+	return (blend);
 }
 
-#define SRGB_TABLE_SIZE 1024
-static short sqrt_fp_to_srgb[SRGB_TABLE_SIZE];
-
-void init_sqrt_fp_to_srgb(void)
+static inline t_col blend_color_fast(t_col base, t_col refl, int refl_fp)
 {
-	for (int i = 0; i < SRGB_TABLE_SIZE; ++i)
-	{
-		float x = (float)i / (SRGB_TABLE_SIZE - 1);
-		sqrt_fp_to_srgb[i] = (short)(sqrtf(x) * 255.0f + 0.5f);
-	}
-}
-
-static inline int to_srgb(int fp_val)
-{
-	if (fp_val < 0)
-		fp_val = 0;
-	else if (fp_val >= FP_ONE)
-		fp_val = FP_ONE - 1;
-	int idx = (int)(((long long)fp_val * (SRGB_TABLE_SIZE - 1)) >> FP_SHIFT);
-	return sqrt_fp_to_srgb[idx];
-}
-
-static inline t_col blend_color(t_col base_col, t_col reflected_col, int reflectance_fp)
-{
-	int inv_reflectance = (FP_ONE - reflectance_fp);
-	inv_reflectance = MUL_FP(inv_reflectance, inv_reflectance);
-	reflectance_fp = FP_ONE - inv_reflectance;
-	int r1 = to_linear(base_col.re);
-	int g1 = to_linear(base_col.gr);
-	int b1 = to_linear(base_col.bl);
-	int r2 = to_linear(reflected_col.re);
-	int g2 = to_linear(reflected_col.gr);
-	int b2 = to_linear(reflected_col.bl);
-	int r = MUL_FP(r1, inv_reflectance) + MUL_FP(MUL_FP(r1, r2), reflectance_fp);
-	int g = MUL_FP(g1, inv_reflectance) + MUL_FP(MUL_FP(g1, g2), reflectance_fp);
-	int b = MUL_FP(b1, inv_reflectance) + MUL_FP(MUL_FP(b1, b2), reflectance_fp);
-	t_col final = {
-		to_srgb(r),
-		to_srgb(g),
-		to_srgb(b)
+	return (t_col){
+		.re = blend_channel(base.re, refl.re, refl_fp),
+		.gr = blend_channel(base.gr, refl.gr, refl_fp),
+		.bl = blend_channel(base.bl, refl.bl, refl_fp),
 	};
-	if (final.re > 255)
-		final.re = 255;
-	if (final.gr > 255)
-		final.gr = 255;
-	if (final.bl > 255)
-		final.bl = 255;
-	return (final);
 }
 
 static inline int	demenish_light(t_wpath *walls, int base_emittance, int max)
@@ -143,6 +103,7 @@ static inline int	demenish_light(t_wpath *walls, int base_emittance, int max)
 	int	i;
 
 	i = -1;
+	return (base_emittance);
 	while (++i < max)
 		base_emittance = MUL_FP(base_emittance, TO_FP(walls[i].reflectance));
 	return (base_emittance);
@@ -160,7 +121,7 @@ static inline int	get_color(t_hit *hit, int nb_hit, t_col fall_back_color, int i
 	{
 		prev_wall_color = color_blend(*(int *)(hit->tex_col[nb_hit]
 			+ (hit->tex_pos_fp[nb_hit] >> 16) * hit->texture[nb_hit]->size_line),
-			hit->light[nb_hit]->color, FROM_FP(demenish_light(hit->wall, TO_FP(hit->light[nb_hit]->emittance), nb_hit)));
+			hit->light[nb_hit]->color, hit->light[nb_hit]->emittance);
 		hit->tex_pos_fp[nb_hit] += hit->step_fp[nb_hit];
 	}
 	final_color = prev_wall_color;
@@ -168,8 +129,8 @@ static inline int	get_color(t_hit *hit, int nb_hit, t_col fall_back_color, int i
 	{
 		wall_color = color_blend(*(int *)(hit->tex_col[nb_hit]
 			+ (hit->tex_pos_fp[nb_hit] >> 16) * hit->texture[nb_hit]->size_line),
-			hit->light[nb_hit]->color, FROM_FP(demenish_light(hit->wall, TO_FP(hit->light[nb_hit]->emittance), nb_hit)));
-		final_color = blend_color(wall_color, prev_wall_color,
+			hit->light[nb_hit]->color, hit->light[nb_hit]->emittance);
+		final_color = blend_color_fast(wall_color, prev_wall_color,
 			TO_FP(hit->wall[nb_hit].reflectance));
 		prev_wall_color = final_color;
 		hit->tex_pos_fp[nb_hit] += hit->step_fp[nb_hit];
@@ -177,76 +138,79 @@ static inline int	get_color(t_hit *hit, int nb_hit, t_col fall_back_color, int i
 	return ((final_color.re << 16) | (final_color.gr << 8) | final_color.bl);
 }
 
-static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, t_hit *hit)
+static inline void draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, t_hit *hit)
 {
-	t_flight	light;
-	t_point		i_world;
-	t_tile		*tile;
-	t_vec		cast;
-	t_vec		world;
-	t_img		*tex;
 	int			bounce;
 	int			offset;
+	t_tile		*tile;
+	t_img		*tex;
+	t_col		color;
+	t_flight	light;
+	t_vec		cast;
+	t_vec		world;
+	int			ix;
+	int			iy;
 
 	cast = ray.cast_table[curr.y * data->render_w + curr.x];
-	world.x = data->map->player.x + cast.y * (ray.l.x + cast.x * ray.r.x);
-	world.y = data->map->player.y + cast.y * (ray.l.y + cast.x * ray.r.y);
+	world = (t_vec){data->map->player.x + cast.y * (ray.l.x + cast.x * ray.r.x),
+		data->map->player.y + cast.y * (ray.l.y + cast.x * ray.r.y)};
 	world = reflect_across_mirror(world, hit, curr, &bounce);
 	if (world.x < 0 || world.x >= data->map->wid || world.y < 0
 		|| world.y >= data->map->len)
 		return set_pixels(data, img, 0), VOID;
-	i_world.x = (int)world.x;
-	i_world.y = (int)world.y;
-	tile = ray.tile_dict[data->map->matrix[i_world.y * data->map->wid + i_world.x]];
+	ix = (int)world.x;
+	iy = (int)world.y;
+	tile = ray.tile_dict[data->map->matrix[iy * data->map->wid + ix]];
 	if (!tile)
 		return set_pixels(data, img, 0), VOID;
 	tex = tile->tex_ce.img;
-	offset = (int)((world.y - i_world.y) * tex->height) * tex->size_line
-		+ (int)((world.x - i_world.x) * tex->width) * tex->bpp;
+	offset = (int)((world.y - iy) * tex->height) * tex->size_line
+		+ (int)((world.x - ix) * tex->width) * tex->bpp;
 	light = data->lmap.lmap[(int)(world.x * LMAP_PRECISION)
 		+ (int)(world.y * LMAP_PRECISION) * data->lmap.wid].ce_fl;
-	set_pixels(data, img, get_color(hit, bounce - 1, color_blend(*(int *)(tex->data + offset),
-			light.color, FROM_FP(demenish_light(hit->wall, TO_FP(light.emittance), bounce - 1))), 1));
+	int	*base_col = (int *)(tex->data + offset);
+	color = color_blend(*base_col, light.color, light.emittance);
+	set_pixels(data, img, get_color(hit, bounce - 1, color, 1));
 }
 
-static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img, t_hit *hit)
+static inline void draw_floor(t_data *data, t_point curr, t_rdir ray, char *img, t_hit *hit)
 {
-	t_flight	light;
-	t_point		i_world;
-	t_tile		*tile;
-	t_vec		cast;
-	t_vec		world;
-	t_img		*tex;
 	int			bounce;
 	int			offset;
+	t_tile		*tile;
+	t_img		*tex;
+	t_col		color;
+	t_flight	light;
+	t_vec		cast;
+	t_vec		world;
+	int			ix;
+	int			iy;
 
 	cast = ray.cast_table[curr.y * data->render_w + curr.x];
-	world.x = data->map->player.x + cast.y * (ray.l.x + cast.x * ray.r.x);
-	world.y = data->map->player.y + cast.y * (ray.l.y + cast.x * ray.r.y);
+	world = (t_vec){data->map->player.x + cast.y * (ray.l.x + cast.x * ray.r.x),
+		data->map->player.y + cast.y * (ray.l.y + cast.x * ray.r.y)};
 	world = reflect_across_mirror(world, hit, curr, &bounce);
 	if (world.x < 0 || world.x >= data->map->wid || world.y < 0
 		|| world.y >= data->map->len)
 		return set_pixels(data, img, 0), VOID;
-	i_world.x = (int)world.x;
-	i_world.y = (int)world.y;
-	tile = ray.tile_dict[data->map->matrix[i_world.y * data->map->wid + i_world.x]];
+	ix = (int)world.x;
+	iy = (int)world.y;
+	tile = ray.tile_dict[data->map->matrix[iy * data->map->wid + ix]];
 	if (!tile)
 		return set_pixels(data, img, 0), VOID;
 	tex = tile->tex_fl.img;
-	offset = (int)((world.y - i_world.y) * tex->height) * tex->size_line
-		+ (int)((world.x - i_world.x) * tex->width) * tex->bpp;
+	offset = (int)((world.y - iy) * tex->height) * tex->size_line
+		+ (int)((world.x - ix) * tex->width) * tex->bpp;
 	light = data->lmap.lmap[(int)(world.x * LMAP_PRECISION)
 		+ (int)(world.y * LMAP_PRECISION) * data->lmap.wid].ce_fl;
-	set_pixels(data, img, get_color(hit, bounce - 1, color_blend(*(int *)(tex->data + offset),
-			light.color, FROM_FP(demenish_light(hit->wall, TO_FP(light.emittance), bounce - 1))), 1));
+	int	*base_col = (int *)(tex->data + offset);
+	color = color_blend(*base_col, light.color, light.emittance);
+	set_pixels(data, img, get_color(hit, bounce - 1, color, 1));
 }
 
 static inline void	draw_wall(t_data *data, char *img, t_hit *hit)
 {
-	int			color;
-
-	color = get_color(hit, hit->bounces, (t_col){0}, 0);
-	set_pixels(data, img, color);
+	set_pixels(data, img, get_color(hit, hit->bounces, (t_col){0}, 0));
 }
 
 void	*draw_walls_thread(void *arg)

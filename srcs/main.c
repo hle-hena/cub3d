@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:05:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/06 17:11:19 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/09 11:06:59 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,6 @@ void	init_utils(t_data *data)
 	int	err;
 
 	err = 0;
-	init_sqrt_fp_to_srgb();
 	data->map->mini_map = (t_point)
 		{data->win_w * 0.9, data->win_h * 0.15};
 	data->map->mini_map_scale = 32;
