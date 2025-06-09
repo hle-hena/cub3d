@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/09 14:58:02 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/09 18:07:28 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,10 +103,11 @@ typedef struct s_trace
 	float	precise_dist;
 	float	last_dist;
 	float	emittance;
+	float	base_emittance;
 	float	angle_factor;
 }	t_trace;
 
-# define ATT_COEF 0.0002
+# define ATT_COEF 0.05
 
 typedef struct s_light
 {
