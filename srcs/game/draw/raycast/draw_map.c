@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/10 10:04:14 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/10 14:06:43 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,23 +81,25 @@ static inline void	set_pixels(t_data *data, char *img, int color)
 #define DIV_FP(a, b) (((long long)(a) << FP_SHIFT) / (long long)(b))
 
 
-static inline short blend_channel(short base, short refl, int refl_fp)
+static inline short blend_channel(short base, short refl, int refl_fp, int inv)
 {
-	int inv = FP_ONE - refl_fp;
-	int base_refl = (base * refl) >> 8;
-	int blend = (base * inv + base_refl * refl_fp) >> FP_SHIFT;
+	// int base_refl = (base * refl) >> 8;
+	int blend = (base * inv + ((base * refl) >> 8) * refl_fp) >> FP_SHIFT;
 	if (blend > 255)
 		return (255);
 	return (blend);
 }
 
 
-static inline t_col blend_color_fast(t_col base, t_col refl, int refl_fp)
+static inline t_col blend_color_fast(t_col base_col, t_col refl_col, int refl_fp)
 {
+	int		inv;
+
+	inv = FP_ONE - refl_fp;
 	return (t_col){
-		.re = blend_channel(base.re, refl.re, refl_fp),
-		.gr = blend_channel(base.gr, refl.gr, refl_fp),
-		.bl = blend_channel(base.bl, refl.bl, refl_fp),
+		.re = blend_channel(base_col.re, refl_col.re, refl_fp, inv),
+		.gr = blend_channel(base_col.gr, refl_col.gr, refl_fp, inv),
+		.bl = blend_channel(base_col.bl, refl_col.bl, refl_fp, inv),
 	};
 }
 
