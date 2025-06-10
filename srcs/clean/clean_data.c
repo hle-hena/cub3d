@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 10:18:57 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/09 14:10:42 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/10 15:01:53 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ int	clean_data(void)
 	data = get_data();
 	clean_map();
 	close_threads(data);
-	mlx_do_key_autorepeaton(data->mlx);
+	// mlx_do_key_autorepeaton(data->mlx);
 	if (data->img.img)
 		mlx_destroy_image(data->mlx, data->img.img);
 	if (data->win)

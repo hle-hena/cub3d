@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/09 19:20:32 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/10 16:31:21 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 # include <stdio.h>
 
 # include <pthread.h>
+# include <immintrin.h>
 # include <float.h>
 
 # define PI 3.1415926535897932384
@@ -240,9 +241,20 @@ typedef struct s_void
 	t_flight	*flight;
 }	t_void;
 
-# define DRAW_THREADS 12
+typedef struct s_simd_info
+{
+	t_hit	*hits[8];
+	t_col	fallback[8];
+	int		nb_hit[8];
+	int		isnt_wall[8];
+}	t_simd;
+
+
+# define DRAW_THREADS 4
 typedef struct s_thread_draw
 {
+	t_simd			info;
+	int				current_pix;
 	t_rdir			ray_dir;
 	int				start_x;
 	int				end_x;

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/10 14:06:43 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/10 17:41:58 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,6 @@ static inline void	set_pixels(t_data *data, char *img, int color)
 #define MUL_FP(a, b) (((long long)(a) * (long long)(b)) >> FP_SHIFT)
 #define DIV_FP(a, b) (((long long)(a) << FP_SHIFT) / (long long)(b))
 
-
 static inline short blend_channel(short base, short refl, int refl_fp, int inv)
 {
 	// int base_refl = (base * refl) >> 8;
@@ -132,7 +131,314 @@ int	get_color(t_hit *hit, int nb_hit, t_col fall_back_color, int isnt_wall)
 	return ((final_color.re << 16) | (final_color.gr << 8) | final_color.bl);
 }
 
-static inline void draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, t_hit *hit)
+__m128i blend_channel_simd(__m128i base, __m128i other, __m256i refl, __m256i inv_refl)
+{
+    // Unpack 8x16-bit to 8x32-bit (split into low and high halves)
+    __m128i base_lo = _mm_unpacklo_epi16(base, _mm_setzero_si128()); // lower 4 values 32-bit
+    __m128i base_hi = _mm_unpackhi_epi16(base, _mm_setzero_si128()); // upper 4 values 32-bit
+
+    __m128i other_lo = _mm_unpacklo_epi16(other, _mm_setzero_si128());
+    __m128i other_hi = _mm_unpackhi_epi16(other, _mm_setzero_si128());
+
+    // Extract lower and upper 128-bit lanes of refl and inv_refl
+    __m128i refl_lo = _mm256_extracti128_si256(refl, 0);      // first 4 refl ints
+    __m128i refl_hi = _mm256_extracti128_si256(refl, 1);      // last 4 refl ints
+
+    __m128i inv_refl_lo = _mm256_extracti128_si256(inv_refl, 0);
+    __m128i inv_refl_hi = _mm256_extracti128_si256(inv_refl, 1);
+
+    // Multiply base by inv_refl (fixed point multiplication)
+    __m128i base_mul_lo = _mm_mullo_epi32(base_lo, inv_refl_lo);
+    __m128i base_mul_hi = _mm_mullo_epi32(base_hi, inv_refl_hi);
+
+    // Multiply other by refl
+    __m128i other_mul_lo = _mm_mullo_epi32(other_lo, refl_lo);
+    __m128i other_mul_hi = _mm_mullo_epi32(other_hi, refl_hi);
+
+    // Sum the partial results
+    __m128i sum_lo = _mm_add_epi32(base_mul_lo, other_mul_lo);
+    __m128i sum_hi = _mm_add_epi32(base_mul_hi, other_mul_hi);
+
+    // Shift right by FP_SHIFT to convert back from fixed point
+    __m128i result_lo = _mm_srli_epi32(sum_lo, FP_SHIFT);
+    __m128i result_hi = _mm_srli_epi32(sum_hi, FP_SHIFT);
+
+    // Pack 32-bit results back into 16-bit values
+    __m128i result = _mm_packus_epi32(result_lo, result_hi);
+
+    return result; // 8 × 16-bit blended channels
+}
+
+
+void get_colors_simd(
+	t_hit *hits[8],
+	int nb_hit[8],
+	t_col fallback[8],
+	int out_colors[8]
+)
+{
+	__m128i	prev_r;
+	__m128i	prev_g;
+	__m128i	prev_b;
+
+	__m128i	curr_r;
+	__m128i	curr_g;
+	__m128i	curr_b;
+	t_col	curr_col[8];
+
+	__m128i	fina_r;
+	__m128i	fina_g;
+	__m128i	fina_b;
+
+	__m256i	refl;
+	__m256i	inv_refl;
+	int		refl_fp[8];
+	int		inv_refl_fp[8];
+	int		i;
+	int		max_hit;
+
+	max_hit = 0;
+	i = -1;
+	while (++i < 8)
+		if (nb_hit[i] > max_hit)
+			max_hit = i;
+	prev_r = _mm_set_epi16(fallback[7].re, fallback[6].re, fallback[5].re, fallback[4].re,
+		fallback[3].re, fallback[2].re, fallback[1].re, fallback[0].re);
+	prev_g = _mm_set_epi16(fallback[7].gr, fallback[6].gr, fallback[5].gr, fallback[4].gr,
+		fallback[3].gr, fallback[2].gr, fallback[1].gr, fallback[0].gr);
+	prev_b = _mm_set_epi16(fallback[7].bl, fallback[6].bl, fallback[5].bl, fallback[4].bl,
+		fallback[3].bl, fallback[2].bl, fallback[1].bl, fallback[0].bl);
+	while (--max_hit >= 0)
+	{
+		i = -1;
+		while (++i < 8)
+		{
+			if (max_hit >= nb_hit[i])
+			{
+				curr_col[i] = (t_col){0};
+				refl_fp[i] = 0;
+				curr_col[i] = (t_col){0};
+				continue ;
+			}
+			curr_col[i] = color_blend(
+				*(int *)((hits[i])->tex_col[max_hit]
+					+ ((hits[i])->tex_pos_fp[max_hit] >> 16) * (hits[i])->texture[max_hit]->size_line),
+				(hits[i])->light[max_hit]->color,
+				(hits[i])->light[max_hit]->emittance);
+			refl_fp[i] = TO_FP((hits[i])->wall[max_hit].reflectance);
+			inv_refl_fp[i] = FP_ONE - refl_fp[i];
+			(hits[i])->tex_pos_fp[max_hit] += (hits[i])->step_fp[max_hit];
+		}
+		curr_r = _mm_set_epi16(curr_col[7].re, curr_col[6].re, curr_col[5].re, curr_col[4].re,
+			curr_col[3].re, curr_col[2].re, curr_col[1].re, curr_col[0].re);
+		curr_g = _mm_set_epi16(curr_col[7].gr, curr_col[6].gr, curr_col[5].gr, curr_col[4].gr,
+			curr_col[3].gr, curr_col[2].gr, curr_col[1].gr, curr_col[0].gr);
+		curr_b = _mm_set_epi16(curr_col[7].bl, curr_col[6].bl, curr_col[5].bl, curr_col[4].bl,
+			curr_col[3].bl, curr_col[2].bl, curr_col[1].bl, curr_col[0].bl);
+		refl = _mm256_set_epi32(refl_fp[7], refl_fp[6], refl_fp[5], refl_fp[4],
+			refl_fp[3], refl_fp[2], refl_fp[1], refl_fp[0]);
+		inv_refl = _mm256_set_epi32(inv_refl_fp[7], inv_refl_fp[6], inv_refl_fp[5], inv_refl_fp[4],
+			inv_refl_fp[3], inv_refl_fp[2], inv_refl_fp[1], inv_refl_fp[0]);
+		fina_r = blend_channel_simd(curr_r, prev_r, refl, inv_refl);
+		fina_g = blend_channel_simd(curr_g, prev_g, refl, inv_refl);
+		fina_b = blend_channel_simd(curr_b, prev_b, refl, inv_refl);
+		prev_r = fina_r;
+		prev_g = fina_g;
+		prev_b = fina_b;
+	}
+	short r_vals[8]__attribute__((aligned(16)));
+	short g_vals[8]__attribute__((aligned(16)));
+	short b_vals[8]__attribute__((aligned(16)));
+	_mm_storeu_si128((__m128i *)r_vals, fina_r);
+	_mm_storeu_si128((__m128i *)g_vals, fina_g);
+	_mm_storeu_si128((__m128i *)b_vals, fina_b);
+
+	for (int i = 0; i < 8; i++) {
+		out_colors[i] = (r_vals[i] << 16) | (g_vals[i] << 8) | b_vals[i];
+	}
+
+}
+
+void get_colors(
+	t_hit *hits[8],
+	int nb_hit[8],
+	t_col fallback[8],
+	int isnt_wall[8],
+	int out_colors[8]
+)
+{
+	out_colors[0] = get_color(hits[0], nb_hit[0], fallback[0], isnt_wall[0]);
+	out_colors[1] = get_color(hits[1], nb_hit[1], fallback[1], isnt_wall[1]);
+	out_colors[2] = get_color(hits[2], nb_hit[2], fallback[2], isnt_wall[2]);
+	out_colors[3] = get_color(hits[3], nb_hit[3], fallback[3], isnt_wall[3]);
+	out_colors[4] = get_color(hits[4], nb_hit[4], fallback[4], isnt_wall[4]);
+	out_colors[5] = get_color(hits[5], nb_hit[5], fallback[5], isnt_wall[5]);
+	out_colors[6] = get_color(hits[6], nb_hit[6], fallback[6], isnt_wall[6]);
+	out_colors[7] = get_color(hits[7], nb_hit[7], fallback[7], isnt_wall[7]);
+}
+
+// // SIMD blend function for 4 pixels at once
+// // base, refl, inv, refl_fp are __m128i with 4x16-bit channels packed as [re gr bl 0] each?
+// // To keep it simple, we will store channels separately in __m128i vectors of 4 shorts per channel.
+
+// static inline __m128i blend_channel_simd(
+// 	__m128i base, __m128i refl, __m128i refl_fp, __m128i inv)
+// {
+// 	// (base * inv + ((base * refl) >> 8) * refl_fp) >> FP_SHIFT
+
+// 	__m128i base_refl = _mm_srli_epi16(_mm_mullo_epi16(base, refl), 8);
+// 	__m128i blended = _mm_srli_epi16(
+// 		_mm_add_epi16(_mm_mullo_epi16(base, inv),
+// 					_mm_mullo_epi16(base_refl, refl_fp)),
+// 		FP_SHIFT);
+// 	// Clamp to 255
+// 	__m128i max_val = _mm_set1_epi16(255);
+// 	blended = _mm_min_epi16(blended, max_val);
+// 	return blended;
+// }
+
+// void get_color_simd(
+//     t_hit *hits[4],        // pointers to 4 hit arrays (one per pixel)
+//     int nb_hit[4],         // number of hits per pixel
+//     t_col fallback[4],     // fallback colors
+//     int isnt_wall[4],      // flags per pixel
+//     int out_colors[4] // output colors (packed)
+// )
+// {
+//     // We'll keep per-pixel prev_wall_color in arrays of shorts
+//     short prev_re[4], prev_gr[4], prev_bl[4];
+
+//     // Initialize prev_wall_color: either fallback or first hit
+//     for (int i = 0; i < 4; i++)
+//     {
+//         if (isnt_wall[i])
+//         {
+//             prev_re[i] = fallback[i].re;
+//             prev_gr[i] = fallback[i].gr;
+//             prev_bl[i] = fallback[i].bl;
+//         }
+//         else
+//         {
+//             // Load color from texture for hit 0
+//             int tex_col_val = *(int *)(hits[i]->tex_col[0]
+//                 + (hits[i]->tex_pos_fp[0] >> 16) * hits[i]->texture[0]->size_line);
+//             // t_col c = unpack_color(tex_col_val);
+//             // Blend with light color and emittance: using your color_blend func (you'd SIMD-ify this too)
+//             t_col blended = color_blend(tex_col_val, hits[i]->light[0]->color, hits[i]->light[0]->emittance);
+//             prev_re[i] = blended.re;
+//             prev_gr[i] = blended.gr;
+//             prev_bl[i] = blended.bl;
+
+//             hits[i]->tex_pos_fp[0] += hits[i]->step_fp[0];
+//         }
+//     }
+
+//     // Convert prev_wall_color arrays to __m128i vectors (16-bit lanes)
+//     __m128i prev_re_v = _mm_loadu_si128((__m128i *)prev_re);
+//     __m128i prev_gr_v = _mm_loadu_si128((__m128i *)prev_gr);
+//     __m128i prev_bl_v = _mm_loadu_si128((__m128i *)prev_bl);
+
+//     // Find max nb_hit to loop from top reflection down
+//     int max_nb_hit = 0;
+//     for (int i = 0; i < 4; i++)
+//         if (nb_hit[i] > max_nb_hit)
+//             max_nb_hit = nb_hit[i];
+
+//     // Loop from nb_hit-1 down to 0
+//     for (int hit_i = max_nb_hit - 1; hit_i >= 0; hit_i--)
+//     {
+//         // Create mask for pixels where nb_hit > hit_i (those that need processing)
+//         // __m128i mask_nb = _mm_set_epi16(
+//         //     (nb_hit[3] > hit_i) ? 0xFFFF : 0,
+//         //     (nb_hit[3] > hit_i) ? 0xFFFF : 0,
+//         //     (nb_hit[2] > hit_i) ? 0xFFFF : 0,
+//         //     (nb_hit[2] > hit_i) ? 0xFFFF : 0,
+//         //     (nb_hit[1] > hit_i) ? 0xFFFF : 0,
+//         //     (nb_hit[1] > hit_i) ? 0xFFFF : 0,
+//         //     (nb_hit[0] > hit_i) ? 0xFFFF : 0,
+//         //     (nb_hit[0] > hit_i) ? 0xFFFF : 0
+//         // );
+//         // Above mask is 8 lanes but we want 4 shorts, so just set for 4 lanes:
+//         // Let's do it simpler:
+//         // We'll use 4 lanes 16-bit: [pixel3 pixel2 pixel1 pixel0]
+//         // So:
+//         __m128i mask;
+//         mask = _mm_set_epi16(
+//             0,
+//             0,
+//             (nb_hit[3] > hit_i) ? 0xFFFF : 0,
+//             0,
+//             0,
+//             (nb_hit[2] > hit_i) ? 0xFFFF : 0,
+//             0,
+//             (nb_hit[1] > hit_i) ? 0xFFFF : 0
+//         );
+//         // This is complicated and incorrect for 4-lane use, so better do 32-bit lane mask:
+//         // Let's do mask as 32-bit lane (__m128i), using _mm_set_epi32
+
+//         // __m128i mask32 = _mm_set_epi32(
+//         //     (nb_hit[3] > hit_i) ? -1 : 0,
+//         //     (nb_hit[2] > hit_i) ? -1 : 0,
+//         //     (nb_hit[1] > hit_i) ? -1 : 0,
+//         //     (nb_hit[0] > hit_i) ? -1 : 0
+//         // );
+
+//         // Load wall_color channels for the current hit for each pixel, or fallback if not present
+//         short wall_re[4], wall_gr[4], wall_bl[4];
+
+//         for (int i = 0; i < 4; i++)
+//         {
+//             if (nb_hit[i] > hit_i)
+//             {
+//                 int tex_col_val = *(int *)(hits[i]->tex_col[hit_i]
+//                     + (hits[i]->tex_pos_fp[hit_i] >> 16) * hits[i]->texture[hit_i]->size_line);
+//                 t_col blended = color_blend(tex_col_val, hits[i]->light[hit_i]->color, hits[i]->light[hit_i]->emittance);
+
+//                 wall_re[i] = blended.re;
+//                 wall_gr[i] = blended.gr;
+//                 wall_bl[i] = blended.bl;
+//             }
+//             else
+//             {
+//                 // Use zero if no hit to blend (or fallback color?)
+//                 wall_re[i] = 0;
+//                 wall_gr[i] = 0;
+//                 wall_bl[i] = 0;
+//             }
+//             hits[i]->tex_pos_fp[hit_i] += hits[i]->step_fp[hit_i];
+//         }
+
+//         __m128i wall_re_v = _mm_loadu_si128((__m128i *)wall_re);
+//         __m128i wall_gr_v = _mm_loadu_si128((__m128i *)wall_gr);
+//         __m128i wall_bl_v = _mm_loadu_si128((__m128i *)wall_bl);
+
+//         // Get reflectance vector as 16-bit values (assuming reflectance stored as int, convert to FP)
+//         short refl_fp_arr[4];
+//         for (int i = 0; i < 4; i++)
+//             refl_fp_arr[i] = TO_FP(hits[i]->wall[hit_i].reflectance);
+//         __m128i refl_fp_v = _mm_loadu_si128((__m128i *)refl_fp_arr);
+
+//         __m128i inv_v = _mm_sub_epi16(_mm_set1_epi16((short)FP_ONE), refl_fp_v);
+
+//         // Blend each channel SIMD
+//         prev_re_v = blend_channel_simd(prev_re_v, wall_re_v, refl_fp_v, inv_v);
+//         prev_gr_v = blend_channel_simd(prev_gr_v, wall_gr_v, refl_fp_v, inv_v);
+//         prev_bl_v = blend_channel_simd(prev_bl_v, wall_bl_v, refl_fp_v, inv_v);
+//     }
+
+//     // Store back blended colors
+//     _mm_storeu_si128((__m128i *)prev_re, prev_re_v);
+//     _mm_storeu_si128((__m128i *)prev_gr, prev_gr_v);
+//     _mm_storeu_si128((__m128i *)prev_bl, prev_bl_v);
+
+//     // Pack final colors to uint32_t (0x00RRGGBB)
+//     for (int i = 0; i < 4; i++)
+//     {
+//         out_colors[i] = (prev_re[i] << 16) | (prev_gr[i] << 8) | prev_bl[i];
+//     }
+// }
+
+static inline void draw_ceil(t_data *data, t_th_draw *td, t_point curr, t_rdir ray, /* char *img, */ t_hit *hit)
 {
 	int			bounce;
 	int			offset;
@@ -151,12 +457,24 @@ static inline void draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, 
 	world = reflect_across_mirror(world, hit, curr, &bounce);
 	if (world.x < 0 || world.x >= data->map->wid || world.y < 0
 		|| world.y >= data->map->len)
-		return set_pixels(data, img, 0), VOID;
+	{
+		td->info.hits[td->current_pix] = hit;
+		td->info.fallback[td->current_pix] = (t_col){0};
+		td->info.isnt_wall[td->current_pix] = 1;
+		td->info.nb_hit[td->current_pix] = 0;
+		return ;
+	}
 	ix = (int)world.x;
 	iy = (int)world.y;
 	tile = ray.tile_dict[data->map->matrix[iy * data->map->wid + ix]];
 	if (!tile)
-		return set_pixels(data, img, 0), VOID;
+	{
+		td->info.hits[td->current_pix] = hit;
+		td->info.fallback[td->current_pix] = (t_col){0};
+		td->info.isnt_wall[td->current_pix] = 1;
+		td->info.nb_hit[td->current_pix] = 0;
+		return ;
+	}
 	tex = tile->tex_ce.img;
 	offset = (int)((world.y - iy) * tex->height) * tex->size_line
 		+ (int)((world.x - ix) * tex->width) * tex->bpp;
@@ -164,10 +482,13 @@ static inline void draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img, 
 		+ (int)(world.y * LMAP_PRECISION) * data->lmap.wid].ce_fl;
 	int	*base_col = (int *)(tex->data + offset);
 	color = color_blend(*base_col, light.color, light.emittance);
-	set_pixels(data, img, get_color(hit, bounce - 1, color, 1));
+	td->info.hits[td->current_pix] = hit;
+	td->info.fallback[td->current_pix] = color;
+	td->info.isnt_wall[td->current_pix] = 1;
+	td->info.nb_hit[td->current_pix] = bounce - 1;
 }
 
-static inline void draw_floor(t_data *data, t_point curr, t_rdir ray, char *img, t_hit *hit)
+static inline void draw_floor(t_data *data, t_th_draw *td, t_point curr, t_rdir ray, /* char *img, */ t_hit *hit)
 {
 	int			bounce;
 	int			offset;
@@ -186,12 +507,24 @@ static inline void draw_floor(t_data *data, t_point curr, t_rdir ray, char *img,
 	world = reflect_across_mirror(world, hit, curr, &bounce);
 	if (world.x < 0 || world.x >= data->map->wid || world.y < 0
 		|| world.y >= data->map->len)
-		return set_pixels(data, img, 0), VOID;
+	{
+		td->info.hits[td->current_pix] = hit;
+		td->info.fallback[td->current_pix] = (t_col){0};
+		td->info.isnt_wall[td->current_pix] = 1;
+		td->info.nb_hit[td->current_pix] = 0;
+		return ;
+	}
 	ix = (int)world.x;
 	iy = (int)world.y;
 	tile = ray.tile_dict[data->map->matrix[iy * data->map->wid + ix]];
 	if (!tile)
-		return set_pixels(data, img, 0), VOID;
+	{
+		td->info.hits[td->current_pix] = hit;
+		td->info.fallback[td->current_pix] = (t_col){0};
+		td->info.isnt_wall[td->current_pix] = 1;
+		td->info.nb_hit[td->current_pix] = 0;
+		return ;
+	}
 	tex = tile->tex_fl.img;
 	offset = (int)((world.y - iy) * tex->height) * tex->size_line
 		+ (int)((world.x - ix) * tex->width) * tex->bpp;
@@ -199,12 +532,45 @@ static inline void draw_floor(t_data *data, t_point curr, t_rdir ray, char *img,
 		+ (int)(world.y * LMAP_PRECISION) * data->lmap.wid].ce_fl;
 	int	*base_col = (int *)(tex->data + offset);
 	color = color_blend(*base_col, light.color, light.emittance);
-	set_pixels(data, img, get_color(hit, bounce - 1, color, 1));
+	td->info.hits[td->current_pix] = hit;
+	td->info.fallback[td->current_pix] = color;
+	td->info.isnt_wall[td->current_pix] = 1;
+	td->info.nb_hit[td->current_pix] = bounce - 1;
 }
 
-static inline void	draw_wall(t_data *data, char *img, t_hit *hit)
+static inline void	draw_wall(/* t_data *data,  */t_th_draw *td/* , char *img */, t_hit *hit)
 {
-	set_pixels(data, img, get_color(hit, hit->bounces, (t_col){0}, 0));
+	td->info.hits[td->current_pix] = hit;
+	td->info.fallback[td->current_pix] = (t_col){0};
+	// td->info.fallback[td->current_pix] = color_blend(*(int *)(hit->tex_col[hit->bounces]
+	// 		+ (hit->tex_pos_fp[hit->bounces] >> 16) * hit->texture[hit->bounces]->size_line),
+	// 		hit->light[hit->bounces]->color, hit->light[hit->bounces]->emittance);
+	// 	hit->tex_pos_fp[hit->bounces] += hit->step_fp[hit->bounces];
+	td->info.isnt_wall[td->current_pix] = 0;
+	td->info.nb_hit[td->current_pix] = hit->bounces;
+}
+
+static inline void	draw_eight(t_data *data, t_th_draw *td, char **img, t_point curr, int *new_line)
+{
+	int	color[8];
+	int	i;
+
+	// get_colors(td->info.hits, td->info.nb_hit, td->info.fallback, td->info.isnt_wall, color);
+	get_colors_simd(td->info.hits, td->info.nb_hit, td->info.fallback, color);
+	i = -1;
+	curr.x -= 8;
+	while (++i < 8)
+	{
+		++curr.x;
+		if (i == *new_line)
+		{
+			*new_line = -1;
+			*img += td->add_next_line + data->img.size_line;
+		}
+		*img += data->img.bpp * 2;
+		set_pixels(data, *img, color[i]);
+	}
+	td->current_pix = 0;
 }
 
 void	*draw_walls_section(t_th_draw *td)
@@ -213,10 +579,13 @@ void	*draw_walls_section(t_th_draw *td)
 	t_hit		*hit;
 	char		*img;
 	t_point		curr;
+	int			new_line;
 
 	data = get_data();
 	img = data->img.data + td->start_x * 2 * data->img.bpp;
 	curr.y = -1;
+	td->current_pix = 0;
+	new_line = -1;
 	while (++curr.y < data->render_h)
 	{
 		curr.x = td->start_x - 1;
@@ -224,14 +593,16 @@ void	*draw_walls_section(t_th_draw *td)
 		{
 			hit = &data->hits[curr.x];
 			if (curr.y >= hit->draw_start[hit->bounces] && curr.y < hit->draw_end[hit->bounces])
-				draw_wall(data, img, hit);
+				draw_wall(td, hit);
 			else if (curr.y < hit->draw_start[hit->bounces])
-				draw_ceil(data, curr, td->ray_dir, img, hit);
+				draw_ceil(data, td, curr, td->ray_dir, hit);
 			else if (curr.y >= hit->draw_end[hit->bounces])
-				draw_floor(data, curr, td->ray_dir, img, hit);
-			img += data->img.bpp * 2;
+				draw_floor(data, td, curr, td->ray_dir, hit);
+			++td->current_pix;
+			if (td->current_pix == 8)
+				draw_eight(data, td, &img, curr, &new_line);
 		}
-		img += td->add_next_line + data->img.size_line;
+		new_line = td->current_pix;
 	}
 	return (NULL);
 }
@@ -275,6 +646,7 @@ void	draw_walls(t_data *data)
 	{
 		pthread_mutex_lock(&data->thread_pool[i].mutex);
 		data->thread_pool[i].ray_dir = ray_dir;
+		data->thread_pool[i].info = (t_simd){0};
 		data->thread_pool[i].done = 0;
 		data->thread_pool[i].ready = 1;
 		pthread_cond_signal(&data->thread_pool[i].cond_start);

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:05:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/09 14:58:06 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/10 15:01:04 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,7 @@ int	main(int ac, char **av)
 
 	data = get_data();
 	data->mlx = mlx_init();
-	mlx_do_key_autorepeatoff(data->mlx);
+	// mlx_do_key_autorepeatoff(data->mlx);
 	data->map = load_map(ac, av);
 	if (data->map)
 	{
