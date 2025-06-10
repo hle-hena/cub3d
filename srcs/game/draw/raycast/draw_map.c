@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/09 15:24:47 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/10 10:04:14 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,17 +99,6 @@ static inline t_col blend_color_fast(t_col base, t_col refl, int refl_fp)
 		.gr = blend_channel(base.gr, refl.gr, refl_fp),
 		.bl = blend_channel(base.bl, refl.bl, refl_fp),
 	};
-}
-
-static inline int	demenish_light(t_wpath *walls, int base_emittance, int max)
-{
-	int	i;
-
-	i = -1;
-	return (base_emittance);
-	while (++i < max)
-		base_emittance = MUL_FP(base_emittance, TO_FP(walls[i].reflectance));
-	return (base_emittance);
 }
 
 int	get_color(t_hit *hit, int nb_hit, t_col fall_back_color, int isnt_wall)
