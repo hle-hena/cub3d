@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/11 15:00:41 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/11 16:50:39 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,11 +153,20 @@ void get_colors(
 // for float :
 //    base * (inv_refl + other * refl)
 
+__m256	color_blend_simd(__m256 base_color, __m256 light_color, __m256 emittance)
+{
+	return (_mm256_mul_ps(_mm256_mul_ps(
+		_mm256_mul_ps(base_color, light_color),
+		emittance
+	), _mm256_set1_ps(1.0f / 65536.0f)));
+}
+
 static inline __m256 blend_channel_simd(__m256 base, __m256 other, __m256 refl, __m256 inv_refl)
 {
-	__m256 other_norm = _mm256_div_ps(other, _mm256_set1_ps(255.0f)); // normalize other to 0–1
-	__m256 scale = _mm256_add_ps(inv_refl, _mm256_mul_ps(other_norm, refl)); // (1 - refl) + other * refl
-	return _mm256_mul_ps(base, scale); // base * (1 - refl + other * refl)
+	return (_mm256_mul_ps(
+		base,
+		_mm256_add_ps(inv_refl, _mm256_mul_ps(_mm256_div_ps(other, _mm256_set1_ps(255.0f)), refl))
+	));
 }
 
 void get_colors_simd(
@@ -173,14 +182,10 @@ void get_colors_simd(
 	__m256	curr_r;
 	__m256	curr_g;
 	__m256	curr_b;
-	t_s_col	curr_col;
-	t_col	temp;
 	__m256	refl;
 	__m256	inv_refl;
 	__m256	one;
-	__m256	min;
 	__m256	max;
-	float	refl_val[8] __attribute__((aligned(32)));
 	int		i;
 	int		max_hit;
 	max_hit = 0;
@@ -191,46 +196,58 @@ void get_colors_simd(
 			max_hit = nb_hit[i];
 	}
 	one = _mm256_set1_ps(1);
-	min = _mm256_set1_ps(0);
-	max = _mm256_set1_ps(255);
+	max = _mm256_set1_ps(256);
 	prev_r = _mm256_load_ps(fallback.r);
 	prev_g = _mm256_load_ps(fallback.g);
 	prev_b = _mm256_load_ps(fallback.b);
-	while (--max_hit >= 0)
+	t_s_col	textures[MAX_BOUNCE] __attribute__((aligned(32))) = {0};
+	t_s_col	light_color[MAX_BOUNCE] __attribute__((aligned(32))) = {0};
+	float	emittance[MAX_BOUNCE][8] __attribute__((aligned(32))) = {{0}};
+	float	refl_val[MAX_BOUNCE][8] __attribute__((aligned(32))) = {{0}};
+	for (int hit = 0; hit < max_hit; ++hit)
 	{
-		i = -1;
-		while (++i < 8)
+		for (int i = 0; i < 8; ++i)
 		{
-			if (max_hit >= nb_hit[i])
+			if (hit >= nb_hit[i])
 			{
-				refl_val[i] = 0;
-				curr_col.r[i] = 0;
-				curr_col.g[i] = 0;
-				curr_col.b[i] = 0;
+				refl_val[hit][i] = 0;
+				emittance[hit][i] = 0;
+				textures[hit].r[i] = 0;
+				textures[hit].g[i] = 0;
+				textures[hit].b[i] = 0;
+				light_color[hit].r[i] = 0;
+				light_color[hit].g[i] = 0;
+				light_color[hit].b[i] = 0;
 				continue ;
 			}
-			temp = color_blend(
-				*(int *)((hits[i])->tex_col[max_hit]
-					+ ((hits[i])->tex_pos_fp[max_hit] >> 16) * (hits[i])->texture[max_hit]->size_line),
-				(hits[i])->light[max_hit]->color,
-				(hits[i])->light[max_hit]->emittance);
-			curr_col.r[i] = (float)temp.re;
-			curr_col.g[i] = (float)temp.gr;
-			curr_col.b[i] = (float)temp.bl;
-			refl_val[i] = (hits[i])->wall[max_hit].reflectance;
-			(hits[i])->tex_pos_fp[max_hit] += (hits[i])->step_fp[max_hit];
+			int	col = *(int *)((hits[i])->tex_col[hit]
+				+ ((hits[i])->tex_pos_fp[hit] >> 16) * (hits[i])->texture[hit]->size_line);
+			textures[hit].r[i] = col >> 16 & 0xFF;
+			textures[hit].g[i] = col >> 8 & 0xFF;
+			textures[hit].b[i] = col & 0xFF;
+			col = (hits[i])->light[hit]->color;
+			light_color[hit].r[i] = col >> 16 & 0xFF;
+			light_color[hit].g[i] = col >> 8 & 0xFF;
+			light_color[hit].b[i] = col & 0xFF;
+			refl_val[hit][i] = (hits[i])->wall[hit].reflectance;
+			emittance[hit][i] = (hits[i])->light[hit]->emittance;
+			(hits[i])->tex_pos_fp[hit] += (hits[i])->step_fp[hit];
 		}
-		curr_r = _mm256_load_ps(curr_col.r);
-		curr_g = _mm256_load_ps(curr_col.g);
-		curr_b = _mm256_load_ps(curr_col.b);
-		refl = _mm256_load_ps(refl_val);
+	}
+	while (--max_hit >= 0)
+	{
+		__m256	em = _mm256_mul_ps(_mm256_load_ps(emittance[max_hit]), max);
+		curr_r = color_blend_simd(_mm256_load_ps(textures[max_hit].r),
+			_mm256_load_ps(light_color[max_hit].r), em);
+		curr_g = color_blend_simd(_mm256_load_ps(textures[max_hit].g),
+			_mm256_load_ps(light_color[max_hit].g), em);
+		curr_b = color_blend_simd(_mm256_load_ps(textures[max_hit].b),
+			_mm256_load_ps(light_color[max_hit].b), em);
+		refl = _mm256_load_ps(refl_val[max_hit]);
 		inv_refl = _mm256_sub_ps(one, refl);
 		prev_r = blend_channel_simd(curr_r, prev_r, refl, inv_refl);
 		prev_g = blend_channel_simd(curr_g, prev_g, refl, inv_refl);
 		prev_b = blend_channel_simd(curr_b, prev_b, refl, inv_refl);
-		prev_r = _mm256_max_ps(min, _mm256_min_ps(prev_r, max));
-		prev_g = _mm256_max_ps(min, _mm256_min_ps(prev_g, max));
-		prev_b = _mm256_max_ps(min, _mm256_min_ps(prev_b, max));
 	}
 	__m256i r_int = _mm256_cvtps_epi32(prev_r);
 	__m256i g_int = _mm256_cvtps_epi32(prev_g);
