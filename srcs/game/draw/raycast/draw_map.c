@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/11 11:52:55 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/11 13:29:04 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,34 +157,27 @@ static inline __m256i blend_channel_simd(__m256i base, __m256i other, __m256i re
 		), FP_SHIFT));
 }
 
-
 void get_colors_simd(
 	t_hit *hits[8],
 	int nb_hit[8],
-	t_col fallback[8],
+	t_s_col fallback,
 	int out_colors[8]
 )
 {
 	__m256i	prev_r;
 	__m256i	prev_g;
 	__m256i	prev_b;
-
 	__m256i	curr_r;
 	__m256i	curr_g;
 	__m256i	curr_b;
-	t_col	curr_col[8];
-
-	__m256i	fina_r;
-	__m256i	fina_g;
-	__m256i	fina_b;
-
+	t_s_col	curr_col;
+	t_col	temp;
 	__m256i	refl;
 	__m256i	inv_refl;
-	int		refl_fp[8];
-	int		inv_refl_fp[8];
+	__m256i	one;
+	int		refl_fp[8]__attribute__((aligned(32)));
 	int		i;
 	int		max_hit;
-
 	max_hit = 0;
 	i = -1;
 	while (++i < 8)
@@ -192,15 +185,10 @@ void get_colors_simd(
 		if (nb_hit[i] > max_hit)
 			max_hit = nb_hit[i];
 	}
-	prev_r = _mm256_set_epi32(fallback[7].re, fallback[6].re, fallback[5].re, fallback[4].re,
-		fallback[3].re, fallback[2].re, fallback[1].re, fallback[0].re);
-	prev_g = _mm256_set_epi32(fallback[7].gr, fallback[6].gr, fallback[5].gr, fallback[4].gr,
-		fallback[3].gr, fallback[2].gr, fallback[1].gr, fallback[0].gr);
-	prev_b = _mm256_set_epi32(fallback[7].bl, fallback[6].bl, fallback[5].bl, fallback[4].bl,
-		fallback[3].bl, fallback[2].bl, fallback[1].bl, fallback[0].bl);
-	fina_r = prev_r;
-	fina_g = prev_g;
-	fina_b = prev_b;
+	one = _mm256_set1_epi32(FP_ONE);
+	prev_r = _mm256_load_si256((__m256i *)fallback.r);
+	prev_g = _mm256_load_si256((__m256i *)fallback.g);
+	prev_b = _mm256_load_si256((__m256i *)fallback.b);
 	while (--max_hit >= 0)
 	{
 		i = -1;
@@ -208,46 +196,34 @@ void get_colors_simd(
 		{
 			if (max_hit >= nb_hit[i])
 			{
-				curr_col[i] = (t_col){0};
 				refl_fp[i] = 0;
-				curr_col[i] = (t_col){0};
+				curr_col.r[i] = 0;
+				curr_col.g[i] = 0;
+				curr_col.b[i] = 0;
 				continue ;
 			}
-			curr_col[i] = color_blend(
+			temp = color_blend(
 				*(int *)((hits[i])->tex_col[max_hit]
 					+ ((hits[i])->tex_pos_fp[max_hit] >> 16) * (hits[i])->texture[max_hit]->size_line),
 				(hits[i])->light[max_hit]->color,
 				(hits[i])->light[max_hit]->emittance);
+			curr_col.r[i] = temp.re;
+			curr_col.g[i] = temp.gr;
+			curr_col.b[i] = temp.bl;
 			refl_fp[i] = TO_FP((hits[i])->wall[max_hit].reflectance);
-			inv_refl_fp[i] = FP_ONE - refl_fp[i];
 			(hits[i])->tex_pos_fp[max_hit] += (hits[i])->step_fp[max_hit];
 		}
-		curr_r = _mm256_set_epi32(curr_col[7].re, curr_col[6].re, curr_col[5].re, curr_col[4].re,
-			curr_col[3].re, curr_col[2].re, curr_col[1].re, curr_col[0].re);
-		curr_g = _mm256_set_epi32(curr_col[7].gr, curr_col[6].gr, curr_col[5].gr, curr_col[4].gr,
-			curr_col[3].gr, curr_col[2].gr, curr_col[1].gr, curr_col[0].gr);
-		curr_b = _mm256_set_epi32(curr_col[7].bl, curr_col[6].bl, curr_col[5].bl, curr_col[4].bl,
-			curr_col[3].bl, curr_col[2].bl, curr_col[1].bl, curr_col[0].bl);
-		refl = _mm256_set_epi32(refl_fp[7], refl_fp[6], refl_fp[5], refl_fp[4],
-			refl_fp[3], refl_fp[2], refl_fp[1], refl_fp[0]);
-		inv_refl = _mm256_set_epi32(inv_refl_fp[7], inv_refl_fp[6], inv_refl_fp[5], inv_refl_fp[4],
-			inv_refl_fp[3], inv_refl_fp[2], inv_refl_fp[1], inv_refl_fp[0]);
-		fina_r = blend_channel_simd(curr_r, prev_r, refl, inv_refl);
-		fina_g = blend_channel_simd(curr_g, prev_g, refl, inv_refl);
-		fina_b = blend_channel_simd(curr_b, prev_b, refl, inv_refl);
-		prev_r = fina_r;
-		prev_g = fina_g;
-		prev_b = fina_b;
+		curr_r = _mm256_load_si256((__m256i *)curr_col.r);
+		curr_g = _mm256_load_si256((__m256i *)curr_col.g);
+		curr_b = _mm256_load_si256((__m256i *)curr_col.b);
+		refl = _mm256_load_si256((__m256i *)refl_fp);
+		inv_refl = _mm256_sub_epi32(one, refl);
+		prev_r = blend_channel_simd(curr_r, prev_r, refl, inv_refl);
+		prev_g = blend_channel_simd(curr_g, prev_g, refl, inv_refl);
+		prev_b = blend_channel_simd(curr_b, prev_b, refl, inv_refl);
 	}
-	int r_vals[8]__attribute__((aligned(32)));
-	int g_vals[8]__attribute__((aligned(32)));
-	int b_vals[8]__attribute__((aligned(32)));
-	_mm256_store_si256((__m256i *)r_vals, fina_r);
-	_mm256_store_si256((__m256i *)g_vals, fina_g);
-	_mm256_store_si256((__m256i *)b_vals, fina_b);
-	for (int i = 0; i < 8; i++) {
-		out_colors[i] = (r_vals[i] << 16) | (g_vals[i] << 8) | b_vals[i];
-	}
+	__m256i packed = _mm256_or_si256(_mm256_or_si256(_mm256_slli_epi32(prev_r, 16), _mm256_slli_epi32(prev_g, 8)), prev_b);
+	_mm256_store_si256((__m256i *)out_colors, packed);
 }
 
 // // SIMD blend function for 4 pixels at once
@@ -432,7 +408,9 @@ static inline void draw_ceil(t_data *data, t_th_draw *td, t_point curr, t_rdir r
 		|| world.y >= data->map->len)
 	{
 		td->info.hits[td->current_pix] = hit;
-		td->info.fallback[td->current_pix] = (t_col){0};
+		td->info.fallback.r[td->current_pix] = color.re;
+		td->info.fallback.g[td->current_pix] = color.gr;
+		td->info.fallback.b[td->current_pix] = color.bl;
 		td->info.isnt_wall[td->current_pix] = 1;
 		td->info.nb_hit[td->current_pix] = 0;
 		return ;
@@ -443,7 +421,9 @@ static inline void draw_ceil(t_data *data, t_th_draw *td, t_point curr, t_rdir r
 	if (!tile)
 	{
 		td->info.hits[td->current_pix] = hit;
-		td->info.fallback[td->current_pix] = (t_col){0};
+		td->info.fallback.r[td->current_pix] = color.re;
+		td->info.fallback.g[td->current_pix] = color.gr;
+		td->info.fallback.b[td->current_pix] = color.bl;
 		td->info.isnt_wall[td->current_pix] = 1;
 		td->info.nb_hit[td->current_pix] = 0;
 		return ;
@@ -456,7 +436,9 @@ static inline void draw_ceil(t_data *data, t_th_draw *td, t_point curr, t_rdir r
 	int	*base_col = (int *)(tex->data + offset);
 	color = color_blend(*base_col, light.color, light.emittance);
 	td->info.hits[td->current_pix] = hit;
-	td->info.fallback[td->current_pix] = color;
+	td->info.fallback.r[td->current_pix] = color.re;
+	td->info.fallback.g[td->current_pix] = color.gr;
+	td->info.fallback.b[td->current_pix] = color.bl;
 	td->info.isnt_wall[td->current_pix] = 1;
 	td->info.nb_hit[td->current_pix] = bounce - 1;
 }
@@ -482,7 +464,9 @@ static inline void draw_floor(t_data *data, t_th_draw *td, t_point curr, t_rdir 
 		|| world.y >= data->map->len)
 	{
 		td->info.hits[td->current_pix] = hit;
-		td->info.fallback[td->current_pix] = (t_col){0};
+		td->info.fallback.r[td->current_pix] = color.re;
+		td->info.fallback.g[td->current_pix] = color.gr;
+		td->info.fallback.b[td->current_pix] = color.bl;
 		td->info.isnt_wall[td->current_pix] = 1;
 		td->info.nb_hit[td->current_pix] = 0;
 		return ;
@@ -493,7 +477,9 @@ static inline void draw_floor(t_data *data, t_th_draw *td, t_point curr, t_rdir 
 	if (!tile)
 	{
 		td->info.hits[td->current_pix] = hit;
-		td->info.fallback[td->current_pix] = (t_col){0};
+		td->info.fallback.r[td->current_pix] = color.re;
+		td->info.fallback.g[td->current_pix] = color.gr;
+		td->info.fallback.b[td->current_pix] = color.bl;
 		td->info.isnt_wall[td->current_pix] = 1;
 		td->info.nb_hit[td->current_pix] = 0;
 		return ;
@@ -506,26 +492,33 @@ static inline void draw_floor(t_data *data, t_th_draw *td, t_point curr, t_rdir 
 	int	*base_col = (int *)(tex->data + offset);
 	color = color_blend(*base_col, light.color, light.emittance);
 	td->info.hits[td->current_pix] = hit;
-	td->info.fallback[td->current_pix] = color;
+	td->info.fallback.r[td->current_pix] = color.re;
+	td->info.fallback.g[td->current_pix] = color.gr;
+	td->info.fallback.b[td->current_pix] = color.bl;
 	td->info.isnt_wall[td->current_pix] = 1;
 	td->info.nb_hit[td->current_pix] = bounce - 1;
 }
 
 static inline void	draw_wall(/* t_data *data,  */t_th_draw *td/* , char *img */, t_hit *hit)
 {
+	t_col	temp;
+
 	td->info.hits[td->current_pix] = hit;
 	// td->info.fallback[td->current_pix] = (t_col){0};
-	td->info.fallback[td->current_pix] = color_blend(*(int *)(hit->tex_col[hit->bounces]
+	temp = color_blend(*(int *)(hit->tex_col[hit->bounces]
 			+ (hit->tex_pos_fp[hit->bounces] >> 16) * hit->texture[hit->bounces]->size_line),
 			hit->light[hit->bounces]->color, hit->light[hit->bounces]->emittance);
 		hit->tex_pos_fp[hit->bounces] += hit->step_fp[hit->bounces];
+	td->info.fallback.r[td->current_pix] = temp.re;
+	td->info.fallback.g[td->current_pix] = temp.gr;
+	td->info.fallback.b[td->current_pix] = temp.bl;
 	td->info.isnt_wall[td->current_pix] = 0;
 	td->info.nb_hit[td->current_pix] = hit->bounces;
 }
 
 static inline void	draw_eight(t_data *data, t_th_draw *td, char **img, t_point curr, int *new_line)
 {
-	int	color[8];
+	int	color[8]__attribute__((aligned(32)));
 	int	i;
 
 	// get_colors(td->info.hits, td->info.nb_hit, td->info.fallback, td->info.isnt_wall, color);

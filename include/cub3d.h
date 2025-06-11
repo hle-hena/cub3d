@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/10 16:31:21 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/11 13:04:15 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -241,10 +241,17 @@ typedef struct s_void
 	t_flight	*flight;
 }	t_void;
 
+typedef struct s_col_simd
+{
+	int	r[8]__attribute__((aligned(32)));
+	int	g[8]__attribute__((aligned(32)));
+	int	b[8]__attribute__((aligned(32)));
+}	t_s_col;
+
 typedef struct s_simd_info
 {
 	t_hit	*hits[8];
-	t_col	fallback[8];
+	t_s_col	fallback;
 	int		nb_hit[8];
 	int		isnt_wall[8];
 }	t_simd;
