@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/11 13:04:15 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/11 14:59:00 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -243,9 +243,9 @@ typedef struct s_void
 
 typedef struct s_col_simd
 {
-	int	r[8]__attribute__((aligned(32)));
-	int	g[8]__attribute__((aligned(32)));
-	int	b[8]__attribute__((aligned(32)));
+	float	r[8] __attribute__((aligned(32)));
+	float	g[8] __attribute__((aligned(32)));
+	float	b[8] __attribute__((aligned(32)));
 }	t_s_col;
 
 typedef struct s_simd_info
@@ -292,6 +292,7 @@ typedef struct s_data
 	t_void		*empty;
 	t_th_draw	thread_pool[DRAW_THREADS];
 	pthread_t	threads[DRAW_THREADS];
+	int			simd;
 }	t_data;
 
 // # define LMAP_PRECISION 512

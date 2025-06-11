@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:05:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/10 15:01:04 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/11 15:00:07 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,7 @@ void init_draw_threads(t_data *data)
 
 	slice = data->render_w / DRAW_THREADS;
 	i = -1;
+	data->simd = 1;
 	while (++i < DRAW_THREADS)
 	{
 		data->thread_pool[i].start_x = i * slice;

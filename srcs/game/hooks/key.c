@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 21:43:05 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/15 22:54:48 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/11 15:03:04 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@ int	key_down(int keycode, t_data *data)
 		data->event.mo_l = -1;
 	else if (keycode == 100)
 		data->event.mo_r = 1;
+	else if (keycode == 65289)
+		;
 	else
 		printf("Key down : [%d]\n", keycode);
 	return (0);
@@ -39,6 +41,8 @@ int	key_up(int keycode, t_data *data)
 		data->event.mo_l = 0;
 	else if (keycode == 100)
 		data->event.mo_r = 0;
+	else if (keycode == 65289)
+		data->simd = !data->simd;
 	else
 		printf("Key up : [%d]\n", keycode);
 	return (0);
