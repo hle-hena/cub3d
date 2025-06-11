@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/11 13:29:04 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/11 13:44:21 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,19 +134,20 @@ int	get_color(t_hit *hit, int nb_hit, t_col fall_back_color, int isnt_wall)
 void get_colors(
 	t_hit *hits[8],
 	int nb_hit[8],
-	t_col fallback[8],
+	t_s_col fallback,
 	int isnt_wall[8],
 	int out_colors[8]
 )
 {
-	out_colors[0] = get_color(hits[0], nb_hit[0], fallback[0], isnt_wall[0]);
-	out_colors[1] = get_color(hits[1], nb_hit[1], fallback[1], isnt_wall[1]);
-	out_colors[2] = get_color(hits[2], nb_hit[2], fallback[2], isnt_wall[2]);
-	out_colors[3] = get_color(hits[3], nb_hit[3], fallback[3], isnt_wall[3]);
-	out_colors[4] = get_color(hits[4], nb_hit[4], fallback[4], isnt_wall[4]);
-	out_colors[5] = get_color(hits[5], nb_hit[5], fallback[5], isnt_wall[5]);
-	out_colors[6] = get_color(hits[6], nb_hit[6], fallback[6], isnt_wall[6]);
-	out_colors[7] = get_color(hits[7], nb_hit[7], fallback[7], isnt_wall[7]);
+	int	i;
+
+	i = -1;
+	while (++i < 8)
+	{
+		out_colors[i] = get_color(hits[i], nb_hit[i],
+			(t_col){fallback.r[i], fallback.g[i], fallback.b[i]},
+			isnt_wall[i]);
+	}
 }
 
 static inline __m256i blend_channel_simd(__m256i base, __m256i other, __m256i refl, __m256i inv_refl)
@@ -501,17 +502,25 @@ static inline void draw_floor(t_data *data, t_th_draw *td, t_point curr, t_rdir 
 
 static inline void	draw_wall(/* t_data *data,  */t_th_draw *td/* , char *img */, t_hit *hit)
 {
-	t_col	temp;
 
 	td->info.hits[td->current_pix] = hit;
-	// td->info.fallback[td->current_pix] = (t_col){0};
-	temp = color_blend(*(int *)(hit->tex_col[hit->bounces]
-			+ (hit->tex_pos_fp[hit->bounces] >> 16) * hit->texture[hit->bounces]->size_line),
-			hit->light[hit->bounces]->color, hit->light[hit->bounces]->emittance);
-		hit->tex_pos_fp[hit->bounces] += hit->step_fp[hit->bounces];
-	td->info.fallback.r[td->current_pix] = temp.re;
-	td->info.fallback.g[td->current_pix] = temp.gr;
-	td->info.fallback.b[td->current_pix] = temp.bl;
+	if (1)//simd
+	{
+		t_col	temp;
+		temp = color_blend(*(int *)(hit->tex_col[hit->bounces]
+				+ (hit->tex_pos_fp[hit->bounces] >> 16) * hit->texture[hit->bounces]->size_line),
+				hit->light[hit->bounces]->color, hit->light[hit->bounces]->emittance);
+			hit->tex_pos_fp[hit->bounces] += hit->step_fp[hit->bounces];
+		td->info.fallback.r[td->current_pix] = temp.re;
+		td->info.fallback.g[td->current_pix] = temp.gr;
+		td->info.fallback.b[td->current_pix] = temp.bl;
+	}
+	else
+	{
+		td->info.fallback.r[td->current_pix] = 0;
+		td->info.fallback.g[td->current_pix] = 0;
+		td->info.fallback.b[td->current_pix] = 0;
+	}
 	td->info.isnt_wall[td->current_pix] = 0;
 	td->info.nb_hit[td->current_pix] = hit->bounces;
 }
