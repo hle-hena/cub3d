@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/11 14:59:00 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/12 13:18:30 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,15 +21,15 @@
 # include <time.h>
 # include <sys/time.h>
 # include <stdio.h>
-
 # include <pthread.h>
 # include <immintrin.h>
 # include <float.h>
 
 # define PI 3.1415926535897932384
 # define VOID (void)0
-typedef unsigned long long t_uint64;
-typedef long long t_int64;
+
+typedef unsigned long long	t_uint64;
+typedef long long			t_int64;
 
 # define TARGET_FPS 60
 # define FRAME_TIME_US (1000000 / 60)
@@ -42,9 +42,9 @@ typedef struct s_trigometry_values
 
 typedef struct s_color
 {
-	int re;
-	int gr;
-	int bl;
+	int	re;
+	int	gr;
+	int	bl;
 }	t_col;
 
 typedef struct s_vector
@@ -151,7 +151,7 @@ typedef struct s_wpath
 	int		mode;
 }	t_wpath;
 
-typedef	struct s_tile
+typedef struct s_tile
 {
 	t_list		*wpath;
 	t_text		tex_no;
@@ -220,7 +220,7 @@ typedef struct s_ray
 	float	precise_dist;
 }	t_ray;
 
-typedef	struct s_ray_dir
+typedef struct s_ray_dir
 {
 	t_vec	l;
 	t_vec	r;
@@ -228,7 +228,7 @@ typedef	struct s_ray_dir
 	t_tile	**tile_dict;
 }	t_rdir;
 
-typedef	struct s_cam
+typedef struct s_cam
 {
 	t_vec	dir;
 	t_vec	plane;
@@ -243,21 +243,29 @@ typedef struct s_void
 
 typedef struct s_col_simd
 {
-	float	r[8] __attribute__((aligned(32)));
-	float	g[8] __attribute__((aligned(32)));
-	float	b[8] __attribute__((aligned(32)));
+	float	r[8]
+		__attribute__((aligned(32)));
+	float	g[8]
+		__attribute__((aligned(32)));
+	float	b[8]
+		__attribute__((aligned(32)));
 }	t_s_col;
 
 typedef struct s_simd_info
 {
-	t_hit	*hits[8];
 	t_s_col	fallback;
-	int		nb_hit[8];
-	int		isnt_wall[8];
+	t_s_col	textures[MAX_BOUNCE];
+	t_s_col	light_color[MAX_BOUNCE];
+	float	emittance[MAX_BOUNCE][8]
+		__attribute__((aligned(32)));
+	float	refl_val[MAX_BOUNCE][8]
+		__attribute__((aligned(32)));
+	int		nb_hit[8]
+		__attribute__((aligned(32)));
 }	t_simd;
 
-
 # define DRAW_THREADS 4
+
 typedef struct s_thread_draw
 {
 	t_simd			info;
@@ -334,7 +342,7 @@ void		add_link(t_list **lst, void *content);
 int			is_correct_flight(void *content, void *to_find);
 int			does_hit(t_list	*wpath, t_ray *ray, t_wpath *wall);
 void		handle_reflexion(t_data *data, t_hit *hit, t_ray *ray,
-	t_wpath wall);
+				t_wpath wall);
 void		init_ray(t_ray *ray, t_vec dir, t_vec origin);
 t_vec		normalize(t_vec v);
 void		handle_hit(t_data *data, t_ray *ray, t_hit *hit);
@@ -375,11 +383,11 @@ int			create_lmap(t_data *data);
 void		raytrace(t_data *data, t_light light, t_vec dir);
 void		handle_light(t_data *data, t_trace *ray, t_light light);
 void		reflect_light(t_data *data, t_trace *ray, t_wpath wall,
-	t_light light);
+				t_light light);
 int			does_light(t_list *wpath, t_trace *ray, t_wpath *wall);
 void		init_trace(t_trace *ray, t_vec dir, t_vec origin, float emittance);
 t_flight	*find_flight(t_data *data, t_point pos, t_wpath wall);
 
-void	print_dict(t_data *data);
+void		print_dict(t_data *data);
 
 #endif
