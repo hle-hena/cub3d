@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/12 13:21:32 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/12 13:54:24 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ void get_colors_simd(t_simd info, int out_colors[8])
 	__m256	one;
 	__m256	max;
 	__m256	inv;
-	__m256i	nb_hit;
+	// __m256i	nb_hit;
 	int		i;
 	int		max_hit;
 	max_hit = 0;
@@ -112,7 +112,7 @@ void get_colors_simd(t_simd info, int out_colors[8])
 		if (info.nb_hit[i] > max_hit)
 			max_hit = info.nb_hit[i];
 	}
-	nb_hit = _mm256_load_si256((__m256i *)info.nb_hit);
+	// nb_hit = _mm256_load_si256((__m256i *)info.nb_hit);
 	one = _mm256_set1_ps(1);
 	max = _mm256_set1_ps(256);
 	inv = _mm256_set1_ps(1.0f / 65536.0f);
