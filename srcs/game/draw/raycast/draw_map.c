@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/12 13:54:24 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/12 15:12:04 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,8 @@ static inline t_col	color_blend(int base_color, int light_color, float emittance
 
 static inline void	set_pixels(t_data *data, char *img, int color)
 {
+	//might be smarter to always have img be a (int *), so there is no need to cast it,
+	//		+ I read less data since data->img.bpp is not needed anymore, just 1.
 	*(int *)(img) = color;
 	*(int *)(img + data->img.bpp) = color;
 	*(int *)(img + data->img.size_line) = color;
@@ -102,7 +104,9 @@ void get_colors_simd(t_simd info, int out_colors[8])
 	__m256	one;
 	__m256	max;
 	__m256	inv;
-	// __m256i	nb_hit;
+	__m256	mask;
+	__m256	nb_hit;
+	__m256	curr_hit;
 	int		i;
 	int		max_hit;
 	max_hit = 0;
@@ -112,10 +116,10 @@ void get_colors_simd(t_simd info, int out_colors[8])
 		if (info.nb_hit[i] > max_hit)
 			max_hit = info.nb_hit[i];
 	}
-	// nb_hit = _mm256_load_si256((__m256i *)info.nb_hit);
 	one = _mm256_set1_ps(1);
 	max = _mm256_set1_ps(256);
 	inv = _mm256_set1_ps(1.0f / 65536.0f);
+	nb_hit = _mm256_cvtepi32_ps(_mm256_load_si256((__m256i *)info.nb_hit));
 	prev_r = _mm256_load_ps(info.fallback.r);
 	prev_g = _mm256_load_ps(info.fallback.g);
 	prev_b = _mm256_load_ps(info.fallback.b);
@@ -130,9 +134,14 @@ void get_colors_simd(t_simd info, int out_colors[8])
 			_mm256_load_ps(info.light_color[max_hit].b), em, inv);
 		refl = _mm256_load_ps(info.refl_val[max_hit]);
 		inv_refl = _mm256_sub_ps(one, refl);
-		prev_r = blend_channel_simd(curr_r, prev_r, refl, inv_refl);
-		prev_g = blend_channel_simd(curr_g, prev_g, refl, inv_refl);
-		prev_b = blend_channel_simd(curr_b, prev_b, refl, inv_refl);
+		curr_hit = _mm256_set1_ps(max_hit);
+		mask = _mm256_cmp_ps(curr_hit, nb_hit, _CMP_LT_OQ);
+		prev_r = _mm256_blendv_ps(prev_r,
+			blend_channel_simd(curr_r, prev_r, refl, inv_refl), mask);
+		prev_g = _mm256_blendv_ps(prev_g,
+			blend_channel_simd(curr_g, prev_g, refl, inv_refl), mask);
+		prev_b = _mm256_blendv_ps(prev_b,
+			blend_channel_simd(curr_b, prev_b, refl, inv_refl), mask);
 	}
 	__m256i r_int = _mm256_cvtps_epi32(prev_r);
 	__m256i g_int = _mm256_cvtps_epi32(prev_g);
@@ -147,26 +156,29 @@ void get_colors_simd(t_simd info, int out_colors[8])
 	_mm256_store_si256((__m256i *)out_colors, packed);
 }
 
+//This function is cache-miss-read heavy ...
 static inline void	setup_color(t_hit *hit, t_th_draw *td, t_col fallback, int nb_hit)
 {
+	int	col;
+
 	td->info.fallback.r[td->current_pix] = fallback.re;
 	td->info.fallback.g[td->current_pix] = fallback.gr;
 	td->info.fallback.b[td->current_pix] = fallback.bl;
 	td->info.nb_hit[td->current_pix] = nb_hit;
 	while (--nb_hit >= 0)
 	{
-		int	col = *(int *)(hit->tex_col[nb_hit]
-			+ (hit->tex_pos_fp[nb_hit] >> 16) * hit->texture[nb_hit]->size_line);
+		col = *(int *)(hit->tex_col[nb_hit]//data miss read here
+			+ (hit->tex_pos_fp[nb_hit] >> 16) * hit->texture[nb_hit]->size_line);//data miss read here
 		td->info.textures[nb_hit].r[td->current_pix] = (col >> 16) & 0xFF;
 		td->info.textures[nb_hit].g[td->current_pix] = (col >> 8) & 0xFF;
 		td->info.textures[nb_hit].b[td->current_pix] = col & 0xFF;
-		col = hit->light[nb_hit]->color;
+		col = hit->light[nb_hit]->color;//data miss read here
 		td->info.light_color[nb_hit].r[td->current_pix] = (col >> 16) & 0xFF;
 		td->info.light_color[nb_hit].g[td->current_pix] = (col >> 8) & 0xFF;
 		td->info.light_color[nb_hit].b[td->current_pix] = col & 0xFF;
-		td->info.refl_val[nb_hit][td->current_pix] = hit->wall[nb_hit].reflectance;
+		td->info.refl_val[nb_hit][td->current_pix] = hit->wall[nb_hit].reflectance;//data miss read here
 		td->info.emittance[nb_hit][td->current_pix] = hit->light[nb_hit]->emittance;
-		hit->tex_pos_fp[nb_hit] += hit->step_fp[nb_hit];
+		hit->tex_pos_fp[nb_hit] += hit->step_fp[nb_hit];//data miss read here
 	}
 }
 
