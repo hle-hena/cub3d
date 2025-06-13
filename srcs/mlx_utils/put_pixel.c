@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:24:55 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/01 12:21:27 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/12 15:29:10 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ int	ft_get_pixel_color(t_data *data, t_point point)
 
 inline void	ft_put_pixel(t_data *data, t_point point, int color)
 {
-	char *dst = data->img.data + point.y * data->img.size_line
-		+ point.x * data->img.bpp;
-	*(int *)dst = color;
+	int *dst = data->img.data + point.y * data->img.size_line
+		+ point.x;
+	*dst = color;
 }

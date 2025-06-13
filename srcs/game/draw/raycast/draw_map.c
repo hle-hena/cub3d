@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/12 15:12:04 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/12 16:04:53 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,14 +65,12 @@ static inline t_col	color_blend(int base_color, int light_color, float emittance
 	return (final);
 }
 
-static inline void	set_pixels(t_data *data, char *img, int color)
+static inline void	set_pixels(t_data *data, int *img, int color)
 {
-	//might be smarter to always have img be a (int *), so there is no need to cast it,
-	//		+ I read less data since data->img.bpp is not needed anymore, just 1.
-	*(int *)(img) = color;
-	*(int *)(img + data->img.bpp) = color;
-	*(int *)(img + data->img.size_line) = color;
-	*(int *)(img + data->img.size_line + data->img.bpp) = color;
+	*(img) = color;
+	*(img + 1) = color;
+	*(img + data->img.size_line) = color;
+	*(img + data->img.size_line + 1) = color;
 }
 
 static inline __m256	color_blend_simd(__m256 base_color, __m256 light_color, __m256 emittance, __m256 inv)
@@ -167,7 +165,7 @@ static inline void	setup_color(t_hit *hit, t_th_draw *td, t_col fallback, int nb
 	td->info.nb_hit[td->current_pix] = nb_hit;
 	while (--nb_hit >= 0)
 	{
-		col = *(int *)(hit->tex_col[nb_hit]//data miss read here
+		col = *(hit->tex_col[nb_hit]//data miss read here
 			+ (hit->tex_pos_fp[nb_hit] >> 16) * hit->texture[nb_hit]->size_line);//data miss read here
 		td->info.textures[nb_hit].r[td->current_pix] = (col >> 16) & 0xFF;
 		td->info.textures[nb_hit].g[td->current_pix] = (col >> 8) & 0xFF;
@@ -209,10 +207,10 @@ static inline void	draw_ceil(t_data *data, t_th_draw *td, t_point curr, t_rdir r
 		return (setup_color(hit, td, (t_col){0}, 0), (void)0);
 	tex = tile->tex_ce.img;
 	offset = (int)((world.y - iy) * tex->height) * tex->size_line
-		+ (int)((world.x - ix) * tex->width) * tex->bpp;
+		+ (int)((world.x - ix) * tex->width);
 	light = data->lmap.lmap[(int)(world.x * LMAP_PRECISION)
 		+ (int)(world.y * LMAP_PRECISION) * data->lmap.wid].ce_fl;
-	int	*base_col = (int *)(tex->data + offset);
+	int	*base_col = (tex->data + offset);
 	color = color_blend(*base_col, light.color, light.emittance);
 	setup_color(hit, td, color, bounce - 1);
 }
@@ -244,10 +242,10 @@ static inline void draw_floor(t_data *data, t_th_draw *td, t_point curr, t_rdir 
 		return (setup_color(hit, td, (t_col){0}, 0), (void)0);
 	tex = tile->tex_fl.img;
 	offset = (int)((world.y - iy) * tex->height) * tex->size_line
-		+ (int)((world.x - ix) * tex->width) * tex->bpp;
+		+ (int)((world.x - ix) * tex->width);
 	light = data->lmap.lmap[(int)(world.x * LMAP_PRECISION)
 		+ (int)(world.y * LMAP_PRECISION) * data->lmap.wid].ce_fl;
-	int	*base_col = (int *)(tex->data + offset);
+	int	*base_col = (tex->data + offset);
 	color = color_blend(*base_col, light.color, light.emittance);
 	setup_color(hit, td, color, bounce - 1);
 }
@@ -263,7 +261,7 @@ static inline void	draw_wall(t_th_draw *td, t_hit *hit)
 	setup_color(hit, td, temp, hit->bounces);
 }
 
-static inline void	draw_eight(t_data *data, t_th_draw *td, char **img, t_point curr, int *new_line)
+static inline void	draw_eight(t_data *data, t_th_draw *td, int **img, t_point curr, int *new_line)
 {
 	int	color[8] __attribute__((aligned(32)));
 	int	i;
@@ -279,7 +277,7 @@ static inline void	draw_eight(t_data *data, t_th_draw *td, char **img, t_point c
 			*img += td->add_next_line + data->img.size_line;
 		}
 		set_pixels(data, *img, color[i]);
-		*img += data->img.bpp * 2;
+		*img += 2;
 	}
 	td->current_pix = 0;
 }
@@ -288,12 +286,12 @@ void	*draw_walls_section(t_th_draw *td)
 {
 	t_data		*data;
 	t_hit		*hit;
-	char		*img;
+	int			*img;
 	t_point		curr;
 	int			new_line;
 
 	data = get_data();
-	img = data->img.data + td->start_x * 2 * data->img.bpp;
+	img = data->img.data + td->start_x * 2;
 	curr.y = -1;
 	td->current_pix = 0;
 	new_line = -1;
@@ -397,7 +395,7 @@ void	init_line_heights(t_data *data, t_hit *hit, int tex_start, int tex_end)
 		hit->tex_pos_fp[i] = (hit->draw_start[i]
 			- data->render_h / 2 + line_height / 2) * hit->step_fp[i];
 		hit->tex_col[i] = hit->texture[i]->data
-			+ (int)(hit->wall[i].pos * hit->texture[i]->width) * hit->texture[i]->bpp;
+			+ (int)(hit->wall[i].pos * hit->texture[i]->width);
 	}
 }
 

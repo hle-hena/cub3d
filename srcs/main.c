@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:05:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/11 15:00:07 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/12 15:39:02 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,11 @@ void	init_mlx(t_data *data)
 	data->empty->flight = ft_calloc(1, sizeof(t_flight));
 	data->empty->texture.img = malloc(sizeof(t_img));
 	data->empty->texture.img = mlx_new_image(data->mlx, 1, 1);
-	data->empty->texture.img->data = mlx_get_data_addr(data->empty->texture.img,
+	data->empty->texture.img->data = (int *)mlx_get_data_addr(data->empty->texture.img,
 		&data->empty->texture.img->bpp, &data->empty->texture.img->size_line,
 		&data->empty->texture.img->endian);
 	data->empty->texture.img->bpp /= 8;
+	data->empty->texture.img->size_line /= data->empty->texture.img->bpp;
 	mlx_get_screen_size(data->mlx, &data->render_w, &data->render_h);
 	data->render_h *= 0.9;
 	// data->render_h *= 2;
@@ -42,11 +43,12 @@ void	init_mlx(t_data *data)
 	data->win = mlx_new_window(data->mlx, data->win_w, data->win_h,
 		"Cub3d");
 	data->img.img = mlx_new_image(data->mlx, data->win_w, data->win_h);
-	data->img.data = mlx_get_data_addr(data->img.img, &data->img.bpp,
+	data->img.data = (int *)mlx_get_data_addr(data->img.img, &data->img.bpp,
 		&data->img.size_line, &data->img.endian);
 	data->img.bpp /= 8;
+	data->img.size_line /= data->img.bpp;
 	data->img_end = data->img.data + (data->win_h - 1) * data->img.size_line
-		+ (data->win_w - 1) * data->img.bpp;
+		+ (data->win_w - 1);
 	data->event = (t_event){0};
 	data->delta_t = 0;
 	data->lmap.nb_ls = 0;
@@ -82,7 +84,7 @@ void init_draw_threads(t_data *data)
 		data->thread_pool[i].start_x = i * slice;
 		data->thread_pool[i].end_x = (i == DRAW_THREADS - 1) ? data->render_w : (i + 1) * slice;
 		data->thread_pool[i].add_next_line = (data->win_w +
-			(data->thread_pool[i].start_x - data->thread_pool[i].end_x) * 2) * data->img.bpp;
+			(data->thread_pool[i].start_x - data->thread_pool[i].end_x) * 2);
 		data->thread_pool[i].ready = 0;
 		data->thread_pool[i].done = 0;
 		pthread_mutex_init(&data->thread_pool[i].mutex, NULL);

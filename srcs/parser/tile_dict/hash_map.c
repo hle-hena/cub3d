@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 13:03:11 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/23 13:46:13 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/12 15:21:26 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,9 +39,10 @@ void	load_new_hash(t_img **hash_table, unsigned int i, char *path, int *err)
 	if (!hash_table[i]->img)
 		return (ft_perror(-1, ft_strsjoin((char *[]){"An error happened during \
 the opening of the file '", path, "'.", NULL}), 1), *err = 1, VOID);
-	hash_table[i]->data = mlx_get_data_addr(hash_table[i]->img,
+	hash_table[i]->data = (int *)mlx_get_data_addr(hash_table[i]->img,
 		&hash_table[i]->bpp, &hash_table[i]->size_line, &hash_table[i]->endian);
 	hash_table[i]->bpp /= 8;
+	hash_table[i]->size_line /= hash_table[i]->bpp;
 	hash_table[i]->path = ft_strdup(path);
 	hash_table[i]->endian = 1;
 	if (!hash_table[i]->path)

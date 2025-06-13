@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/12 13:18:30 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/12 15:58:30 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ typedef struct s_point
 typedef struct s_img
 {
 	void	*img;
-	char	*data;
+	int		*data;
 	char	*path;
 	int		bpp;
 	int		size_line;
@@ -201,7 +201,7 @@ typedef struct s_hit
 	int			draw_end[MAX_BOUNCE];
 	int			tex_pos_fp[MAX_BOUNCE];
 	int			step_fp[MAX_BOUNCE];
-	char		*tex_col[MAX_BOUNCE];
+	int			*tex_col[MAX_BOUNCE];
 	int			bounces;
 }	t_hit;
 
@@ -253,18 +253,15 @@ typedef struct s_col_simd
 
 typedef struct s_simd_info
 {
-	t_s_col	fallback;
-	t_s_col	textures[MAX_BOUNCE];
-	t_s_col	light_color[MAX_BOUNCE];
-	float	emittance[MAX_BOUNCE][8]
-		__attribute__((aligned(32)));
-	float	refl_val[MAX_BOUNCE][8]
-		__attribute__((aligned(32)));
-	int		nb_hit[8]
-		__attribute__((aligned(32)));
+	t_s_col										fallback;
+	t_s_col										textures[MAX_BOUNCE];
+	t_s_col										light_color[MAX_BOUNCE];
+	float emittance[MAX_BOUNCE][8]__attribute__	((aligned(32)));
+	float refl_val[MAX_BOUNCE][8]__attribute__	((aligned(32)));
+	int nb_hit[8]__attribute__					((aligned(32)));
 }	t_simd;
 
-# define DRAW_THREADS 4
+# define DRAW_THREADS 16
 
 typedef struct s_thread_draw
 {
@@ -286,7 +283,7 @@ typedef struct s_data
 	void		*mlx;
 	void		*win;
 	t_img		img;
-	char		*img_end;
+	int			*img_end;
 	int			win_h;
 	int			win_w;
 	int			render_h;

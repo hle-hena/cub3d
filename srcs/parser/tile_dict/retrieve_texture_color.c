@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 12:49:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/23 13:47:57 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/12 15:27:59 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,9 +50,10 @@ void	set_img_color(t_img **img, char *line, t_col color, int *err)
 the opening of the image for '", line, "'.", NULL}), 1), *err = 1, VOID);
 	(*img)->height = 1;
 	(*img)->width = 1;
-	(*img)->data = mlx_get_data_addr((*img)->img, &(*img)->bpp, &(*img)->size_line,
+	(*img)->data = (int *)mlx_get_data_addr((*img)->img, &(*img)->bpp, &(*img)->size_line,
 		&(*img)->endian);
 	(*img)->bpp /= 8;
+	(*img)->size_line /= (*img)->bpp;
 	(*img)->endian = 0;
 	*(int *)(*img)->data = calc_color(color);
 }
