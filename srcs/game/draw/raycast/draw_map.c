@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/13 11:34:49 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/13 17:24:16 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,18 +165,18 @@ static inline void	setup_color(t_draw *draw, t_th_draw *td, t_col fallback, int 
 	td->info.nb_hit[td->current_pix] = nb_hit;
 	while (--nb_hit >= 0)
 	{
-		col = *(draw->tex_col[nb_hit]//data miss read here
-			+ (draw->tex_pos_fp[nb_hit] >> 16) * draw->tex_sizeline[nb_hit]);//data miss read here
+		col = *(draw->tex_col[nb_hit]
+			+ (draw->tex_pos_fp[nb_hit] >> 16) * draw->tex_sizeline[nb_hit]);
 		td->info.textures[nb_hit].r[td->current_pix] = (col >> 16) & 0xFF;
 		td->info.textures[nb_hit].g[td->current_pix] = (col >> 8) & 0xFF;
 		td->info.textures[nb_hit].b[td->current_pix] = col & 0xFF;
-		col = draw->light_color[nb_hit];//data miss read here
+		col = draw->light_color[nb_hit];
 		td->info.light_color[nb_hit].r[td->current_pix] = (col >> 16) & 0xFF;
 		td->info.light_color[nb_hit].g[td->current_pix] = (col >> 8) & 0xFF;
 		td->info.light_color[nb_hit].b[td->current_pix] = col & 0xFF;
-		td->info.refl_val[nb_hit][td->current_pix] = draw->reflectance[nb_hit];//data miss read here
+		td->info.refl_val[nb_hit][td->current_pix] = draw->reflectance[nb_hit];
 		td->info.emittance[nb_hit][td->current_pix] = draw->light_emittance[nb_hit];
-		draw->tex_pos_fp[nb_hit] += draw->step_fp[nb_hit];//data miss read here
+		draw->tex_pos_fp[nb_hit] += draw->step_fp[nb_hit];
 	}
 }
 
@@ -261,20 +261,41 @@ static inline void	draw_wall(t_th_draw *td, t_draw *draw)
 	setup_color(draw, td, temp, draw->bounces);
 }
 
-static inline void	draw_eight(t_data *data, t_th_draw *td, int **img, t_point curr, int *new_line)
+// static inline void	draw_eight(t_data *data, t_th_draw *td, int **img, int *new_line)
+// {
+// 	int	color[8] __attribute__((aligned(32)));
+// 	int	i;
+
+// 	get_colors_simd(td->info, color);
+// 	i = -1;
+// 	while (++i < td->current_pix)
+// 	{
+// 		if (i == *new_line)
+// 		{
+// 			*new_line = -1;
+// 			*img += td->add_next_line + data->img.size_line;
+// 		}
+// 		set_pixels(data, *img, color[i]);
+// 		*img += 2;
+// 	}
+// 	td->current_pix = 0;
+// }
+
+// #define BLOCK 16
+
+static inline void	draw_blocked_eight(t_data *data, t_th_draw *td, int **img, int *new_line)
 {
 	int	color[8] __attribute__((aligned(32)));
 	int	i;
 
 	get_colors_simd(td->info, color);
 	i = -1;
-	curr.x -= 8;
-	while (++i < 8)
+	while (++i < td->current_pix)
 	{
 		if (i == *new_line)
 		{
 			*new_line = -1;
-			*img += td->add_next_line + data->img.size_line;
+			*img += data->img.size_line * 2 - BLOCK * 2;
 		}
 		set_pixels(data, *img, color[i]);
 		*img += 2;
@@ -282,39 +303,84 @@ static inline void	draw_eight(t_data *data, t_th_draw *td, int **img, t_point cu
 	td->current_pix = 0;
 }
 
-void	*draw_walls_section(t_th_draw *td)
+void	new_draw_walls_section(t_th_draw *td)
 {
 	t_data		*data;
 	t_draw		*draw;
 	int			*img;
 	t_point		curr;
+	t_point		bcurr;
 	int			new_line;
 
 	data = get_data();
-	img = data->img.data + td->start_x * 2;
-	curr.y = -1;
 	td->current_pix = 0;
 	new_line = -1;
-	while (++curr.y < data->render_h)
+	bcurr.y = 0;
+	while (bcurr.y < data->render_h)
 	{
-		curr.x = td->start_x - 1;
-		while (++curr.x < td->end_x)
+		bcurr.x = td->start_x;
+		while (bcurr.x < td->end_x)
 		{
-			draw = &data->draw[curr.x];
-			if (curr.y >= draw->draw_start[draw->bounces] && curr.y < draw->draw_end[draw->bounces])
-				draw_wall(td, draw);
-			else if (curr.y < draw->draw_start[draw->bounces])
-				draw_ceil(data, td, curr, td->ray_dir, draw);
-			else if (curr.y >= draw->draw_end[draw->bounces])
-				draw_floor(data, td, curr, td->ray_dir, draw);
-			++td->current_pix;
-			if (td->current_pix == 8)
-				draw_eight(data, td, &img, curr, &new_line);
+			img = data->img.data + bcurr.x * 2 + bcurr.y * data->img.size_line * 2;
+			curr.y = bcurr.y;
+			while (curr.y < bcurr.y + BLOCK && curr.y < data->render_h)
+			{
+				curr.x = bcurr.x;
+				while (curr.x < bcurr.x + BLOCK && curr.x < td->end_x)
+				{
+					draw = &data->draw[curr.x];
+					if (curr.y >= draw->draw_start[draw->bounces] && curr.y < draw->draw_end[draw->bounces])
+						draw_wall(td, draw);
+					else if (curr.y < draw->draw_start[draw->bounces])
+						draw_ceil(data, td, curr, td->ray_dir, draw);
+					else if (curr.y >= draw->draw_end[draw->bounces])
+						draw_floor(data, td, curr, td->ray_dir, draw);
+					++td->current_pix;
+					if (td->current_pix == 8)
+						draw_blocked_eight(data, td, &img, &new_line);
+					++curr.x;
+				}
+				new_line = td->current_pix;
+				++curr.y;
+			}
+			bcurr.x += BLOCK;
 		}
-		new_line = td->current_pix;
+		bcurr.y += BLOCK;
 	}
-	return (NULL);
 }
+
+// void	draw_walls_section(t_th_draw *td)
+// {
+// 	t_data		*data;
+// 	t_draw		*draw;
+// 	int			*img;
+// 	t_point		curr;
+// 	int			new_line;
+
+// 	data = get_data();
+// 	img = data->img.data + td->start_x * 2;
+// 	curr.y = -1;
+// 	td->current_pix = 0;
+// 	new_line = -1;
+// 	while (++curr.y < data->render_h)
+// 	{
+// 		curr.x = td->start_x - 1;
+// 		while (++curr.x < td->end_x)
+// 		{
+// 			draw = &data->draw[curr.x];
+// 			if (curr.y >= draw->draw_start[draw->bounces] && curr.y < draw->draw_end[draw->bounces])
+// 				draw_wall(td, draw);
+// 			else if (curr.y < draw->draw_start[draw->bounces])
+// 				draw_ceil(data, td, curr, td->ray_dir, draw);
+// 			else if (curr.y >= draw->draw_end[draw->bounces])
+// 				draw_floor(data, td, curr, td->ray_dir, draw);
+// 			++td->current_pix;
+// 			if (td->current_pix == 8)
+// 				draw_eight(data, td, &img, &new_line);
+// 		}
+// 		new_line = td->current_pix;
+// 	}
+// }
 
 void	*draw_walls_thread(void *arg)
 {
@@ -330,7 +396,7 @@ void	*draw_walls_thread(void *arg)
 			break ;
 		job->ready = 0;
 		pthread_mutex_unlock(&job->mutex);
-		draw_walls_section(job);
+		new_draw_walls_section(job);
 		pthread_mutex_lock(&job->mutex);
 		job->done = 1;
 		pthread_cond_signal(&job->cond_done);
@@ -441,12 +507,6 @@ void cast_rays(t_data *data)
 	t_vec	ray_dir;
 	float	look_dir;
 
-	int		debug = 0;//////////////////////////set this
-	struct	timespec start, end;
-	long	ms;
-
-	if (debug)
-		clock_gettime(CLOCK_MONOTONIC, &start);
 	look_dir = (float)data->map->player.rot * PI / 180;
 	data->cam.dir = (t_vec){cos(look_dir), sin(look_dir)};
 	data->cam.plane = (t_vec){-sin(look_dir) * tan((float)(60 * PI / 180) / 2),
@@ -459,21 +519,5 @@ void cast_rays(t_data *data)
 		ray_dir.y = data->cam.dir.y + data->cam.plane.y * cam_x;
 		data->draw[x] = cast_ray(data, ray_dir);
 	}
-	if (debug)
-	{
-		clock_gettime(CLOCK_MONOTONIC, &end);
-		long ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
-		printf("Raycast took\t%ldns\n", ms);
-	}
-
-
-	if (debug)
-		clock_gettime(CLOCK_MONOTONIC, &start);
 	draw_walls(data);
-	if (debug)
-	{
-		clock_gettime(CLOCK_MONOTONIC, &end);
-		ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
-		printf("Draw took\t%ldns\n\n", ms);
-	}
 }
