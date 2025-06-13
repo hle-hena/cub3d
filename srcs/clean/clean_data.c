@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 10:18:57 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/10 15:01:53 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/13 11:39:27 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,8 @@ int	clean_data(void)
 		mlx_destroy_window(data->mlx, data->win);
 	if (data->mlx)
 		mlx_destroy_display(data->mlx);
-	if (data->hits)
-		ft_del((void **)&data->hits);
+	if (data->draw)
+		ft_del((void **)&data->draw);//probably not the right way to do it I think ?
 	if (*get_cast_table())
 		ft_del((void **)get_cast_table());
 	if (data->lmap.lmap)

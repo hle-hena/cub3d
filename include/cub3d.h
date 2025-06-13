@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/12 15:58:30 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/13 11:40:10 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,7 +194,6 @@ typedef struct s_hit
 	t_img		*texture[MAX_BOUNCE];
 	t_flight	*light[MAX_BOUNCE];
 	t_wpath		wall[MAX_BOUNCE];
-	t_vec		ray_dir[MAX_BOUNCE];
 	t_vec		hit[MAX_BOUNCE];
 	float		dist[MAX_BOUNCE];
 	int			draw_start[MAX_BOUNCE];
@@ -204,6 +203,22 @@ typedef struct s_hit
 	int			*tex_col[MAX_BOUNCE];
 	int			bounces;
 }	t_hit;
+
+typedef struct s_draw
+{
+	int			draw_start[MAX_BOUNCE];
+	int			draw_end[MAX_BOUNCE];
+	float		reflectance[MAX_BOUNCE];
+	t_vec		normal[MAX_BOUNCE];
+	t_vec		hit[MAX_BOUNCE];
+	int			light_color[MAX_BOUNCE];
+	float		light_emittance[MAX_BOUNCE];
+	int			tex_pos_fp[MAX_BOUNCE];
+	int			tex_sizeline[MAX_BOUNCE]; 
+	int			step_fp[MAX_BOUNCE];
+	int			*tex_col[MAX_BOUNCE];
+	int			bounces;
+}	t_draw;
 
 typedef struct s_ray
 {
@@ -261,7 +276,7 @@ typedef struct s_simd_info
 	int nb_hit[8]__attribute__					((aligned(32)));
 }	t_simd;
 
-# define DRAW_THREADS 16
+# define DRAW_THREADS 4
 
 typedef struct s_thread_draw
 {
@@ -292,7 +307,7 @@ typedef struct s_data
 	t_lmap		lmap;
 	t_cam		cam;
 	t_map		*map;
-	t_hit		*hits;
+	t_draw		*draw;
 	t_event		event;
 	t_void		*empty;
 	t_th_draw	thread_pool[DRAW_THREADS];
