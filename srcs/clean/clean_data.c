@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 10:18:57 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/13 11:39:27 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/15 11:17:46 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	close_threads(t_data *data)
 	int	i;
 
 	i = -1;
-	while (++i < DRAW_THREADS)
+	while (++i < data->draw_thread)
 	{
 		pthread_mutex_lock(&data->thread_pool[i].mutex);
 		data->thread_pool[i].ready = 2;

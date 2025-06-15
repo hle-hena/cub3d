@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/13 17:15:46 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/15 11:25:13 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -276,7 +276,6 @@ typedef struct s_simd_info
 	int nb_hit[8]__attribute__					((aligned(32)));
 }	t_simd;
 
-# define DRAW_THREADS 4
 
 typedef struct s_thread_draw
 {
@@ -310,14 +309,14 @@ typedef struct s_data
 	t_draw		*draw;
 	t_event		event;
 	t_void		*empty;
-	t_th_draw	thread_pool[DRAW_THREADS];
-	pthread_t	threads[DRAW_THREADS];
-	int			simd;
+	int			draw_thread;
+	t_th_draw	*thread_pool;
+	pthread_t	*threads;
+	int			option;
 }	t_data;
 
 // # define LMAP_PRECISION 512
 # define LMAP_PRECISION 129
-# define BLOCK 16
 
 void		*draw_walls_thread(void *arg);
 t_data		*get_data(void);

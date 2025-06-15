@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 21:49:44 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/27 17:15:40 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/15 11:40:05 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void	move_event(t_data *data)
 	if (data->event.rot < 0)
 		data->map->player.rot += (float)data->event.rot * ROT_SPEED + 360;
 	else
-		data->map->player.rot += ceil((float)data->event.rot * ROT_SPEED) + 360;
+		data->map->player.rot -= (float)data->event.rot * -ROT_SPEED + 360;
 	data->map->player.rot = fmodf(data->map->player.rot, 360);
 	data->event.rot = 0;
 	delta.x = cos_val * (data->event.mo_f + data->event.mo_b)

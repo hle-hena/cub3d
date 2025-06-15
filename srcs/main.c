@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:05:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/13 11:39:02 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/15 11:25:18 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,13 +76,16 @@ void init_draw_threads(t_data *data)
 	int	i;
 	int slice;
 
-	slice = data->render_w / DRAW_THREADS;
+	data->draw_thread = sysconf(_SC_NPROCESSORS_ONLN);
+	data->thread_pool = malloc(data->draw_thread * sizeof(t_th_draw));
+	data->threads = malloc(data->draw_thread * sizeof(pthread_t));
+	slice = data->render_w / data->draw_thread;
 	i = -1;
-	data->simd = 1;
-	while (++i < DRAW_THREADS)
+	data->option = 1;
+	while (++i < data->draw_thread)
 	{
 		data->thread_pool[i].start_x = i * slice;
-		data->thread_pool[i].end_x = (i == DRAW_THREADS - 1) ? data->render_w : (i + 1) * slice;
+		data->thread_pool[i].end_x = (i == data->draw_thread - 1) ? data->render_w : (i + 1) * slice;
 		data->thread_pool[i].add_next_line = (data->win_w +
 			(data->thread_pool[i].start_x - data->thread_pool[i].end_x) * 2);
 		data->thread_pool[i].ready = 0;

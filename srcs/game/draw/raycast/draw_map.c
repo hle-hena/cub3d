@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/13 17:24:16 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/15 11:43:41 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -261,27 +261,28 @@ static inline void	draw_wall(t_th_draw *td, t_draw *draw)
 	setup_color(draw, td, temp, draw->bounces);
 }
 
-// static inline void	draw_eight(t_data *data, t_th_draw *td, int **img, int *new_line)
-// {
-// 	int	color[8] __attribute__((aligned(32)));
-// 	int	i;
+static inline void	draw_eight(t_data *data, t_th_draw *td, int **img, int *new_line)
+{
+	int	color[8] __attribute__((aligned(32)));
+	int	i;
 
-// 	get_colors_simd(td->info, color);
-// 	i = -1;
-// 	while (++i < td->current_pix)
-// 	{
-// 		if (i == *new_line)
-// 		{
-// 			*new_line = -1;
-// 			*img += td->add_next_line + data->img.size_line;
-// 		}
-// 		set_pixels(data, *img, color[i]);
-// 		*img += 2;
-// 	}
-// 	td->current_pix = 0;
-// }
+	get_colors_simd(td->info, color);
+	i = -1;
+	while (++i < td->current_pix)
+	{
+		if (i == *new_line)
+		{
+			*new_line = -1;
+			*img += td->add_next_line + data->img.size_line;
+		}
+		set_pixels(data, *img, color[i]);
+		*img += 2;
+	}
+	td->current_pix = 0;
+}
 
-// #define BLOCK 16
+#define BLOCK_X 16
+#define BLOCK_Y 128
 
 static inline void	draw_blocked_eight(t_data *data, t_th_draw *td, int **img, int *new_line)
 {
@@ -295,7 +296,7 @@ static inline void	draw_blocked_eight(t_data *data, t_th_draw *td, int **img, in
 		if (i == *new_line)
 		{
 			*new_line = -1;
-			*img += data->img.size_line * 2 - BLOCK * 2;
+			*img += data->img.size_line * 2 - BLOCK_X * 2;
 		}
 		set_pixels(data, *img, color[i]);
 		*img += 2;
@@ -314,7 +315,6 @@ void	new_draw_walls_section(t_th_draw *td)
 
 	data = get_data();
 	td->current_pix = 0;
-	new_line = -1;
 	bcurr.y = 0;
 	while (bcurr.y < data->render_h)
 	{
@@ -323,10 +323,11 @@ void	new_draw_walls_section(t_th_draw *td)
 		{
 			img = data->img.data + bcurr.x * 2 + bcurr.y * data->img.size_line * 2;
 			curr.y = bcurr.y;
-			while (curr.y < bcurr.y + BLOCK && curr.y < data->render_h)
+			new_line = -1;
+			while (curr.y < bcurr.y + BLOCK_Y && curr.y < data->render_h)
 			{
 				curr.x = bcurr.x;
-				while (curr.x < bcurr.x + BLOCK && curr.x < td->end_x)
+				while (curr.x < bcurr.x + BLOCK_X && curr.x < td->end_x)
 				{
 					draw = &data->draw[curr.x];
 					if (curr.y >= draw->draw_start[draw->bounces] && curr.y < draw->draw_end[draw->bounces])
@@ -343,44 +344,44 @@ void	new_draw_walls_section(t_th_draw *td)
 				new_line = td->current_pix;
 				++curr.y;
 			}
-			bcurr.x += BLOCK;
+			bcurr.x += BLOCK_X;
 		}
-		bcurr.y += BLOCK;
+		bcurr.y += BLOCK_Y;
 	}
 }
 
-// void	draw_walls_section(t_th_draw *td)
-// {
-// 	t_data		*data;
-// 	t_draw		*draw;
-// 	int			*img;
-// 	t_point		curr;
-// 	int			new_line;
+void	draw_walls_section(t_th_draw *td)
+{
+	t_data		*data;
+	t_draw		*draw;
+	int			*img;
+	t_point		curr;
+	int			new_line;
 
-// 	data = get_data();
-// 	img = data->img.data + td->start_x * 2;
-// 	curr.y = -1;
-// 	td->current_pix = 0;
-// 	new_line = -1;
-// 	while (++curr.y < data->render_h)
-// 	{
-// 		curr.x = td->start_x - 1;
-// 		while (++curr.x < td->end_x)
-// 		{
-// 			draw = &data->draw[curr.x];
-// 			if (curr.y >= draw->draw_start[draw->bounces] && curr.y < draw->draw_end[draw->bounces])
-// 				draw_wall(td, draw);
-// 			else if (curr.y < draw->draw_start[draw->bounces])
-// 				draw_ceil(data, td, curr, td->ray_dir, draw);
-// 			else if (curr.y >= draw->draw_end[draw->bounces])
-// 				draw_floor(data, td, curr, td->ray_dir, draw);
-// 			++td->current_pix;
-// 			if (td->current_pix == 8)
-// 				draw_eight(data, td, &img, &new_line);
-// 		}
-// 		new_line = td->current_pix;
-// 	}
-// }
+	data = get_data();
+	img = data->img.data + td->start_x * 2;
+	curr.y = -1;
+	td->current_pix = 0;
+	new_line = -1;
+	while (++curr.y < data->render_h)
+	{
+		curr.x = td->start_x - 1;
+		while (++curr.x < td->end_x)
+		{
+			draw = &data->draw[curr.x];
+			if (curr.y >= draw->draw_start[draw->bounces] && curr.y < draw->draw_end[draw->bounces])
+				draw_wall(td, draw);
+			else if (curr.y < draw->draw_start[draw->bounces])
+				draw_ceil(data, td, curr, td->ray_dir, draw);
+			else if (curr.y >= draw->draw_end[draw->bounces])
+				draw_floor(data, td, curr, td->ray_dir, draw);
+			++td->current_pix;
+			if (td->current_pix == 8)
+				draw_eight(data, td, &img, &new_line);
+		}
+		new_line = td->current_pix;
+	}
+}
 
 void	*draw_walls_thread(void *arg)
 {
@@ -396,7 +397,10 @@ void	*draw_walls_thread(void *arg)
 			break ;
 		job->ready = 0;
 		pthread_mutex_unlock(&job->mutex);
-		new_draw_walls_section(job);
+		if (get_data()->option)
+			new_draw_walls_section(job);
+		else
+			draw_walls_section(job);
 		pthread_mutex_lock(&job->mutex);
 		job->done = 1;
 		pthread_cond_signal(&job->cond_done);
@@ -417,7 +421,7 @@ void	draw_walls(t_data *data)
 	ray_dir.cast_table = *get_cast_table();
 	ray_dir.tile_dict = get_tile_dict();
 	i = -1;
-	while (++i < DRAW_THREADS)
+	while (++i < data->draw_thread)
 	{
 		pthread_mutex_lock(&data->thread_pool[i].mutex);
 		data->thread_pool[i].ray_dir = ray_dir;
@@ -428,7 +432,7 @@ void	draw_walls(t_data *data)
 		pthread_mutex_unlock(&data->thread_pool[i].mutex);
 	}
 	i = -1;
-	while (++i < DRAW_THREADS)
+	while (++i < data->draw_thread)
 	{
 		pthread_mutex_lock(&data->thread_pool[i].mutex);
 		while (!data->thread_pool[i].done)
