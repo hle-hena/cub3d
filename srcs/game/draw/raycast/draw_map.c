@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/15 11:43:41 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/15 11:56:54 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -282,7 +282,7 @@ static inline void	draw_eight(t_data *data, t_th_draw *td, int **img, int *new_l
 }
 
 #define BLOCK_X 16
-#define BLOCK_Y 128
+#define BLOCK_Y 16
 
 static inline void	draw_blocked_eight(t_data *data, t_th_draw *td, int **img, int *new_line)
 {
