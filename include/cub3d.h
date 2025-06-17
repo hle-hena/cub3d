@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/17 15:53:53 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/17 16:37:06 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,8 @@
 # include <stdio.h>
 # include <pthread.h>
 # include <immintrin.h>
-# include <float.h>
 
+# define FLT_EPSILON 1.19209289550781250000000000000000000e-7F
 # define PI 3.1415926535897932384
 # define VOID (void)0
 
@@ -187,7 +187,7 @@ typedef struct s_events
 	int		echap;
 }	t_event;
 
-# define MAX_BOUNCE 16
+# define MAX_BOUNCE 12
 
 typedef struct s_hit
 {
@@ -206,17 +206,17 @@ typedef struct s_hit
 
 typedef struct s_draw
 {
-	int			draw_start[MAX_BOUNCE];
-	int			draw_end[MAX_BOUNCE];
 	float		reflectance[MAX_BOUNCE];
-	t_vec		normal[MAX_BOUNCE];
-	t_vec		hit[MAX_BOUNCE];
 	int			light_color[MAX_BOUNCE];
 	float		light_emittance[MAX_BOUNCE];
 	int			tex_pos_fp[MAX_BOUNCE];
 	int			tex_sizeline[MAX_BOUNCE];
 	int			step_fp[MAX_BOUNCE];
 	int			*tex_col[MAX_BOUNCE];
+	int			draw_start[MAX_BOUNCE];
+	int			draw_end[MAX_BOUNCE];
+	t_vec		normal[MAX_BOUNCE];
+	t_vec		hit[MAX_BOUNCE];
 	int			bounces;
 }	t_draw;
 
