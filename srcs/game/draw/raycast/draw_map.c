@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/15 11:56:54 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/16 15:21:26 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,26 +21,27 @@
 
 static inline t_vec reflect_across_mirror(t_vec point, t_draw *draw, t_point curr, int *bounce)
 {
-	t_vec reflected = point;
-	int b = 0;
-
-	while (++b <= draw->bounces)
+	t_vec	reflected;
+	t_vec	normal;
+	t_vec	hit;
+	int		b;
+	float	dot;
+	
+	reflected = point;
+	b = -1;
+	while (++b < draw->bounces)
 	{
-		if (curr.y < draw->draw_start[b - 1] || curr.y > draw->draw_end[b - 1])
+		if (curr.y < draw->draw_start[b] || curr.y > draw->draw_end[b])
 			break;
-
-		t_vec normal = draw->normal[b-1];
-		float dx = reflected.x - draw->hit[b - 1].x;
-		float dy = reflected.y - draw->hit[b - 1].y;
-		float dot = dx * normal.x + dy * normal.y;
-		reflected.x -= 2.0f * dot * normal.x;
-		reflected.y -= 2.0f * dot * normal.y;
+		normal = draw->normal[b];
+		hit = draw->hit[b];
+		dot = (reflected.x - hit.x) * normal.x + (reflected.y - hit.y) * normal.y;
+		reflected.x -= 2 * dot * normal.x;
+		reflected.y -= 2 * dot * normal.y;
 	}
 	*bounce = b;
-	return reflected;
+	return (reflected);
 }
-
-
 
 static inline t_col	color_blend(int base_color, int light_color, float emittance)
 {
@@ -212,7 +213,7 @@ static inline void	draw_ceil(t_data *data, t_th_draw *td, t_point curr, t_rdir r
 		+ (int)(world.y * LMAP_PRECISION) * data->lmap.wid].ce_fl;
 	int	*base_col = (tex->data + offset);
 	color = color_blend(*base_col, light.color, light.emittance);
-	setup_color(draw, td, color, bounce - 1);
+	setup_color(draw, td, color, bounce);
 }
 
 static inline void draw_floor(t_data *data, t_th_draw *td, t_point curr, t_rdir ray, t_draw *draw)
@@ -247,7 +248,7 @@ static inline void draw_floor(t_data *data, t_th_draw *td, t_point curr, t_rdir 
 		+ (int)(world.y * LMAP_PRECISION) * data->lmap.wid].ce_fl;
 	int	*base_col = (tex->data + offset);
 	color = color_blend(*base_col, light.color, light.emittance);
-	setup_color(draw, td, color, bounce - 1);
+	setup_color(draw, td, color, bounce);
 }
 
 static inline void	draw_wall(t_th_draw *td, t_draw *draw)
@@ -259,26 +260,6 @@ static inline void	draw_wall(t_th_draw *td, t_draw *draw)
 			draw->light_color[draw->bounces], draw->light_emittance[draw->bounces]);
 		draw->tex_pos_fp[draw->bounces] += draw->step_fp[draw->bounces];
 	setup_color(draw, td, temp, draw->bounces);
-}
-
-static inline void	draw_eight(t_data *data, t_th_draw *td, int **img, int *new_line)
-{
-	int	color[8] __attribute__((aligned(32)));
-	int	i;
-
-	get_colors_simd(td->info, color);
-	i = -1;
-	while (++i < td->current_pix)
-	{
-		if (i == *new_line)
-		{
-			*new_line = -1;
-			*img += td->add_next_line + data->img.size_line;
-		}
-		set_pixels(data, *img, color[i]);
-		*img += 2;
-	}
-	td->current_pix = 0;
 }
 
 #define BLOCK_X 16
@@ -304,7 +285,7 @@ static inline void	draw_blocked_eight(t_data *data, t_th_draw *td, int **img, in
 	td->current_pix = 0;
 }
 
-void	new_draw_walls_section(t_th_draw *td)
+void	draw_walls_section(t_th_draw *td)
 {
 	t_data		*data;
 	t_draw		*draw;
@@ -350,39 +331,6 @@ void	new_draw_walls_section(t_th_draw *td)
 	}
 }
 
-void	draw_walls_section(t_th_draw *td)
-{
-	t_data		*data;
-	t_draw		*draw;
-	int			*img;
-	t_point		curr;
-	int			new_line;
-
-	data = get_data();
-	img = data->img.data + td->start_x * 2;
-	curr.y = -1;
-	td->current_pix = 0;
-	new_line = -1;
-	while (++curr.y < data->render_h)
-	{
-		curr.x = td->start_x - 1;
-		while (++curr.x < td->end_x)
-		{
-			draw = &data->draw[curr.x];
-			if (curr.y >= draw->draw_start[draw->bounces] && curr.y < draw->draw_end[draw->bounces])
-				draw_wall(td, draw);
-			else if (curr.y < draw->draw_start[draw->bounces])
-				draw_ceil(data, td, curr, td->ray_dir, draw);
-			else if (curr.y >= draw->draw_end[draw->bounces])
-				draw_floor(data, td, curr, td->ray_dir, draw);
-			++td->current_pix;
-			if (td->current_pix == 8)
-				draw_eight(data, td, &img, &new_line);
-		}
-		new_line = td->current_pix;
-	}
-}
-
 void	*draw_walls_thread(void *arg)
 {
 	t_th_draw	*job;
@@ -398,8 +346,6 @@ void	*draw_walls_thread(void *arg)
 		job->ready = 0;
 		pthread_mutex_unlock(&job->mutex);
 		if (get_data()->option)
-			new_draw_walls_section(job);
-		else
 			draw_walls_section(job);
 		pthread_mutex_lock(&job->mutex);
 		job->done = 1;
