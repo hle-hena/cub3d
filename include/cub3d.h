@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/16 18:34:54 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/17 15:53:53 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -291,12 +291,13 @@ typedef struct s_thread_draw
 	pthread_cond_t	cond_done;
 }	t_th_draw;
 
+# define IMG_BUFFER 4
+
 typedef struct s_data
 {
 	void		*mlx;
 	void		*win;
-	t_img		img;
-	int			*img_end;
+	t_img		img[IMG_BUFFER];
 	int			win_h;
 	int			win_w;
 	int			render_h;
@@ -312,6 +313,7 @@ typedef struct s_data
 	t_th_draw	*thread_pool;
 	pthread_t	*threads;
 	int			option;
+	int			img_buffer;
 }	t_data;
 
 // # define LMAP_PRECISION 512

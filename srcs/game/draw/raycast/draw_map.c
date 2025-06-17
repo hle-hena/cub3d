@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/16 15:21:26 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/17 15:49:28 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,8 +70,8 @@ static inline void	set_pixels(t_data *data, int *img, int color)
 {
 	*(img) = color;
 	*(img + 1) = color;
-	*(img + data->img.size_line) = color;
-	*(img + data->img.size_line + 1) = color;
+	*(img + data->img[0].size_line) = color;
+	*(img + data->img[0].size_line + 1) = color;
 }
 
 static inline __m256	color_blend_simd(__m256 base_color, __m256 light_color, __m256 emittance, __m256 inv)
@@ -277,7 +277,7 @@ static inline void	draw_blocked_eight(t_data *data, t_th_draw *td, int **img, in
 		if (i == *new_line)
 		{
 			*new_line = -1;
-			*img += data->img.size_line * 2 - BLOCK_X * 2;
+			*img += data->img[0].size_line * 2 - BLOCK_X * 2;
 		}
 		set_pixels(data, *img, color[i]);
 		*img += 2;
@@ -302,7 +302,7 @@ void	draw_walls_section(t_th_draw *td)
 		bcurr.x = td->start_x;
 		while (bcurr.x < td->end_x)
 		{
-			img = data->img.data + bcurr.x * 2 + bcurr.y * data->img.size_line * 2;
+			img = data->img[data->img_buffer].data + bcurr.x * 2 + bcurr.y * data->img[0].size_line * 2;
 			curr.y = bcurr.y;
 			new_line = -1;
 			while (curr.y < bcurr.y + BLOCK_Y && curr.y < data->render_h)
@@ -401,7 +401,7 @@ void	init_line_heights(t_data *data, t_hit *hit, int tex_start, int tex_end)
 		if (line_height == 0)
 			line_height = 1;
 		tex_start = -line_height / 2 + data->render_h / 2;
-		tex_end = (line_height / 2 + data->render_h / 2) + 1;
+		tex_end = (line_height / 2 + data->render_h / 2);
 		hit->draw_start[i] = ft_max(tex_start, 0);
 		hit->draw_end[i] = ft_min(tex_end, data->render_h);
 		line_height = tex_end - tex_start;

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:05:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/15 11:25:18 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/17 15:47:49 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@ t_data	*get_data(void)
 
 void	init_mlx(t_data *data)
 {
+	int	i;
+
 	data->empty = ft_calloc(1, sizeof(t_void));
 	data->empty->flight = ft_calloc(1, sizeof(t_flight));
 	data->empty->texture.img = malloc(sizeof(t_img));
@@ -42,17 +44,20 @@ void	init_mlx(t_data *data)
 	data->render_w /= 2;
 	data->win = mlx_new_window(data->mlx, data->win_w, data->win_h,
 		"Cub3d");
-	data->img.img = mlx_new_image(data->mlx, data->win_w, data->win_h);
-	data->img.data = (int *)mlx_get_data_addr(data->img.img, &data->img.bpp,
-		&data->img.size_line, &data->img.endian);
-	data->img.bpp /= 8;
-	data->img.size_line /= data->img.bpp;
-	data->img_end = data->img.data + (data->win_h - 1) * data->img.size_line
-		+ (data->win_w - 1);
+	i = -1;
+	while (++i < IMG_BUFFER)
+	{
+		data->img[i].img = mlx_new_image(data->mlx, data->win_w, data->win_h);
+		data->img[i].data = (int *)mlx_get_data_addr(data->img[i].img, &data->img[i].bpp,
+			&data->img[i].size_line, &data->img[i].endian);
+		data->img[i].bpp /= 8;
+		data->img[i].size_line /= data->img[i].bpp;
+	}
 	data->event = (t_event){0};
 	data->delta_t = 0;
 	data->lmap.nb_ls = 0;
 	data->lmap.lights = NULL;
+	data->img_buffer = 0;
 }
 
 void	init_utils(t_data *data)

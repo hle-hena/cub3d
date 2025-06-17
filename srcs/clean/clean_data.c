@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 10:18:57 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/15 11:17:46 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/17 15:03:51 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,13 +30,18 @@ void	close_threads(t_data *data)
 int	clean_data(void)
 {
 	t_data	*data;
+	int		i;
 
 	data = get_data();
 	clean_map();
 	close_threads(data);
 	// mlx_do_key_autorepeaton(data->mlx);
-	if (data->img.img)
-		mlx_destroy_image(data->mlx, data->img.img);
+	i = -1;
+	while (++i < IMG_BUFFER)
+	{
+		if (data->img[i].img)
+			mlx_destroy_image(data->mlx, data->img[i].img);
+	}
 	if (data->win)
 		mlx_destroy_window(data->mlx, data->win);
 	if (data->mlx)
