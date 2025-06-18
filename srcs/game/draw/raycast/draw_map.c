@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/17 16:22:20 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/18 17:35:56 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,30 +18,6 @@
 	// clock_gettime(CLOCK_MONOTONIC, &end);
 	// long ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
 	// printf("Took %ldns\n", ms);
-
-static inline t_vec reflect_across_mirror(t_vec point, t_draw *draw, t_point curr, int *bounce)
-{
-	t_vec	reflected;
-	t_vec	normal;
-	t_vec	hit;
-	int		b;
-	float	dot;
-	
-	reflected = point;
-	b = -1;
-	while (++b < draw->bounces)
-	{
-		if (curr.y < draw->draw_start[b] || curr.y > draw->draw_end[b])
-			break;
-		normal = draw->normal[b];
-		hit = draw->hit[b];
-		dot = (reflected.x - hit.x) * normal.x + (reflected.y - hit.y) * normal.y;
-		reflected.x -= 2 * dot * normal.x;
-		reflected.y -= 2 * dot * normal.y;
-	}
-	*bounce = b;
-	return (reflected);
-}
 
 static inline t_col	color_blend(int base_color, int light_color, float emittance)
 {
@@ -74,22 +50,6 @@ static inline void	set_pixels(t_data *data, int *img, int color)
 	*(img + data->img[0].size_line + 1) = color;
 }
 
-static inline __m256	color_blend_simd(__m256 base_color, __m256 light_color, __m256 emittance, __m256 inv)
-{
-	return (_mm256_mul_ps(_mm256_mul_ps(
-		_mm256_mul_ps(base_color, light_color),
-		emittance
-	), inv));
-}
-
-static inline __m256 blend_channel_simd(__m256 base, __m256 other, __m256 refl, __m256 inv_refl)
-{
-	return (_mm256_mul_ps(
-		base,
-		_mm256_add_ps(inv_refl, _mm256_mul_ps(_mm256_div_ps(other, _mm256_set1_ps(255.0f)), refl))
-	));
-}
-
 void get_colors_simd(t_simd info, int out_colors[8])
 {
 	__m256	prev_r;
@@ -101,8 +61,8 @@ void get_colors_simd(t_simd info, int out_colors[8])
 	__m256	refl;
 	__m256	inv_refl;
 	__m256	one;
-	__m256	max;
-	__m256	inv;
+	__m256	div;
+	__m256	mul;
 	__m256	mask;
 	__m256	nb_hit;
 	__m256	curr_hit;
@@ -116,35 +76,67 @@ void get_colors_simd(t_simd info, int out_colors[8])
 			max_hit = info.nb_hit[i];
 	}
 	one = _mm256_set1_ps(1);
-	max = _mm256_set1_ps(256);
-	inv = _mm256_set1_ps(1.0f / 65536.0f);
+	div = _mm256_set1_ps((float)1 / 255);
+	mul = _mm256_set1_ps(255);
 	nb_hit = _mm256_cvtepi32_ps(_mm256_load_si256((__m256i *)info.nb_hit));
-	prev_r = _mm256_load_ps(info.fallback.r);
-	prev_g = _mm256_load_ps(info.fallback.g);
-	prev_b = _mm256_load_ps(info.fallback.b);
+	prev_r = _mm256_mul_ps(_mm256_load_ps(info.fallback.r), div);
+	prev_g = _mm256_mul_ps(_mm256_load_ps(info.fallback.g), div);
+	prev_b = _mm256_mul_ps(_mm256_load_ps(info.fallback.b), div);
 	while (--max_hit >= 0)
 	{
-		__m256	em = _mm256_mul_ps(_mm256_load_ps(info.emittance[max_hit]), max);
-		curr_r = color_blend_simd(_mm256_load_ps(info.textures[max_hit].r),
-			_mm256_load_ps(info.light_color[max_hit].r), em, inv);
-		curr_g = color_blend_simd(_mm256_load_ps(info.textures[max_hit].g),
-			_mm256_load_ps(info.light_color[max_hit].g), em, inv);
-		curr_b = color_blend_simd(_mm256_load_ps(info.textures[max_hit].b),
-			_mm256_load_ps(info.light_color[max_hit].b), em, inv);
+		curr_r = _mm256_mul_ps(_mm256_load_ps(info.textures[max_hit].r), div);
+		curr_g = _mm256_mul_ps(_mm256_load_ps(info.textures[max_hit].g), div);
+		curr_b = _mm256_mul_ps(_mm256_load_ps(info.textures[max_hit].b), div);
+		curr_hit = _mm256_set1_ps((float)max_hit);
 		refl = _mm256_load_ps(info.refl_val[max_hit]);
 		inv_refl = _mm256_sub_ps(one, refl);
-		curr_hit = _mm256_set1_ps(max_hit);
 		mask = _mm256_cmp_ps(curr_hit, nb_hit, _CMP_LT_OQ);
-		prev_r = _mm256_blendv_ps(prev_r,
-			blend_channel_simd(curr_r, prev_r, refl, inv_refl), mask);
-		prev_g = _mm256_blendv_ps(prev_g,
-			blend_channel_simd(curr_g, prev_g, refl, inv_refl), mask);
-		prev_b = _mm256_blendv_ps(prev_b,
-			blend_channel_simd(curr_b, prev_b, refl, inv_refl), mask);
+		prev_r = _mm256_blendv_ps(
+			prev_r,
+			_mm256_add_ps(
+				_mm256_mul_ps(
+					curr_r,
+					_mm256_mul_ps(refl, prev_r)
+				),
+				_mm256_mul_ps(
+					_mm256_mul_ps(inv_refl, curr_r),
+					_mm256_mul_ps(_mm256_load_ps(info.light_color[max_hit].r), div)
+				)
+			),
+			mask
+		);
+		prev_g = _mm256_blendv_ps(
+			prev_g,
+			_mm256_add_ps(
+				_mm256_mul_ps(
+					curr_g,
+					_mm256_mul_ps(refl, prev_g)
+				),
+				_mm256_mul_ps(
+					_mm256_mul_ps(inv_refl, curr_g),
+					_mm256_mul_ps(_mm256_load_ps(info.light_color[max_hit].g), div)
+				)
+			),
+			mask
+		);
+		prev_b = _mm256_blendv_ps(
+			prev_b,
+			_mm256_add_ps(
+				_mm256_mul_ps(
+					curr_b,
+					_mm256_mul_ps(refl, prev_b)
+				),
+				_mm256_mul_ps(
+					_mm256_mul_ps(inv_refl, curr_b),
+					_mm256_mul_ps(_mm256_load_ps(info.light_color[max_hit].b), div)
+				)
+			),
+			mask
+		);
 	}
-	__m256i r_int = _mm256_cvtps_epi32(prev_r);
-	__m256i g_int = _mm256_cvtps_epi32(prev_g);
-	__m256i b_int = _mm256_cvtps_epi32(prev_b);
+	__m256i r_int = _mm256_cvtps_epi32(_mm256_mul_ps(prev_r, mul));
+	__m256i g_int = _mm256_cvtps_epi32(_mm256_mul_ps(prev_g, mul));
+	__m256i b_int = _mm256_cvtps_epi32(_mm256_mul_ps(prev_b, mul));
 	__m256i packed = _mm256_or_si256(
 		_mm256_or_si256(
 			_mm256_slli_epi32(r_int, 16),
@@ -181,6 +173,55 @@ static inline void	setup_color(t_draw *draw, t_th_draw *td, t_col fallback, int 
 	}
 }
 
+//logic to merge everything.
+/* 
+func
+{
+
+create a mask for if it is a floor, one of it is a ceil and one of if it is a wall.
+
+do the reflexion logic.
+
+if mask of ceil or mask of floor and point is outside of map, set color as if it wall
+
+if the tile is wrong, set color as black
+
+retrieve color based on if I have a wall, a floor or a ceil, and if color was already set
+
+call the setup color
+
+}
+ */
+
+// void	draw_all()
+// {
+	
+// }
+
+static inline t_vec reflect_across_mirror(t_vec point, t_draw *draw, t_point curr, int *bounce)
+{
+	t_vec	reflected;
+	t_vec	normal;
+	t_vec	hit;
+	int		b;
+	float	dot;
+
+	reflected = point;
+	b = -1;
+	while (++b < draw->bounces)
+	{
+		if (curr.y < draw->draw_start[b] || curr.y > draw->draw_end[b])
+			break;
+		normal = draw->normal[b];
+		hit = draw->hit[b];
+		dot = (reflected.x - hit.x) * normal.x + (reflected.y - hit.y) * normal.y;
+		reflected.x -= 2 * dot * normal.x;
+		reflected.y -= 2 * dot * normal.y;
+	}
+	*bounce = b;
+	return (reflected);
+}
+
 static inline void	draw_ceil(t_data *data, t_th_draw *td, t_point curr, t_rdir ray, t_draw *draw)
 {
 	int			bounce;
@@ -200,7 +241,9 @@ static inline void	draw_ceil(t_data *data, t_th_draw *td, t_point curr, t_rdir r
 	world = reflect_across_mirror(world, draw, curr, &bounce);
 	if (world.x < 0 || world.x >= data->map->wid || world.y < 0
 		|| world.y >= data->map->len)
-		return (setup_color(draw, td, (t_col){0}, 0), (void)0);
+		return (setup_color(draw, td, color_blend(*(int *)(draw->tex_col[draw->bounces]
+			+ (draw->tex_pos_fp[draw->bounces] >> 16) * draw->tex_sizeline[draw->bounces]),
+			draw->light_color[draw->bounces], draw->light_emittance[draw->bounces]), bounce), (void)0);
 	ix = (int)world.x;
 	iy = (int)world.y;
 	tile = ray.tile_dict[data->map->matrix[iy * data->map->wid + ix]];
@@ -235,7 +278,9 @@ static inline void draw_floor(t_data *data, t_th_draw *td, t_point curr, t_rdir 
 	world = reflect_across_mirror(world, draw, curr, &bounce);
 	if (world.x < 0 || world.x >= data->map->wid || world.y < 0
 		|| world.y >= data->map->len)
-		return (setup_color(draw, td, (t_col){0}, 0), (void)0);
+		return (setup_color(draw, td, color_blend(*(int *)(draw->tex_col[draw->bounces]
+			+ (draw->tex_pos_fp[draw->bounces] >> 16) * draw->tex_sizeline[draw->bounces]),
+			draw->light_color[draw->bounces], draw->light_emittance[draw->bounces]), bounce), (void)0);
 	ix = (int)world.x;
 	iy = (int)world.y;
 	tile = ray.tile_dict[data->map->matrix[iy * data->map->wid + ix]];
@@ -345,8 +390,7 @@ void	*draw_walls_thread(void *arg)
 			break ;
 		job->ready = 0;
 		pthread_mutex_unlock(&job->mutex);
-		if (get_data()->option)
-			draw_walls_section(job);
+		draw_walls_section(job);
 		pthread_mutex_lock(&job->mutex);
 		job->done = 1;
 		pthread_cond_signal(&job->cond_done);
