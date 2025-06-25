@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 12:04:42 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/15 11:34:34 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/25 13:31:12 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ void	fps_counter(t_data *data)
 	frame_count++;
 
 	elapsed_since_last_print = now - last_fps_print_time;
-	if (elapsed_since_last_print >= 200000)
+	if (elapsed_since_last_print >= 400000)
 	{
 		float current_fps = 1000000.0f / elapsed;
 		float average_fps = (total_time > 0) ? (frame_count * 1000000.0f / total_time) : 0.0f;

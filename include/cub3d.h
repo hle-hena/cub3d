@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/17 16:37:06 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/25 13:17:17 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -316,7 +316,6 @@ typedef struct s_data
 	int			img_buffer;
 }	t_data;
 
-// # define LMAP_PRECISION 512
 # define LMAP_PRECISION 129
 
 void		*draw_walls_thread(void *arg);
@@ -326,10 +325,6 @@ t_map		*load_map(int ac, char **av);
 int			clean_map(void);
 int			clean_data(void);
 
-// static inline int	get(t_map *map, int x, int y)
-// {
-// 	return (*(map->matrix + y * map->wid + x));
-// }
 
 void		fill_cast_table(t_data *data, int *err);
 

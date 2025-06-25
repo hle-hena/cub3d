@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/18 17:35:56 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/25 13:15:53 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,40 +173,13 @@ static inline void	setup_color(t_draw *draw, t_th_draw *td, t_col fallback, int 
 	}
 }
 
-//logic to merge everything.
-/* 
-func
-{
-
-create a mask for if it is a floor, one of it is a ceil and one of if it is a wall.
-
-do the reflexion logic.
-
-if mask of ceil or mask of floor and point is outside of map, set color as if it wall
-
-if the tile is wrong, set color as black
-
-retrieve color based on if I have a wall, a floor or a ceil, and if color was already set
-
-call the setup color
-
-}
- */
-
-// void	draw_all()
-// {
-	
-// }
-
 static inline t_vec reflect_across_mirror(t_vec point, t_draw *draw, t_point curr, int *bounce)
 {
-	t_vec	reflected;
 	t_vec	normal;
 	t_vec	hit;
 	int		b;
 	float	dot;
 
-	reflected = point;
 	b = -1;
 	while (++b < draw->bounces)
 	{
@@ -214,12 +187,12 @@ static inline t_vec reflect_across_mirror(t_vec point, t_draw *draw, t_point cur
 			break;
 		normal = draw->normal[b];
 		hit = draw->hit[b];
-		dot = (reflected.x - hit.x) * normal.x + (reflected.y - hit.y) * normal.y;
-		reflected.x -= 2 * dot * normal.x;
-		reflected.y -= 2 * dot * normal.y;
+		dot = 2 * ((point.x - hit.x) * normal.x + (point.y - hit.y) * normal.y);
+		point.x -= dot * normal.x;
+		point.y -= dot * normal.y;
 	}
 	*bounce = b;
-	return (reflected);
+	return (point);
 }
 
 static inline void	draw_ceil(t_data *data, t_th_draw *td, t_point curr, t_rdir ray, t_draw *draw)
