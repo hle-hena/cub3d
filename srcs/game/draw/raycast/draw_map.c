@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/25 13:15:53 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/25 14:23:25 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -404,54 +404,39 @@ void	draw_walls(t_data *data)
 	}
 }
 
-void	init_line_heights(t_data *data, t_hit *hit, int tex_start, int tex_end)
+t_draw	init_draw(t_data *data, t_hit hit, int tex_start, int tex_end)
 {
 	int		i;
 	int		line_height;
+	t_draw	draw;
 
 	i = -1;
-	while (++i <= hit->bounces)
+	draw.bounces = hit.bounces;
+	while (++i <= hit.bounces)
 	{
-		if (hit->dist[i] <= 0.0f)
-			hit->dist[i] = 0.0001f;
-		line_height = (int)(data->render_h * 2 / hit->dist[i]);
+		if (hit.dist[i] <= 0.0f)
+			hit.dist[i] = 0.0001f;
+		line_height = (int)(data->render_h * 2 / hit.dist[i]);
 		if (line_height == 0)
 			line_height = 1;
 		tex_start = -line_height / 2 + data->render_h / 2;
 		tex_end = (line_height / 2 + data->render_h / 2);
-		hit->draw_start[i] = ft_max(tex_start, 0);
-		hit->draw_end[i] = ft_min(tex_end, data->render_h);
+		draw.draw_start[i] = ft_max(tex_start, 0);
+		draw.draw_end[i] = ft_min(tex_end, data->render_h);
 		line_height = tex_end - tex_start;
 		if (line_height == 0)
 			line_height = 1;
-		hit->step_fp[i] = (hit->texture[i]->height << 16) / line_height;
-		hit->tex_pos_fp[i] = (hit->draw_start[i]
-			- data->render_h / 2 + line_height / 2) * hit->step_fp[i];
-		hit->tex_col[i] = hit->texture[i]->data
-			+ (int)(hit->wall[i].pos * hit->texture[i]->width);
-	}
-}
-
-t_draw	init_draw(t_hit hit)
-{
-	t_draw	draw;
-
-	draw = (t_draw){0};
-	draw.bounces = hit.bounces;
-	while (hit.bounces >= 0)
-	{
-		draw.light_color[hit.bounces] = hit.light[hit.bounces]->color;
-		draw.light_emittance[hit.bounces] =  hit.light[hit.bounces]->emittance;
-		draw.normal[hit.bounces] = hit.wall[hit.bounces].normal;
-		draw.reflectance[hit.bounces] = hit.wall[hit.bounces].reflectance;
-		draw.step_fp[hit.bounces] = hit.step_fp[hit.bounces];
-		draw.tex_pos_fp[hit.bounces] = hit.tex_pos_fp[hit.bounces];
-		draw.tex_col[hit.bounces] = hit.tex_col[hit.bounces];
-		draw.tex_sizeline[hit.bounces] = hit.texture[hit.bounces]->size_line;
-		draw.draw_start[hit.bounces] = hit.draw_start[hit.bounces];
-		draw.draw_end[hit.bounces] = hit.draw_end[hit.bounces];
-		draw.hit[hit.bounces] = hit.hit[hit.bounces];
-		--hit.bounces;
+		draw.step_fp[i] = (hit.texture[i]->height << 16) / line_height;
+		draw.tex_pos_fp[i] = (hit.draw_start[i]
+			- data->render_h / 2 + line_height / 2) * hit.step_fp[i];
+		draw.tex_col[i] = hit.texture[i]->data
+			+ (int)(hit.wall[i].pos * hit.texture[i]->width);
+		draw.tex_sizeline[i] = hit.texture[i]->size_line;
+		draw.light_color[i] = hit.light[i]->color;
+		draw.light_emittance[i] = hit.light[i]->emittance;
+		draw.reflectance[i] = hit.wall[i].reflectance;
+		draw.normal[i] = hit.wall[i].normal;
+		draw.hit[i] = hit.hit[i];
 	}
 	return (draw);
 }
@@ -460,11 +445,9 @@ t_draw cast_ray(t_data *data, t_vec ray_dir)
 {
 	t_hit	hit;
 
-	hit = (t_hit){0};
 	hit = raycast(data, ray_dir, (t_vec){data->map->player.x,
 		data->map->player.y});
-	init_line_heights(data, &hit, 0, 0);
-	return (init_draw(hit));
+	return (init_draw(data, hit, 0, 0));
 }
 
 void cast_rays(t_data *data)
