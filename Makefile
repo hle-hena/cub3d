@@ -18,7 +18,7 @@ SRCS = $(addprefix srcs/, \
 		$(addprefix tile_dict/, hash_map.c is_dict_full.c retrieve_lonely.c \
 			retrieve_player.c retrieve_texture_color.c retrieve_texture_val.c \
 			retrieve_texture.c retrieve_tile_dict.c retrieve_tile_info.c \
-			retrieve_value.c)\
+			retrieve_value.c retrieve_wall_line.c)\
 		$(addprefix map/, is_map_valid.c retrieve_map.c)\
 		$(addprefix lmap/, load.c retrieve_light.c)\
 		$(addprefix raytrace/, find_flight.c handle_light.c raytrace_utils.c\

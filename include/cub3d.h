@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/25 13:17:17 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/30 17:28:57 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -187,7 +187,7 @@ typedef struct s_events
 	int		echap;
 }	t_event;
 
-# define MAX_BOUNCE 12
+# define MAX_BOUNCE 4
 
 typedef struct s_hit
 {
@@ -327,6 +327,9 @@ int			clean_data(void);
 
 
 void		fill_cast_table(t_data *data, int *err);
+
+void		retrieve_line(t_tile *tile, char *arg, int *err);
+void		retrieve_arc(t_tile *tile, char *arg, int *err);
 
 t_tile		*new_tile(void);
 t_tile		**get_tile_dict(void);

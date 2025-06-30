@@ -1,8 +1,8 @@
 5 {
-	NO 200,200,200 1
-	SO 200,200,200 1
-	EA 200,200,200 1
-	WE 200,200,200 1
+	NO 140,140,140 0.8
+	SO 140,140,140 0.8
+	EA 140,140,140 0.8
+	WE 140,140,140 0.8
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
 	CH 100

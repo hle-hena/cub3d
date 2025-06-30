@@ -6,105 +6,16 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:28:34 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/05 16:07:45 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/30 17:28:54 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-void	retrieve_wall(t_tile *tile, char *arg, int *err)
-{
-	//This func need to be more well done.
-	t_wpath	*line;
-
-	line = malloc(sizeof(t_wpath));
-	if (!line)
-		return (*err = 1, VOID);
-	arg++;
-	arg++;
-	line->start.x = ft_atof_err(arg, 0, 1, &arg);
-	arg++;
-	arg++;
-	line->start.y = ft_atof_err(arg, 0, 1, &arg);
-	arg++;
-	arg++;
-	arg++;
-	arg++;
-	line->end.x = ft_atof_err(arg, 0, 1, &arg);
-	arg++;
-	arg++;
-	line->end.y = ft_atof_err(arg, 0, 1, &arg);
-	arg++;
-	arg++;
-	arg++;
-	arg++;
-	line->texture = tile->tex_no;
-	line->normal = (t_vec){
-		-line->end.y + line->start.y,
-		line->end.x - line->start.x
-	};
-	line->normal = normalize(line->normal);
-	line->reflectance = 0;
-	line->mode = 0;
-	line->center = (t_vec){0};
-	if (*arg)
-		line->reflectance = ft_atof_err(arg, 0, 1, &arg);
-	add_link(&tile->wpath, line);
-}
-
-void	retrieve_arc(t_tile *tile, char *arg, int *err)
-{
-	//This func need to be more well done.
-	t_wpath	*line;
-
-	line = malloc(sizeof(t_wpath));
-	if (!line)
-		return (*err = 1, VOID);
-	arg++;
-	arg++;
-	line->start.x = ft_atof_err(arg, 0, 1, &arg);
-	arg++;
-	arg++;
-	line->start.y = ft_atof_err(arg, 0, 1, &arg);
-	arg++;
-	arg++;
-	arg++;
-	arg++;
-	line->end.x = ft_atof_err(arg, 0, 1, &arg);
-	arg++;
-	arg++;
-	line->end.y = ft_atof_err(arg, 0, 1, &arg);
-	arg++;
-	arg++;
-	arg++;
-	arg++;
-	if (*arg == '-')
-		line->center.x = -ft_atof_err(++arg, -100, 100, &arg);
-	else
-		line->center.x = ft_atof_err(arg, -100, 100, &arg);
-	arg++;
-	arg++;
-	if (*arg == '-')
-		line->center.y = -ft_atof_err(++arg, -100, 100, &arg);
-	else
-		line->center.y = ft_atof_err(arg, -100, 100, &arg);
-	arg++;
-	arg++;
-	arg++;
-	arg++;
-	line->texture = tile->tex_no;
-	line->normal = (t_vec){0};
-	line->reflectance = 0;
-	line->mode = 1;
-	if (*arg)
-		line->reflectance = ft_atof_err(arg, 0, 1, &arg);
-	add_link(&tile->wpath, line);
-}
-
 void	type_switch(t_tile *tile, char *line, char *arg, int *err)
 {
 	if (ft_strncmp("wl ", line, 3) == 0)
-		retrieve_wall(tile, arg, err);
+		retrieve_line(tile, arg, err);
 	else if (ft_strncmp("wa ", line, 3) == 0)
 		retrieve_arc(tile, arg, err);
 	else if (ft_strncmp("NO ", line, 3) == 0)

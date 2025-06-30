@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/25 14:23:25 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/06/30 10:39:16 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -427,8 +427,8 @@ t_draw	init_draw(t_data *data, t_hit hit, int tex_start, int tex_end)
 		if (line_height == 0)
 			line_height = 1;
 		draw.step_fp[i] = (hit.texture[i]->height << 16) / line_height;
-		draw.tex_pos_fp[i] = (hit.draw_start[i]
-			- data->render_h / 2 + line_height / 2) * hit.step_fp[i];
+		draw.tex_pos_fp[i] = (draw.draw_start[i]
+			- data->render_h / 2 + line_height / 2) * draw.step_fp[i];
 		draw.tex_col[i] = hit.texture[i]->data
 			+ (int)(hit.wall[i].pos * hit.texture[i]->width);
 		draw.tex_sizeline[i] = hit.texture[i]->size_line;
