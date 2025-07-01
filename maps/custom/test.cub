@@ -5,8 +5,6 @@
 	WE textures/simonkraft/bookshelf_01.xpm
 	C 0,0,0
 	F 0,0,0
-	CH 100
-	FH 0
 	W 1
 }
 1 {
@@ -14,12 +12,10 @@
 	SO textures/simonkraft/bookshelf_01.xpm
 	EA textures/simonkraft/bookshelf_01.xpm
 	WE textures/simonkraft/bookshelf_01.xpm
-	C 0,0,0
-	F 0,0,0
-	CH 100
-	FH 0
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
 	W 1
-	wa ((0.5, 0), (0.5, 0)), 1
+	wa ((0.5, 0), (0.5, 0), (0.5, 0.5)), 0.8
 }
 0 {
 	NO textures/simonkraft/bookshelf_01.xpm
@@ -28,19 +24,19 @@
 	EA textures/simonkraft/bookshelf.xpm
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
-	CH 100
-	FH 0
 	W 0
 }
 P=0
 
-L ((1.5, 1.5), 1)
-#L ((2.5, 2.5), 1)
-#L ((5, 2.5), 1)
-#L ((7.5, 2.5), 1)
+L ((2.5, 2.5), 1)
+L ((4.5, 2.5), 1)
 
-.....
-.000.
-.N10.
-.000. 
-.....
+.........
+.0000000.
+.0000000.
+.0000000.
+.N001000.
+.0000000.
+.0000000.
+.0000000. 
+.........

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/30 17:28:57 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/01 15:27:14 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,6 +139,32 @@ typedef struct s_light_map
 	int			len;
 }	t_lmap;
 
+typedef struct s_graph_link	t_link;
+typedef struct s_graph_node	t_node;
+
+struct s_graph_node
+{
+	t_vec	coo;
+	t_link	*connect[512];
+	int		visited;
+};
+
+struct s_graph_link
+{
+	t_node	*start;
+	t_node	*end;
+	t_vec	center;
+	int		type;
+};
+
+typedef struct s_graph
+{
+	t_node	nodes[1024];
+	t_link	links[512];
+	int		nb_links;
+	int		nb_nodes;
+}	t_graph;
+
 typedef struct s_wpath
 {
 	t_vec	start;
@@ -160,8 +186,6 @@ typedef struct s_tile
 	t_text		tex_ea;
 	t_text		tex_ce;
 	t_text		tex_fl;
-	int			ceil_height;
-	int			floor_height;
 	int			is_wall;
 }	t_tile;
 

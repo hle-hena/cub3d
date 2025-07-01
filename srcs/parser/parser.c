@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:16:19 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/27 12:53:11 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/01 11:15:34 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,8 @@ t_map	*load_map(int ac, char **av)
 	temp = retrieve_tile_dict(map, map_fd, &err);
 	if (is_dict_full(map, err))
 		return (ft_del((void **)&temp), NULL);
+	// if (build_polygons(map))
+	// 	return (ft_del((void **)&temp), NULL);
 	retrieve_map(map, temp, map_fd, &err);
 	if (is_map_valid(map, get_tile_dict(), err))
 		return (NULL);

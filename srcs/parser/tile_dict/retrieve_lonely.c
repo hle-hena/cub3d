@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 10:37:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/28 11:43:07 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/01 10:39:30 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,6 @@ identifier at ", line, ".", NULL}), 1), *err = 1, 0);
 		retrieve_texture(&(tiles[index])->tex_fl, arg, err, "F");
 	else if (ft_strncmp("W ", line, 2) == 0)
 		retrieve_value(&(tiles[index])->is_wall, arg, err, "W");
-	else if (ft_strncmp("CH ", line, 2) == 0)
-		retrieve_value(&(tiles[index])->ceil_height, arg, err, "CH");
-	else if (ft_strncmp("FH ", line, 2) == 0)
-		retrieve_value(&(tiles[index])->floor_height, arg, err, "FH");
 	else
 		return (ft_del((void **)&arg), 1);
 	return (ft_del((void **)&arg), 0);
@@ -66,10 +62,6 @@ int	is_end(char *line)
 	else if (ft_strncmp("F ", line, 2) == 0)
 		is_end = 0;
 	else if (ft_strncmp("W ", line, 2) == 0)
-		is_end = 0;
-	else if (ft_strncmp("CH ", line, 2) == 0)
-		is_end = 0;
-	else if (ft_strncmp("FH ", line, 2) == 0)
 		is_end = 0;
 	else
 		is_end = 1;

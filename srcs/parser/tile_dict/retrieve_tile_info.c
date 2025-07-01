@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:28:34 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/30 17:28:54 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/01 10:41:21 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,10 +32,6 @@ void	type_switch(t_tile *tile, char *line, char *arg, int *err)
 		retrieve_texture(&tile->tex_fl, arg, err, "F");
 	else if (ft_strncmp("W ", line, 2) == 0)
 		retrieve_value(&tile->is_wall, arg, err, "W");
-	else if (ft_strncmp("CH ", line, 2) == 0)
-		retrieve_value(&tile->ceil_height, arg, err, "CH");
-	else if (ft_strncmp("FH ", line, 2) == 0)
-		retrieve_value(&tile->floor_height, arg, err, "FH");
 	else
 		(ft_perror(-1, ft_strsjoin((char *[]){"Invalid identifier at \
 line : ", line, ".", NULL}), 1), *err = 1);
@@ -55,38 +51,6 @@ identifier at ", line, ".", NULL}), 1), *err = 1, VOID);
 		return (*err = 1, VOID);
 	type_switch(tile, line, arg, err);
 	ft_del((void **)&arg);
-}
-
-void	add_wpath(t_tile *tile, int *err)
-{
-	t_wpath	*wpath;
-
-	if (tile->wpath)
-		return ;
-	wpath = malloc(sizeof(t_wpath));
-	if (!wpath)
-		return (*err = 1, VOID);
-	*wpath = (t_wpath){(t_vec){0, 0}, (t_vec){0, 1}, (t_vec){0}, tile->tex_we,
-			(t_vec){-1, 0}, tile->tex_we.reflectance, 0, 0};
-	add_link(&tile->wpath, wpath);
-	wpath = malloc(sizeof(t_wpath));
-	if (!wpath)
-		return (*err = 1, VOID);
-	*wpath = (t_wpath){(t_vec){0, 0}, (t_vec){1, 0}, (t_vec){0}, tile->tex_no,
-			(t_vec){0, -1}, tile->tex_no.reflectance, 0, 0};
-	add_link(&tile->wpath, wpath);
-	wpath = malloc(sizeof(t_wpath));
-	if (!wpath)
-		return (*err = 1, VOID);
-	*wpath = (t_wpath){(t_vec){1, 1}, (t_vec){0, 1}, (t_vec){0}, tile->tex_so,
-			(t_vec){0, 1}, tile->tex_so.reflectance, 0, 0};
-	add_link(&tile->wpath, wpath);
-	wpath = malloc(sizeof(t_wpath));
-	if (!wpath)
-		return (*err = 1, VOID);
-	*wpath = (t_wpath){(t_vec){1, 1}, (t_vec){1, 0}, (t_vec){0}, tile->tex_ea,
-			(t_vec){1, 0}, tile->tex_ea.reflectance, 0, 0};
-	add_link(&tile->wpath, wpath);
 }
 
 t_tile	*new_tile(void)
@@ -109,8 +73,6 @@ t_tile	*new_tile(void)
 	new->tex_no.reflectance = 0;
 	new->tex_so.reflectance = 0;
 	new->tex_we.reflectance = 0;
-	new->ceil_height = -1;
-	new->floor_height = -1;
 	new->is_wall = -1;
 	return (new);
 }
@@ -129,13 +91,13 @@ void	retrieve_tile(t_tile **tiles, int map_fd, char *line, int *err)
 	{
 		temp = get_next_line(map_fd);
 		if (!temp)
-			return (ft_perror(-1, "Internal error: malloc.", 0), *err = 1, VOID);
+			return (ft_perror(-1, "Unexpected end of file.", 0), *err = 1, VOID);
 		line = ft_strtrim(temp, "\t\n ");
 		ft_del((void **)&temp);
 		if (!line)
 			return (ft_perror(-1, "Internal error: malloc.", 0), *err = 1, VOID);
 		if (ft_strncmp("}", line, 2) == 0)
-			return (ft_del((void **)&line), add_wpath(*tiles, err), VOID);
+			return (ft_del((void **)&line), VOID);
 		retrieve_switch(*tiles, line, err);
 		ft_del((void **)&line);
 		if (*err)

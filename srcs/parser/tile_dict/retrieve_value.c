@@ -6,39 +6,18 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 16:34:13 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/24 15:09:57 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/01 10:47:33 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-void	get_limits(int *limits, char **lim_str, char *id)
+void	get_limits(int *limits, char **lim_str)
 {
 	limits[0] = 0;
-	limits[1] = 0;
+	limits[1] = 1;
 	lim_str[0] = "0";
-	lim_str[1] = "0";
-	if (ft_strncmp("CH", id, 3) == 0)
-	{
-		limits[0] = 1;
-		limits[1] = 100;
-		lim_str[0] = "1";
-		lim_str[1] = "100";
-	}
-	else if (ft_strncmp("FH", id, 3) == 0)
-	{
-		limits[0] = 0;
-		limits[1] = 99;
-		lim_str[0] = "0";
-		lim_str[1] = "99";
-	}
-	else if (ft_strncmp("W", id, 3) == 0)
-	{
-		limits[0] = 0;
-		limits[1] = 1;
-		lim_str[0] = "0";
-		lim_str[1] = "1";
-	}
+	lim_str[1] = "1";
 }
 
 void	retrieve_value(int *value, char *arg, int *err, char *id)
@@ -49,7 +28,7 @@ void	retrieve_value(int *value, char *arg, int *err, char *id)
 	if (*value != -1)
 		return (ft_perror(-1, ft_strsjoin((char *[]){"Duplicate of identifier '\
 ", id, "'.", NULL}), 1), *err = 1, VOID);
-	(get_limits(limits, lim_str, id), *value = 0);
+	(get_limits(limits, lim_str), *value = 0);
 	while (*arg == '0' && ft_isdigit(*(arg + 1)))
 		arg++;
 	while (ft_isdigit(*arg))

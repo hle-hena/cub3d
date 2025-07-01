@@ -5,8 +5,6 @@
 	WE 140,140,140 0.8
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
-	CH 100
-	FH 1
 	W 1
 }
 1 {
@@ -16,8 +14,6 @@
 	WE 200,200,200 1
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
-	CH 100
-	FH 1
 	W 1
 	wl ((1, 0), (0, 1)), 0.5
 }
@@ -28,8 +24,6 @@
 	WE 200,200,200 1
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
-	CH 100
-	FH 1
 	W 1
 	wl ((0, 0), (1, 1)), 0.5
 }
@@ -40,8 +34,6 @@
 	EA 120,120,120
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
-	CH 100
-	FH 0
 	W 0
 }
 . {
@@ -51,8 +43,6 @@
 	WE textures/simonkraft/bookshelf.xpm
 	C 0,0,0
 	F 0,0,0
-	CH 100
-	FH 1
 	W 1
 }
 L ((2.5, 2.5), {255, 0, 0}, 1)
