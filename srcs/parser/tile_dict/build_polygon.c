@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 10:55:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/01 16:56:35 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/03 15:58:34 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,10 @@ t_vec	intersect_link(t_link *l1, t_link *l2, t_vec *prev_found_inter,
 	float	s;
 	float	t;
 
-	//this is only if link->type == 0, so if both links are straight.
+	//this is only if link->type == 0, so if both links are straight lines.
+	//Is it possible to make it work with both link->type == 0 and == 1, in the same function ?
+	//Or do I need 4 function, one for each combination of the two types ?
+	//So one for intersection between segments, one for intersection between arc, one for segment to arc and one for arc to segment
 	s1.x = l1->end->coo.x - l1->start->coo.x;
 	s1.y = l1->end->coo.y - l1->start->coo.y;
 	s2.x = l2->end->coo.x - l2->start->coo.x;
@@ -39,9 +42,10 @@ t_vec	intersect_link(t_link *l1, t_link *l2, t_vec *prev_found_inter,
 	return ((t_vec){-1, -1});
 }
 
-t_vec	find_closest_inter()
+int	find_closest_inter()
 {
 	//TO-DO
+	// find_node(graph->nodes, inter, &graph->nb_nodes)
 }
 
 int	find_node(t_node *nodes, t_vec coo, int *current)
@@ -49,7 +53,7 @@ int	find_node(t_node *nodes, t_vec coo, int *current)
 	int	i;
 
 	i = -1;
-	while (++i < current)
+	while (++i < *current)
 	{
 		if (nodes[i].coo.x == coo.x && nodes[i].coo.y == coo.y)
 			return (i);
@@ -58,7 +62,7 @@ int	find_node(t_node *nodes, t_vec coo, int *current)
 	nodes[i].visited = 0;
 	nodes[i].connect[0] = NULL;
 	++(*current);
-	return (current);
+	return (i);
 }
 
 void	add_connection(t_node *dest, t_link *to_add)
@@ -96,8 +100,8 @@ void	build_primitive_graph(t_list *wpath, t_graph *graph)
 	{
 		wall = (t_wpath *)wpath->content;
 		found_start = find_node(graph->nodes, wall->start, &graph->nb_nodes);
-		graph->links[++j].start = &graph->nodes[found_start];
 		found_end = find_node(graph->nodes, wall->start, &graph->nb_nodes);
+		graph->links[++j].start = &graph->nodes[found_start];
 		graph->links[j].end = &graph->nodes[found_end];
 		graph->links[j].center = wall->center;
 		graph->links[j].type = wall->mode;
@@ -113,10 +117,8 @@ void	build_primitive_graph(t_list *wpath, t_graph *graph)
 void	grow_graph(t_graph *graph)
 {
 	int		i;
-	int		j;
 	int		i_link;
 	int		i_node;
-	t_vec	temp;
 
 
 	//need to walk though this func like a dumb robot, to see if there are any cases I missed.
@@ -125,42 +127,22 @@ void	grow_graph(t_graph *graph)
 	i = -1;
 	while (++i < graph->nb_links)
 	{
-		j = 0;
-		while (j < 511 && graph->links[i].start->connect[j])
+		i_node = find_closest_inter();
+		//if no inter means end of line, this if statement is useless.
+		//I think no inter should output smth like i_node = -1.
+		//-> this means that the find_closest should  output the index to the found inter
+		if (i_node != -1)
 		{
-			temp = find_closest_inter(&i_link);
-			if (temp.x == -1)// if there exists no unvisited nodes it can reach
-				continue ;
-			i_node = find_node(graph->nodes, temp, &graph->nb_nodes);
-			if (&graph->nodes[i_node] != graph->links[i].start->connect[j]->end
-				&& &graph->nodes[i_node] != graph->links[i].start->connect[j]->start)
-			{
-				graph->links[graph->nb_links].start = &graph->nodes[i_node];
-				graph->links[graph->nb_links].end = graph->links[i].start->connect[j]->end;
-				graph->links[graph->nb_links].center = graph->links[i].start->connect[j]->center;
-				graph->links[graph->nb_links].type = graph->links[i].start->connect[j]->type;
-				graph->links[i].start->connect[j]->end = &graph->nodes[i_node];
-				replace_connection(&graph->links[graph->nb_links].end,
-					graph->links[i].start->connect[j], &graph->links[graph->nb_links]);
-				add_connection(&graph->nodes[i_node], graph->links[i].start->connect[j]);
-				add_connection(&graph->nodes[i_node], &graph->links[graph->nb_links]);
-				++graph->nb_links;
-			}
-			if (graph->links[i_link].start != &graph->nodes[i_node]
-				&& graph->links[i_link].end != &graph->nodes[i_node])
-			{
-				graph->links[graph->nb_links].start = &graph->nodes[i_node];
-				graph->links[graph->nb_links].end = graph->links[i_link].start;
-				graph->links[graph->nb_links].center = graph->links[i_link].center;
-				graph->links[graph->nb_links].type = graph->links[i_link].type;
-				graph->links[i_link].start = &graph->nodes[i_node];
-				replace_connection(graph->links[graph->nb_links].end,
-					&graph->links[i_link], &graph->links[graph->nb_links]);
-				add_connection(&graph->nodes[i_node], &graph->links[i_link]);
-				add_connection(&graph->nodes[i_node], &graph->links[graph->nb_links]);
-				++graph->nb_links;
-			}
-			++j;
+			graph->links[graph->nb_links].start = &graph->nodes[i_node];
+			graph->links[graph->nb_links].end = graph->links[i].end;
+			graph->links[graph->nb_links].center = graph->links[i].center;
+			graph->links[graph->nb_links].type = graph->links[i].type;
+			graph->links[i].end = &graph->nodes[i_node];
+			replace_connection(&graph->links[graph->nb_links].end,
+				&graph->links[i], &graph->links[graph->nb_links]);
+			add_connection(&graph->nodes[i_node], &graph->links[i]);
+			add_connection(&graph->nodes[i_node], &graph->links[graph->nb_links]);
+			++graph->nb_links;
 		}
 	}
 }
