@@ -6,13 +6,99 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 10:55:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/03 15:58:34 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/04 16:41:40 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-t_vec	intersect_link(t_link *l1, t_link *l2, t_vec *prev_found_inter,
+static inline t_vec vec_sub(t_vec a, t_vec b) {
+	return (t_vec){a.x - b.x, a.y - b.y};
+}
+
+static inline t_vec vec_add(t_vec a, t_vec b) {
+	return (t_vec){a.x + b.x, a.y + b.y};
+}
+
+static inline t_vec vec_scale(t_vec a, float s) {
+	return (t_vec){a.x * s, a.y * s};
+}
+
+static inline float vec_dot(t_vec a, t_vec b) {
+	return a.x * b.x + a.y * b.y;
+}
+
+static inline float vec_cross(t_vec a, t_vec b) {
+	return a.x * b.y - a.y * b.x;
+}
+
+static inline float vec_len2(t_vec a) {
+	return a.x * a.x + a.y * a.y;
+}
+
+void	intersect_seg_arc(t_link *seg, t_link *arc, t_vec *prev_found_inter,
+	float *prev_dist)
+{
+	t_vec	v_start;
+	t_vec	v_end;
+	t_vec	v_hit;
+	t_vec	delta;
+	t_vec	dir;
+	t_vec	hit;
+	float	t;
+	float	a;
+	float	b;
+	float	discriminant;
+	float	sqrt_d;
+	int		i;
+	int		on_arc;
+
+	dir = vec_sub(seg->end->coo, seg->start->coo);
+	delta = vec_sub(seg->start->coo, arc->center);
+	a = vec_dot(dir, dir);
+	b = 2.0f * vec_dot(dir, delta);
+	discriminant = (b * b) - 4.0f * a * (vec_dot(delta, delta) -
+			vec_len2(vec_sub(arc->start->coo, arc->center)));
+	if (discriminant < 0.0f)
+		return;
+	sqrt_d = sqrtf(discriminant);
+	i = -1;
+	while (++i < 2)
+	{
+		t = (i == 0) * ((-b - sqrt_d) / (2.0f * a))
+			+ (i == 1) * ((-b + sqrt_d) / (2.0f * a));
+		if (t < 0.0f || t > 1.0f)
+			continue;
+		hit = vec_add(seg->start->coo, vec_scale(dir, t));
+		if (arc->start->coo.x == arc->end->coo.x && arc->start->coo.y == arc->end->coo.y)
+		{
+			if (t < *prev_dist) {
+				*prev_found_inter = hit;
+				*prev_dist = t;
+			}
+			continue;
+		}
+		v_hit = vec_scale(vec_sub(hit, arc->center),
+			1.0f / sqrtf(vec_len2(vec_sub(hit, arc->center))));
+		v_start = vec_scale(vec_sub(arc->start->coo, arc->center),
+			1.0f / sqrtf(vec_len2(vec_sub(arc->start->coo, arc->center))));
+		v_end = vec_scale(vec_sub(arc->end->coo, arc->center),
+			1.0f / sqrtf(vec_len2(vec_sub(arc->end->coo, arc->center))));
+		if (vec_cross(v_start, v_end) >= 0)
+			on_arc = (vec_cross(v_start, v_hit) >= -FLT_EPSILON
+				&& vec_cross(v_hit, v_end) >= -FLT_EPSILON);
+		else
+			on_arc = (vec_cross(v_start, v_hit) >= -FLT_EPSILON
+				|| vec_cross(v_hit, v_end) >= -FLT_EPSILON);
+		if (on_arc && (t < *prev_dist || *prev_dist == -1))
+		{
+			*prev_found_inter = hit;
+			*prev_dist = t;
+		}
+	}
+}
+
+void	intersect_seg_seg(t_link *l1, t_link *l2, t_vec *prev_found_inter,
 	float *prev_dist)
 {
 	t_vec	s1;
@@ -20,10 +106,6 @@ t_vec	intersect_link(t_link *l1, t_link *l2, t_vec *prev_found_inter,
 	float	s;
 	float	t;
 
-	//this is only if link->type == 0, so if both links are straight lines.
-	//Is it possible to make it work with both link->type == 0 and == 1, in the same function ?
-	//Or do I need 4 function, one for each combination of the two types ?
-	//So one for intersection between segments, one for intersection between arc, one for segment to arc and one for arc to segment
 	s1.x = l1->end->coo.x - l1->start->coo.x;
 	s1.y = l1->end->coo.y - l1->start->coo.y;
 	s2.x = l2->end->coo.x - l2->start->coo.x;
@@ -32,14 +114,32 @@ t_vec	intersect_link(t_link *l1, t_link *l2, t_vec *prev_found_inter,
 		* (l1->start->coo.y - l2->start->coo.y)) / (-s2.x * s1.y + s1.x * s2.y);
 	t = ( s2.x * (l1->start->coo.y - l2->start->coo.y) - s2.y
 		* (l1->start->coo.x - l2->start->coo.x)) / (-s2.x * s1.y + s1.x * s2.y);
-	if (s >= 0 && s <= 1 && t >= 0 && t <= 1 && t < *prev_dist)
+	if (s >= 0 && s <= 1 && t > 0 && t < 1 && (t < *prev_dist || *prev_dist == -1))
 	{
 		prev_found_inter->x = l1->start->coo.x + (t * s1.x);
 		prev_found_inter->y = l1->start->coo.y + (t * s1.y);
 		*prev_dist = t;
-		return (*prev_found_inter);
 	}
-	return ((t_vec){-1, -1});
+}
+
+void	intersect_switch(t_link *l1, t_link *l2, t_vec *prev_found_inter,
+		float *prev_dist)
+{
+	t_vec	temp_inter;
+	float	temp_dist;
+
+	temp_dist = -1;
+	if (l1->type == 0 && l2->type == 0)
+		intersect_seg_seg(l1, l2, &temp_inter, &temp_dist);
+	else if (l1->type == 0)
+		intersect_seg_arc(l1, l2, &temp_inter, &temp_dist);
+	else if (l2->type == 0)
+	{
+		intersect_seg_arc(l2, l1, &temp_inter, &temp_dist);
+		temp_dist = vec_len2(vec_sub(l1->start->coo, temp_inter));
+	}
+	else
+		intersect_arc_arc(l1, l2, &temp_inter, &temp_dist);
 }
 
 int	find_closest_inter()
