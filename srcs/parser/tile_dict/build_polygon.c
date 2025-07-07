@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 10:55:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/07 16:08:52 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/07 16:13:08 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,7 +189,7 @@ void	intersect_switch(t_link *l1, t_link *l2, t_inter *inter)
 	else if (l1->type == 0)
 		intersect_seg_arc(l1, l2, inter, &check_possible_seg_arc);
 	else if (l2->type == 0)
-		intersect_seg_arc(l1, l2, inter, &check_possible_arg_seg);
+		intersect_seg_arc(l2, l1, inter, &check_possible_arg_seg);
 	else
 		intersect_arc_arc(l1, l2, inter);
 }
