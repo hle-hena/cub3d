@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/01 15:27:14 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/07 15:34:51 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,6 +138,19 @@ typedef struct s_light_map
 	int			wid;
 	int			len;
 }	t_lmap;
+
+typedef struct s_intersection
+{
+	t_vec	coo;
+	float	dist;
+}	t_inter;
+
+typedef struct s_info_check_intersection
+{
+	t_inter *inter;
+	t_vec	dir;
+	float	t;
+}	t_info_check;
 
 typedef struct s_graph_link	t_link;
 typedef struct s_graph_node	t_node;

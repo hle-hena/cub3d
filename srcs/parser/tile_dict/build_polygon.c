@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 10:55:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/04 16:41:40 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/07 16:08:52 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,22 +36,115 @@ static inline float vec_len2(t_vec a) {
 	return a.x * a.x + a.y * a.y;
 }
 
-void	intersect_seg_arc(t_link *seg, t_link *arc, t_vec *prev_found_inter,
-	float *prev_dist)
+static inline t_vec	vec_unit(t_vec a)
 {
-	t_vec	v_start;
-	t_vec	v_end;
+	return (vec_scale(a, 1 / sqrtf(vec_len2(a))));
+}
+
+/* 
+			float dot = vec_dot(v1, v_hit);
+			dot = fminf(fmaxf(dot, -1.0f), 1.0f);
+			float angle = acosf(dot);
+			if (vec_cross(v1, v_hit) < 0)
+				angle = (2.0f * M_PI) - angle;
+			float total_angle = acosf(vec_dot(v1, v2));
+			if (vec_cross(v1, v2) < 0)
+				total_angle = (2.0f * M_PI) - total_angle;
+
+			*percent_out = angle / total_angle;
+			*normal_out = v_hit;
+			return t;
+ */
+
+void	check_possible_arg_seg(t_link *seg, t_link *arc, t_info_check check)
+{
+	t_vec	hit;
 	t_vec	v_hit;
+	t_vec	v_end;
+	t_vec	v_start;
+	int		on_arc;
+	float	angle;
+	float	total_angle;
+
+	if (check.t < 0.0f || check.t > 1.0f)
+		return ;
+	hit = vec_add(seg->start->coo, vec_scale(check.dir, check.t));
+	v_hit = vec_unit(vec_sub(hit, arc->center));
+	v_end = vec_unit(vec_sub(arc->end->coo, arc->center));
+	v_start = vec_unit(vec_sub(arc->start->coo, arc->center));
+	if (arc->start->coo.x == arc->end->coo.x && arc->start->coo.y == arc->end->coo.y)
+	{
+		if (check.t < check.inter->dist || check.inter->dist == -1) {
+			check.inter->coo = hit;
+			angle = acosf(vec_dot(v_start, v_hit)) / (2.0f * PI);
+			if (vec_cross(v_start, v_hit) < 0)
+				angle = 1.0f - angle;
+			check.inter->dist = angle;
+		}
+		return ;
+	}
+	if (vec_cross(v_start, v_end) >= 0)
+		on_arc = (vec_cross(v_start, v_hit) >= -FLT_EPSILON
+			&& vec_cross(v_hit, v_end) >= -FLT_EPSILON);
+	else
+		on_arc = (vec_cross(v_start, v_hit) >= -FLT_EPSILON
+			|| vec_cross(v_hit, v_end) >= -FLT_EPSILON);
+	if (on_arc && (check.t < check.inter->dist || check.inter->dist == -1))
+	{
+		check.inter->coo = hit;
+		angle = acosf(fminf(fmaxf(vec_dot(v_start, v_hit), -1.0f), 1.0f));
+		if (vec_cross(v_start, v_hit) < 0)
+			angle = (2.0f * PI) - angle;
+		total_angle = acosf(vec_dot(v_start, v_end));
+		if (vec_cross(v_start, v_end) < 0)
+			total_angle = (2.0f * PI) - total_angle;
+		check.inter->dist = angle / total_angle;
+	}
+}
+
+void	check_possible_seg_arc(t_link *seg, t_link *arc, t_info_check check)
+{
+	t_vec	hit;
+	t_vec	v_hit;
+	t_vec	v_end;
+	t_vec	v_start;
+	int		on_arc;
+
+	if (check.t < 0.0f || check.t > 1.0f)
+		return ;
+	hit = vec_add(seg->start->coo, vec_scale(check.dir, check.t));
+	if (arc->start->coo.x == arc->end->coo.x && arc->start->coo.y == arc->end->coo.y)
+	{
+		if (check.t < check.inter->dist || check.inter->dist == -1) {
+			check.inter->coo = hit;
+			check.inter->dist = check.t;
+		}
+		return ;
+	}
+	v_hit = vec_unit(vec_sub(hit, arc->center));
+	v_end = vec_unit(vec_sub(arc->end->coo, arc->center));
+	v_start = vec_unit(vec_sub(arc->start->coo, arc->center));
+	if (vec_cross(v_start, v_end) >= 0)
+		on_arc = (vec_cross(v_start, v_hit) >= -FLT_EPSILON
+			&& vec_cross(v_hit, v_end) >= -FLT_EPSILON);
+	else
+		on_arc = (vec_cross(v_start, v_hit) >= -FLT_EPSILON
+			|| vec_cross(v_hit, v_end) >= -FLT_EPSILON);
+	if (on_arc && (check.t < check.inter->dist || check.inter->dist == -1))
+	{
+		check.inter->coo = hit;
+		check.inter->dist = check.t;
+	}
+}
+
+void	intersect_seg_arc(t_link *seg, t_link *arc, t_inter *inter, void (*f)(t_link *, t_link *, t_info_check))
+{
 	t_vec	delta;
 	t_vec	dir;
-	t_vec	hit;
-	float	t;
 	float	a;
 	float	b;
 	float	discriminant;
 	float	sqrt_d;
-	int		i;
-	int		on_arc;
 
 	dir = vec_sub(seg->end->coo, seg->start->coo);
 	delta = vec_sub(seg->start->coo, arc->center);
@@ -62,44 +155,11 @@ void	intersect_seg_arc(t_link *seg, t_link *arc, t_vec *prev_found_inter,
 	if (discriminant < 0.0f)
 		return;
 	sqrt_d = sqrtf(discriminant);
-	i = -1;
-	while (++i < 2)
-	{
-		t = (i == 0) * ((-b - sqrt_d) / (2.0f * a))
-			+ (i == 1) * ((-b + sqrt_d) / (2.0f * a));
-		if (t < 0.0f || t > 1.0f)
-			continue;
-		hit = vec_add(seg->start->coo, vec_scale(dir, t));
-		if (arc->start->coo.x == arc->end->coo.x && arc->start->coo.y == arc->end->coo.y)
-		{
-			if (t < *prev_dist) {
-				*prev_found_inter = hit;
-				*prev_dist = t;
-			}
-			continue;
-		}
-		v_hit = vec_scale(vec_sub(hit, arc->center),
-			1.0f / sqrtf(vec_len2(vec_sub(hit, arc->center))));
-		v_start = vec_scale(vec_sub(arc->start->coo, arc->center),
-			1.0f / sqrtf(vec_len2(vec_sub(arc->start->coo, arc->center))));
-		v_end = vec_scale(vec_sub(arc->end->coo, arc->center),
-			1.0f / sqrtf(vec_len2(vec_sub(arc->end->coo, arc->center))));
-		if (vec_cross(v_start, v_end) >= 0)
-			on_arc = (vec_cross(v_start, v_hit) >= -FLT_EPSILON
-				&& vec_cross(v_hit, v_end) >= -FLT_EPSILON);
-		else
-			on_arc = (vec_cross(v_start, v_hit) >= -FLT_EPSILON
-				|| vec_cross(v_hit, v_end) >= -FLT_EPSILON);
-		if (on_arc && (t < *prev_dist || *prev_dist == -1))
-		{
-			*prev_found_inter = hit;
-			*prev_dist = t;
-		}
-	}
+	f(seg, arc, (t_info_check){inter, dir, (-b - sqrt_d) / (2.0f * a)});
+	f(seg, arc, (t_info_check){inter, dir, (-b + sqrt_d) / (2.0f * a)});
 }
 
-void	intersect_seg_seg(t_link *l1, t_link *l2, t_vec *prev_found_inter,
-	float *prev_dist)
+void	intersect_seg_seg(t_link *l1, t_link *l2, t_inter *inter)
 {
 	t_vec	s1;
 	t_vec	s2;
@@ -114,32 +174,24 @@ void	intersect_seg_seg(t_link *l1, t_link *l2, t_vec *prev_found_inter,
 		* (l1->start->coo.y - l2->start->coo.y)) / (-s2.x * s1.y + s1.x * s2.y);
 	t = ( s2.x * (l1->start->coo.y - l2->start->coo.y) - s2.y
 		* (l1->start->coo.x - l2->start->coo.x)) / (-s2.x * s1.y + s1.x * s2.y);
-	if (s >= 0 && s <= 1 && t > 0 && t < 1 && (t < *prev_dist || *prev_dist == -1))
+	if (s >= 0 && s <= 1 && t > 0 && t < 1 && (t < inter->dist || inter->dist == -1))
 	{
-		prev_found_inter->x = l1->start->coo.x + (t * s1.x);
-		prev_found_inter->y = l1->start->coo.y + (t * s1.y);
-		*prev_dist = t;
+		inter->coo.x = l1->start->coo.x + (t * s1.x);
+		inter->coo.y = l1->start->coo.y + (t * s1.y);
+		inter->dist = t;
 	}
 }
 
-void	intersect_switch(t_link *l1, t_link *l2, t_vec *prev_found_inter,
-		float *prev_dist)
+void	intersect_switch(t_link *l1, t_link *l2, t_inter *inter)
 {
-	t_vec	temp_inter;
-	float	temp_dist;
-
-	temp_dist = -1;
 	if (l1->type == 0 && l2->type == 0)
-		intersect_seg_seg(l1, l2, &temp_inter, &temp_dist);
+		intersect_seg_seg(l1, l2, inter);
 	else if (l1->type == 0)
-		intersect_seg_arc(l1, l2, &temp_inter, &temp_dist);
+		intersect_seg_arc(l1, l2, inter, &check_possible_seg_arc);
 	else if (l2->type == 0)
-	{
-		intersect_seg_arc(l2, l1, &temp_inter, &temp_dist);
-		temp_dist = vec_len2(vec_sub(l1->start->coo, temp_inter));
-	}
+		intersect_seg_arc(l1, l2, inter, &check_possible_arg_seg);
 	else
-		intersect_arc_arc(l1, l2, &temp_inter, &temp_dist);
+		intersect_arc_arc(l1, l2, inter);
 }
 
 int	find_closest_inter()
@@ -214,23 +266,19 @@ void	build_primitive_graph(t_list *wpath, t_graph *graph)
 		;//This means that we got too many lines for that tile.
 }
 
+
+//this code suppose that we don't have duplicate of circles and lines, I need to do that.
 void	grow_graph(t_graph *graph)
 {
 	int		i;
 	int		i_link;
 	int		i_node;
 
-
-	//need to walk though this func like a dumb robot, to see if there are any cases I missed.
-	//also dont know if I need to set visited ????
 	//there might be an overflow possible ?
 	i = -1;
 	while (++i < graph->nb_links)
 	{
 		i_node = find_closest_inter();
-		//if no inter means end of line, this if statement is useless.
-		//I think no inter should output smth like i_node = -1.
-		//-> this means that the find_closest should  output the index to the found inter
 		if (i_node != -1)
 		{
 			graph->links[graph->nb_links].start = &graph->nodes[i_node];
