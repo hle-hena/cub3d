@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/07 15:34:51 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/21 17:15:33 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -354,6 +354,8 @@ typedef struct s_data
 }	t_data;
 
 # define LMAP_PRECISION 129
+
+int			build_polygons();
 
 void		*draw_walls_thread(void *arg);
 t_data		*get_data(void);

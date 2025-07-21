@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/30 10:39:16 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/10 15:28:44 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -280,8 +280,8 @@ static inline void	draw_wall(t_th_draw *td, t_draw *draw)
 	setup_color(draw, td, temp, draw->bounces);
 }
 
-#define BLOCK_X 16
-#define BLOCK_Y 16
+#define BLOCK_X 32
+#define BLOCK_Y 32
 
 static inline void	draw_blocked_eight(t_data *data, t_th_draw *td, int **img, int *new_line)
 {
