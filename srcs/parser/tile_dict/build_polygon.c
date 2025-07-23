@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 10:55:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/23 15:54:04 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/23 17:06:04 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,26 @@ static inline t_vec	vec_unit(t_vec a)
 	return (vec_scale(a, 1 / sqrtf(vec_len2(a))));
 }
 
+int	find_node(t_node *nodes, t_vec coo, int *current, int should_create)
+{
+	int	i;
+
+	i = -1;
+	while (++i < *current)
+	{
+		if (fabs(nodes[i].coo.x - coo.x) < FLT_EPSILON
+			&& fabs(nodes[i].coo.y - coo.y) < FLT_EPSILON)
+			return (i);
+	}
+	if (*current == 1023 || !should_create)
+		return (-1);
+	nodes[i].coo = coo;
+	nodes[i].visited = 0;
+	nodes[i].connect[0] = NULL;
+	++(*current);
+	return (i);
+}
+
 int	on_arc(t_link *C, t_vec hit, t_inter *inter, int can_hit_border)
 {
 	t_vec	v_hit;
@@ -78,6 +98,7 @@ int	on_arc(t_link *C, t_vec hit, t_inter *inter, int can_hit_border)
 	float	angle;
 	float	total_angle;
 
+	(void)can_hit_border;
 	v_hit = vec_unit(vec_sub(hit, C->center));
 	v_end = vec_unit(vec_sub(C->end->coo, C->center));
 	v_start = vec_unit(vec_sub(C->start->coo, C->center));
@@ -86,14 +107,9 @@ int	on_arc(t_link *C, t_vec hit, t_inter *inter, int can_hit_border)
 		angle = acosf(vec_dot(v_start, v_hit)) / (2.0f * PI);
 		if (vec_cross(v_start, v_hit) < 0)
 			angle = 1.0f - angle;
-		if ((angle > 0.01f && angle < 1.0f - 0.01f)
-			|| can_hit_border)
-		{
-			inter->coo = hit;
-			inter->dist = angle;
-			return (1);
-		}
-		return (0);
+		inter->coo = hit;
+		inter->dist = angle;
+		return (1);
 	}
 	if (vec_cross(v_start, v_end) >= 0)
 		on_arc = (vec_cross(v_start, v_hit) >= -FLT_EPSILON
@@ -108,8 +124,7 @@ int	on_arc(t_link *C, t_vec hit, t_inter *inter, int can_hit_border)
 	if (vec_cross(v_start, v_end) < 0)
 		total_angle = (2.0f * PI) - total_angle;
 	angle /= total_angle;
-	if (on_arc && ((angle > 0.01f && angle < 1.0f - 0.01f)
-		|| can_hit_border))
+	if (on_arc)
 	{
 		inter->coo = hit;
 		inter->dist = angle;
@@ -140,13 +155,14 @@ int	retrieve_utils_vec(t_link *arc1, t_link *arc2, t_vec *p_mid, t_vec *perp)
 	return (0);
 }
 
-void	intersect_arc_arc(t_link *arc1, t_link *arc2, t_inter *inter)
+void	intersect_arc_arc(t_link *arc1, t_link *arc2, t_inter *inter, t_graph *graph)
 {
 	t_vec			check;
 	t_vec			perp;
 	t_vec			p_mid;
 	t_inter			trash;
 	t_inter			temp;
+	int				found;
 
 	temp.dist = -1;
 	trash.dist = -1;
@@ -157,8 +173,13 @@ void	intersect_arc_arc(t_link *arc1, t_link *arc2, t_inter *inter)
 	{
 		if (temp.dist < inter->dist || inter->dist < 0)
 		{
-			inter->dist = temp.dist;
-			inter->coo = temp.coo;
+			found = find_node(graph->nodes, temp.coo, &graph->nb_nodes, 0);
+			if (found == -1 || (&graph->nodes[found] != arc1->start
+				&& &graph->nodes[found] != arc1->end))
+			{
+				inter->dist = temp.dist;
+				inter->coo = temp.coo;
+			}
 		}
 	}
 	check = vec_sub(p_mid, perp);
@@ -166,13 +187,18 @@ void	intersect_arc_arc(t_link *arc1, t_link *arc2, t_inter *inter)
 	{
 		if (temp.dist < inter->dist || inter->dist < 0)
 		{
-			inter->dist = temp.dist;
-			inter->coo = temp.coo;
+			found = find_node(graph->nodes, temp.coo, &graph->nb_nodes, 0);
+			if (found == -1 || (&graph->nodes[found] != arc1->start
+				&& &graph->nodes[found] != arc1->end))
+			{
+				inter->dist = temp.dist;
+				inter->coo = temp.coo;
+			}
 		}
 	}
 }
 
-void	check_possible_arc_seg(t_link *seg, t_link *arc, t_info_check check)
+void	check_possible_arc_seg(t_link *seg, t_link *arc, t_info_check check, t_graph *graph)
 {
 	t_vec	hit;
 	t_vec	v_hit;
@@ -181,6 +207,7 @@ void	check_possible_arc_seg(t_link *seg, t_link *arc, t_info_check check)
 	int		on_arc;
 	float	angle;
 	float	total_angle;
+	int		found;
 
 	if (check.t < 0.0f || check.t > 1.0f)
 		return ;
@@ -193,11 +220,15 @@ void	check_possible_arc_seg(t_link *seg, t_link *arc, t_info_check check)
 		angle = acosf(vec_dot(v_start, v_hit)) / (2.0f * PI);
 		if (vec_cross(v_start, v_hit) < 0)
 			angle = 1.0f - angle;
-		if ((angle < check.inter->dist || check.inter->dist < 0)
-			&& (angle > FLT_EPSILON && angle < 1.0f - FLT_EPSILON))
+		if ((angle < check.inter->dist || check.inter->dist < 0))
 		{
-			check.inter->coo = hit;
-			check.inter->dist = angle;
+			found = find_node(graph->nodes, hit, &graph->nb_nodes, 0);
+			if (found == -1 || (&graph->nodes[found] != arc->start
+				&& &graph->nodes[found] != arc->end))
+			{
+				check.inter->coo = hit;
+				check.inter->dist = angle;
+			}
 		}
 		return ;
 	}
@@ -214,32 +245,41 @@ void	check_possible_arc_seg(t_link *seg, t_link *arc, t_info_check check)
 	if (vec_cross(v_start, v_end) < 0)
 		total_angle = (2.0f * PI) - total_angle;
 	angle /= total_angle;
-	if (on_arc && (angle < check.inter->dist || check.inter->dist < 0)
-		&& (angle > FLT_EPSILON && angle < 1.0f - FLT_EPSILON))
+	if (on_arc && (angle < check.inter->dist || check.inter->dist < 0))
 	{
-		check.inter->coo = hit;
-		check.inter->dist = angle;
+		found = find_node(graph->nodes, hit, &graph->nb_nodes, 0);
+		if (found == -1 || (&graph->nodes[found] != arc->start
+			&& &graph->nodes[found] != arc->end))
+		{
+			check.inter->coo = hit;
+			check.inter->dist = angle;
+		}
 	}
 }
 
-void	check_possible_seg_arc(t_link *seg, t_link *arc, t_info_check check)
+void	check_possible_seg_arc(t_link *seg, t_link *arc, t_info_check check, t_graph *graph)
 {
 	t_vec	hit;
 	t_vec	v_hit;
 	t_vec	v_end;
 	t_vec	v_start;
 	int		on_arc;
+	int		found;
 
 	if (check.t < 0.0f || check.t > 1.0f)
 		return ;
 	hit = vec_add(seg->start->coo, vec_scale(check.dir, check.t));
 	if (arc->start->coo.x == arc->end->coo.x && arc->start->coo.y == arc->end->coo.y)
 	{
-		if ((check.t < check.inter->dist || check.inter->dist < 0)
-			&& (check.t > FLT_EPSILON && check.t < 1 - FLT_EPSILON))
+		if ((check.t < check.inter->dist || check.inter->dist < 0))
 		{
-			check.inter->coo = hit;
-			check.inter->dist = check.t;
+			found = find_node(graph->nodes, hit, &graph->nb_nodes, 0);
+			if (found == -1 || (&graph->nodes[found] != seg->start
+				&& &graph->nodes[found] != seg->end))
+			{
+				check.inter->coo = hit;
+				check.inter->dist = check.t;
+			}
 		}
 		return ;
 	}
@@ -252,15 +292,19 @@ void	check_possible_seg_arc(t_link *seg, t_link *arc, t_info_check check)
 	else
 		on_arc = (vec_cross(v_start, v_hit) >= -FLT_EPSILON
 			|| vec_cross(v_hit, v_end) >= -FLT_EPSILON);
-	if (on_arc && (check.t < check.inter->dist || check.inter->dist < 0)
-		&& (check.t > FLT_EPSILON && check.t < 1 - FLT_EPSILON))
+	if (on_arc && (check.t < check.inter->dist || check.inter->dist < 0))
 	{
-		check.inter->coo = hit;
-		check.inter->dist = check.t;
+		found = find_node(graph->nodes, hit, &graph->nb_nodes, 0);
+		if (found == -1 || (&graph->nodes[found] != seg->start
+			&& &graph->nodes[found] != seg->end))
+		{
+			check.inter->coo = hit;
+			check.inter->dist = check.t;
+		}
 	}
 }
 
-void	intersect_seg_arc(t_link *seg, t_link *arc, t_inter *inter, void (*f)(t_link *, t_link *, t_info_check))
+void	intersect_seg_arc(t_link *seg, t_link *arc, t_inter *inter, void (*f)(t_link *, t_link *, t_info_check, t_graph *), t_graph *graph)
 {
 	t_vec	delta;
 	t_vec	dir;
@@ -278,8 +322,8 @@ void	intersect_seg_arc(t_link *seg, t_link *arc, t_inter *inter, void (*f)(t_lin
 	if (discriminant < 0.0f)
 		return;
 	sqrt_d = sqrtf(discriminant);
-	f(seg, arc, (t_info_check){inter, dir, (-b - sqrt_d) / (2.0f * a)});
-	f(seg, arc, (t_info_check){inter, dir, (-b + sqrt_d) / (2.0f * a)});
+	f(seg, arc, (t_info_check){inter, dir, (-b - sqrt_d) / (2.0f * a)}, graph);
+	f(seg, arc, (t_info_check){inter, dir, (-b + sqrt_d) / (2.0f * a)}, graph);
 }
 
 void	intersect_seg_seg(t_link *l1, t_link *l2, t_inter *inter)
@@ -306,36 +350,16 @@ void	intersect_seg_seg(t_link *l1, t_link *l2, t_inter *inter)
 	}
 }
 
-void	intersect_switch(t_link *l1, t_link *l2, t_inter *inter)
+void	intersect_switch(t_link *l1, t_link *l2, t_inter *inter, t_graph *graph)
 {
 	if (l1->type == 0 && l2->type == 0)
 		intersect_seg_seg(l1, l2, inter);
 	else if (l1->type == 0)
-		intersect_seg_arc(l1, l2, inter, &check_possible_seg_arc);
+		intersect_seg_arc(l1, l2, inter, &check_possible_seg_arc, graph);
 	else if (l2->type == 0)
-		intersect_seg_arc(l2, l1, inter, &check_possible_arc_seg);
+		intersect_seg_arc(l2, l1, inter, &check_possible_arc_seg, graph);
 	else
-		intersect_arc_arc(l1, l2, inter);
-}
-
-int	find_node(t_node *nodes, t_vec coo, int *current)
-{
-	int	i;
-
-	i = -1;
-	while (++i < *current)
-	{
-		if (fabs(nodes[i].coo.x - coo.x) < FLT_EPSILON
-			&& fabs(nodes[i].coo.y - coo.y) < FLT_EPSILON)
-			return (i);
-	}
-	if (*current == 1023)
-		return (-1);
-	nodes[i].coo = coo;
-	nodes[i].visited = 0;
-	nodes[i].connect[0] = NULL;
-	++(*current);
-	return (i);
+		intersect_arc_arc(l1, l2, inter, graph);
 }
 
 int	find_closest_inter(t_graph *graph, int current)
@@ -349,13 +373,13 @@ int	find_closest_inter(t_graph *graph, int current)
 	{
 		if (i == current)
 			continue ;
-		intersect_switch(&graph->links[current], &graph->links[i], &inter);//might not need to pass it as a pointer ?
+		intersect_switch(&graph->links[current], &graph->links[i], &inter, graph);//might not need to pass it as a pointer ?
 	}
 	if (inter.dist == -1)
 		return (-1);
 	if (inter.dist < FLT_EPSILON)
 		return (-1);
-	return (find_node(graph->nodes, inter.coo, &graph->nb_nodes));
+	return (find_node(graph->nodes, inter.coo, &graph->nb_nodes, 1));
 }
 
 void	add_connection(t_node *dest, t_link *to_add)
@@ -392,8 +416,8 @@ void	build_primitive_graph(t_list *wpath, t_graph *graph, char *letter)
 	while (wpath && j < 511)
 	{
 		wall = (t_wpath *)wpath->content;
-		found_start = find_node(graph->nodes, wall->start, &graph->nb_nodes);
-		found_end = find_node(graph->nodes, wall->end, &graph->nb_nodes);
+		found_start = find_node(graph->nodes, wall->start, &graph->nb_nodes, 1);
+		found_end = find_node(graph->nodes, wall->end, &graph->nb_nodes, 1);
 		graph->links[++j].start = &graph->nodes[found_start];
 		graph->links[j].end = &graph->nodes[found_end];
 		graph->links[j].center = wall->center;
@@ -423,7 +447,7 @@ void	grow_graph(t_graph *graph, char *letter)
 		i_node = find_closest_inter(graph, i);
 		if (i_node != -1)
 		{
-			// printf("\t\tSplitting the segment index [%d] at the coo {%.12f, %.12f}\n", i, graph->nodes[i_node].coo.x, graph->nodes[i_node].coo.y);
+			printf("\t\tSplitting the segment index [%d] at the coo {%.12f, %.12f}\n", i, graph->nodes[i_node].coo.x, graph->nodes[i_node].coo.y);
 			graph->links[graph->nb_links].start = &graph->nodes[i_node];
 			graph->links[graph->nb_links].end = graph->links[i].end;
 			graph->links[graph->nb_links].center = graph->links[i].center;

@@ -57,7 +57,7 @@ debug: FLAGS += -g
 debug: $(NAME)
 
 fdebug: clear
-fdebug: FLAGS += -fsanitize=address -fno-omit-frame-pointer
+fdebug: FLAGS += -fsanitize=address -fno-omit-frame-pointer -g
 fdebug: $(NAME)
 
 valgrind: all
