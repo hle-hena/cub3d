@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 10:55:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/23 17:06:04 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/23 17:20:46 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -376,8 +376,6 @@ int	find_closest_inter(t_graph *graph, int current)
 		intersect_switch(&graph->links[current], &graph->links[i], &inter, graph);//might not need to pass it as a pointer ?
 	}
 	if (inter.dist == -1)
-		return (-1);
-	if (inter.dist < FLT_EPSILON)
 		return (-1);
 	return (find_node(graph->nodes, inter.coo, &graph->nb_nodes, 1));
 }
