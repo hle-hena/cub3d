@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 10:55:35 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/29 15:29:39 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/22 11:15:09 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,8 @@ void	retrieve_light(char *line, int *err)
 	t_lmap	*lmap;
 
 	lmap = &get_data()->lmap;
-	lmap->lights = ft_realloc(lmap->lights, (lmap->nb_ls + 1) * sizeof(t_light));
+	lmap->lights = ft_realloc(lmap->lights, (lmap->nb_ls + 1) * sizeof(t_light),
+		lmap->nb_ls * sizeof(t_light));
 	lmap->lights[lmap->nb_ls].pos.y = -1;
 	lmap->lights[lmap->nb_ls].emittance = -1;
 	lmap->lights[lmap->nb_ls].color = (t_col){-1, -1, -1};

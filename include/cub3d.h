@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/21 17:15:33 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/23 15:45:39 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 # include <pthread.h>
 # include <immintrin.h>
 
+// # define FLT_EPSILON 1e-4f
 # define FLT_EPSILON 1.19209289550781250000000000000000000e-7F
 # define PI 3.1415926535897932384
 # define VOID (void)0

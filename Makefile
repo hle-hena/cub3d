@@ -1,8 +1,8 @@
 MAKEFLAGS += --no-print-directory
 
 NAME = cub3d
-CC = cc
-FLAGS = -Wall -Wextra -Werror -I./include -Imlx -mavx2 -O3
+CC = cc 
+FLAGS = -Wall -Wextra -Werror -I./include -Imlx -mavx2
 RM = rm -f
 
 FRAMEDIR = ./mlx
@@ -46,7 +46,19 @@ OBJ = $(SRCS:.c=.o)
 	@$(CC) $(FLAGS) -c $< -o $(<:.c=.o)
 	@printf "\r\033[K"
 
+all: FLAGS += -O3
 all: $(NAME)
+
+no: clear
+no: $(NAME)
+
+debug: clear
+debug: FLAGS += -g
+debug: $(NAME)
+
+fdebug: clear
+fdebug: FLAGS += -fsanitize=address -fno-omit-frame-pointer
+fdebug: $(NAME)
 
 valgrind: all
 	valgrind --leak-check=full --show-leak-kinds=all ./$(NAME) $(ARG)
@@ -59,12 +71,17 @@ $(NAME): $(LIBFT) $(OBJ)
 	@echo "\n\033[2K\r\033[94mLinking $(NAME) 🗹\033[0m\n"
 	@echo "\033[2K\r\033[94mLinking mlx 🗹\033[0m\n"
 	@make -C mlx > /dev/null 2>&1
-	@$(CC) $(OBJ) $(FRAMEWORK) -o $(NAME) -L $(LIBFT_DIR) -lft
+	@$(CC) $(FLAGS) $(OBJ) $(FRAMEWORK) -o $(NAME) -L $(LIBFT_DIR) -lft
 	@len=$$(echo -n "$(NAME)" | wc -c); \
 	border=$$(printf '=%.0s' $$(seq 1 $$((len + 36)))); \
 	echo "\n\033[94m|$$border|\033[0m"; \
 	echo "\033[94m|    🎉 $(NAME) Compilation Complete! 🎉    |\033[0m"; \
 	echo "\033[94m|$$border|\033[0m\n"
+
+clear:
+	@echo -n "\033[34m"
+	@$(RM) $(OBJ)
+	@echo "Object files removed\033[0m"
 
 clean:
 	@echo -n "\033[34m"
@@ -82,4 +99,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean clear re debug fdebug

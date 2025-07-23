@@ -6,11 +6,39 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 10:55:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/21 17:33:30 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/23 15:54:04 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
+
+int	debug = 0;
+
+void	print_graph(t_graph *graph, char *letter)
+{
+	int	i;
+
+	i = -1;
+	printf("This is the graph of %s:\n", letter);
+	while (++i < graph->nb_links)
+	{
+		if (graph->links[i].type == 0)
+		{
+			printf("\tA line is connecting {%.12f, %.12f} to {%.12f, %.12f}\n",
+				graph->links[i].start->coo.x, graph->links[i].start->coo.y,
+				graph->links[i].end->coo.x, graph->links[i].end->coo.y);
+		}
+		else
+		{
+			printf("\tAn arc is connecting {%.12f, %.12f} to {%.12f, %.12f}\
+, with {%.12f, %.12f} as center\n",
+				graph->links[i].start->coo.x, graph->links[i].start->coo.y,
+				graph->links[i].end->coo.x, graph->links[i].end->coo.y,
+				graph->links[i].center.x, graph->links[i].center.y);
+		}
+	}
+	// printf("\tStarting to grow the graph.\n");
+}
 
 static inline t_vec vec_sub(t_vec a, t_vec b) {
 	return (t_vec){a.x - b.x, a.y - b.y};
@@ -41,7 +69,7 @@ static inline t_vec	vec_unit(t_vec a)
 	return (vec_scale(a, 1 / sqrtf(vec_len2(a))));
 }
 
-int	on_arc(t_link *C, t_vec hit, t_inter *inter)
+int	on_arc(t_link *C, t_vec hit, t_inter *inter, int can_hit_border)
 {
 	t_vec	v_hit;
 	t_vec	v_end;
@@ -58,9 +86,14 @@ int	on_arc(t_link *C, t_vec hit, t_inter *inter)
 		angle = acosf(vec_dot(v_start, v_hit)) / (2.0f * PI);
 		if (vec_cross(v_start, v_hit) < 0)
 			angle = 1.0f - angle;
-		inter->coo = hit;
-		inter->dist = angle;
-		return (1);
+		if ((angle > 0.01f && angle < 1.0f - 0.01f)
+			|| can_hit_border)
+		{
+			inter->coo = hit;
+			inter->dist = angle;
+			return (1);
+		}
+		return (0);
 	}
 	if (vec_cross(v_start, v_end) >= 0)
 		on_arc = (vec_cross(v_start, v_hit) >= -FLT_EPSILON
@@ -75,7 +108,8 @@ int	on_arc(t_link *C, t_vec hit, t_inter *inter)
 	if (vec_cross(v_start, v_end) < 0)
 		total_angle = (2.0f * PI) - total_angle;
 	angle /= total_angle;
-	if (on_arc)
+	if (on_arc && ((angle > 0.01f && angle < 1.0f - 0.01f)
+		|| can_hit_border))
 	{
 		inter->coo = hit;
 		inter->dist = angle;
@@ -84,7 +118,7 @@ int	on_arc(t_link *C, t_vec hit, t_inter *inter)
 	return (0);
 }
 
-void	retrieve_utils_vec(t_link *arc1, t_link *arc2, t_vec *p_mid, t_vec *perp)
+int	retrieve_utils_vec(t_link *arc1, t_link *arc2, t_vec *p_mid, t_vec *perp)
 {
 	float	r1;
 	float	r2;
@@ -98,11 +132,12 @@ void	retrieve_utils_vec(t_link *arc1, t_link *arc2, t_vec *p_mid, t_vec *perp)
 	d_vec = vec_sub(arc2->center, arc1->center);
 	d = sqrtf(vec_len2(d_vec));
 	if (d > r1 + r2 || d < fabsf(r1 - r2) || d == 0.0f)
-		return ;
+		return (1);
 	a = (r1 * r1 - r2 * r2 + d * d) / (2.0f * d);
 	h = sqrtf(r1 * r1 - a * a);
 	*p_mid = vec_add(arc1->center, vec_scale(d_vec, a / d));
-	*perp = (t_vec){ -d_vec.y * (h / d), d_vec.x * (h / d) };
+	*perp = (t_vec){-d_vec.y * (h / d), d_vec.x * (h / d)};
+	return (0);
 }
 
 void	intersect_arc_arc(t_link *arc1, t_link *arc2, t_inter *inter)
@@ -115,9 +150,10 @@ void	intersect_arc_arc(t_link *arc1, t_link *arc2, t_inter *inter)
 
 	temp.dist = -1;
 	trash.dist = -1;
-	retrieve_utils_vec(arc1, arc2, &p_mid, &perp);
+	if (retrieve_utils_vec(arc1, arc2, &p_mid, &perp))
+		return ;
 	check = vec_add(p_mid, perp);
-	if (on_arc(arc1, check, &temp) && on_arc(arc2, check, &trash))
+	if (on_arc(arc1, check, &temp, 0) && on_arc(arc2, check, &trash, 1))
 	{
 		if (temp.dist < inter->dist || inter->dist < 0)
 		{
@@ -126,7 +162,7 @@ void	intersect_arc_arc(t_link *arc1, t_link *arc2, t_inter *inter)
 		}
 	}
 	check = vec_sub(p_mid, perp);
-	if (on_arc(arc1, check, &temp) && on_arc(arc2, check, &trash))
+	if (on_arc(arc1, check, &temp, 0) && on_arc(arc2, check, &trash, 1))
 	{
 		if (temp.dist < inter->dist || inter->dist < 0)
 		{
@@ -157,7 +193,8 @@ void	check_possible_arc_seg(t_link *seg, t_link *arc, t_info_check check)
 		angle = acosf(vec_dot(v_start, v_hit)) / (2.0f * PI);
 		if (vec_cross(v_start, v_hit) < 0)
 			angle = 1.0f - angle;
-		if (angle < check.inter->dist || check.inter->dist < 0)
+		if ((angle < check.inter->dist || check.inter->dist < 0)
+			&& (angle > FLT_EPSILON && angle < 1.0f - FLT_EPSILON))
 		{
 			check.inter->coo = hit;
 			check.inter->dist = angle;
@@ -177,7 +214,8 @@ void	check_possible_arc_seg(t_link *seg, t_link *arc, t_info_check check)
 	if (vec_cross(v_start, v_end) < 0)
 		total_angle = (2.0f * PI) - total_angle;
 	angle /= total_angle;
-	if (on_arc && (angle < check.inter->dist || check.inter->dist < 0))
+	if (on_arc && (angle < check.inter->dist || check.inter->dist < 0)
+		&& (angle > FLT_EPSILON && angle < 1.0f - FLT_EPSILON))
 	{
 		check.inter->coo = hit;
 		check.inter->dist = angle;
@@ -197,7 +235,9 @@ void	check_possible_seg_arc(t_link *seg, t_link *arc, t_info_check check)
 	hit = vec_add(seg->start->coo, vec_scale(check.dir, check.t));
 	if (arc->start->coo.x == arc->end->coo.x && arc->start->coo.y == arc->end->coo.y)
 	{
-		if (check.t < check.inter->dist || check.inter->dist < 0) {
+		if ((check.t < check.inter->dist || check.inter->dist < 0)
+			&& (check.t > FLT_EPSILON && check.t < 1 - FLT_EPSILON))
+		{
 			check.inter->coo = hit;
 			check.inter->dist = check.t;
 		}
@@ -212,7 +252,8 @@ void	check_possible_seg_arc(t_link *seg, t_link *arc, t_info_check check)
 	else
 		on_arc = (vec_cross(v_start, v_hit) >= -FLT_EPSILON
 			|| vec_cross(v_hit, v_end) >= -FLT_EPSILON);
-	if (on_arc && (check.t < check.inter->dist || check.inter->dist < 0))
+	if (on_arc && (check.t < check.inter->dist || check.inter->dist < 0)
+		&& (check.t > FLT_EPSILON && check.t < 1 - FLT_EPSILON))
 	{
 		check.inter->coo = hit;
 		check.inter->dist = check.t;
@@ -256,7 +297,8 @@ void	intersect_seg_seg(t_link *l1, t_link *l2, t_inter *inter)
 		* (l1->start->coo.y - l2->start->coo.y)) / (-s2.x * s1.y + s1.x * s2.y);
 	t = ( s2.x * (l1->start->coo.y - l2->start->coo.y) - s2.y
 		* (l1->start->coo.x - l2->start->coo.x)) / (-s2.x * s1.y + s1.x * s2.y);
-	if (s >= 0 && s <= 1 && t > 0 && t < 1 && (t < inter->dist || inter->dist < 0))
+	if (s >= 0 - FLT_EPSILON && s <= 1 + FLT_EPSILON && t > 0 && t < 1 && (t < inter->dist || inter->dist < 0)
+		&& (t > FLT_EPSILON && t < 1 - FLT_EPSILON))
 	{
 		inter->coo.x = l1->start->coo.x + (t * s1.x);
 		inter->coo.y = l1->start->coo.y + (t * s1.y);
@@ -283,9 +325,12 @@ int	find_node(t_node *nodes, t_vec coo, int *current)
 	i = -1;
 	while (++i < *current)
 	{
-		if (nodes[i].coo.x == coo.x && nodes[i].coo.y == coo.y)
+		if (fabs(nodes[i].coo.x - coo.x) < FLT_EPSILON
+			&& fabs(nodes[i].coo.y - coo.y) < FLT_EPSILON)
 			return (i);
 	}
+	if (*current == 1023)
+		return (-1);
 	nodes[i].coo = coo;
 	nodes[i].visited = 0;
 	nodes[i].connect[0] = NULL;
@@ -307,6 +352,8 @@ int	find_closest_inter(t_graph *graph, int current)
 		intersect_switch(&graph->links[current], &graph->links[i], &inter);//might not need to pass it as a pointer ?
 	}
 	if (inter.dist == -1)
+		return (-1);
+	if (inter.dist < FLT_EPSILON)
 		return (-1);
 	return (find_node(graph->nodes, inter.coo, &graph->nb_nodes));
 }
@@ -332,7 +379,7 @@ void	replace_connection(t_node *dest, t_link *to_replace, t_link *to_add)
 	dest->connect[i] = to_add;
 }
 
-void	build_primitive_graph(t_list *wpath, t_graph *graph)
+void	build_primitive_graph(t_list *wpath, t_graph *graph, char *letter)
 {
 	t_wpath	*wall;
 	int		j;
@@ -352,80 +399,72 @@ void	build_primitive_graph(t_list *wpath, t_graph *graph)
 		graph->links[j].center = wall->center;
 		graph->links[j].type = wall->mode;
 		add_connection(&graph->nodes[found_start], &graph->links[j]);
-		add_connection(&graph->nodes[found_end], &graph->links[j]);
+		if (found_end != found_start)
+			add_connection(&graph->nodes[found_end], &graph->links[j]);
 		wpath = wpath->next;
 		++graph->nb_links;
 	}
+	if (debug)
+		print_graph(graph, letter);
 	if (wpath)
 		return (printf("This is an error and you forgot it, you little angel\n"), VOID);//This means that we got too many lines for that tile.
 }
 
 //this code suppose that we don't have duplicate of circles and lines, I need to do that.
-void	grow_graph(t_graph *graph)
+void	grow_graph(t_graph *graph, char *letter)
 {
 	int		i;
 	int		i_node;
 
-	//there might be an overflow possible ?
+	//there might be an overflow possible ? //DEFINITLY POSSIBLE X)))))))))))))))))))))))))))))))))))))))))))))))))
 	i = -1;
-	while (++i < graph->nb_links)
+	while (++i < graph->nb_links && i < 511)
 	{
 		i_node = find_closest_inter(graph, i);
 		if (i_node != -1)
 		{
+			// printf("\t\tSplitting the segment index [%d] at the coo {%.12f, %.12f}\n", i, graph->nodes[i_node].coo.x, graph->nodes[i_node].coo.y);
 			graph->links[graph->nb_links].start = &graph->nodes[i_node];
 			graph->links[graph->nb_links].end = graph->links[i].end;
 			graph->links[graph->nb_links].center = graph->links[i].center;
 			graph->links[graph->nb_links].type = graph->links[i].type;
 			graph->links[i].end = &graph->nodes[i_node];
-			replace_connection(graph->links[graph->nb_links].end,
-				&graph->links[i], &graph->links[graph->nb_links]);
+			if (graph->links[i].start != graph->links[graph->nb_links].end)
+				replace_connection(graph->links[graph->nb_links].end,
+					&graph->links[i], &graph->links[graph->nb_links]);
+			else
+				add_connection(graph->links[i].start, &graph->links[graph->nb_links]);
 			add_connection(&graph->nodes[i_node], &graph->links[i]);
 			add_connection(&graph->nodes[i_node], &graph->links[graph->nb_links]);
 			++graph->nb_links;
+			if (debug)
+				print_graph(graph, letter);
 		}
 	}
-}
-
-void	print_graph(t_graph *graph, char *letter)
-{
-	int	i;
-
-	i = -1;
-	printf("This is the graph of %s:\n", letter);
-	while (++i < graph->nb_links)
-	{
-		if (graph->links[i].type == 0)
-		{
-			printf("\tA line is connecting {%.3f, %.3f} to {%.3f, %.3f}\n",
-				graph->links[i].start->coo.x, graph->links[i].start->coo.y,
-				graph->links[i].end->coo.x, graph->links[i].end->coo.y);
-		}
-		else
-		{
-			printf("\tAn arc is connecting {%.3f, %.3f} to {%.3f, %.3f}\
-, with {%.3f, %3f} as center\n",
-				graph->links[i].start->coo.x, graph->links[i].start->coo.y,
-				graph->links[i].end->coo.x, graph->links[i].end->coo.y,
-				graph->links[i].center.x, graph->links[i].center.y);
-		}
-	}
+	//should do something if it exit because of overflow
 }
 
 int	build_polygon(t_tile *tile, char id)
 {
 	char	letter[2];
-	t_graph	graph;
+	t_graph	*graph;
 
 	letter[0] = id;
 	letter[1] = 0;
 	if (ft_lstsize(tile->wpath) >= 32)
 		return (ft_perror(-1, ft_strsjoin((char *[]){"Too many lines for tile \
 ", letter, ". Expected at most 32 lines.", NULL}), 0), 1);
-	graph = (t_graph){0};
-	build_primitive_graph(tile->wpath, &graph);
-	grow_graph(&graph);
-	print_graph(&graph, letter);
+	graph = malloc(sizeof(t_graph));
+	if (!graph)
+		return (ft_perror(-1, "Internal error: malloc.", 0),
+			 ft_del((void **)&graph), 1);
+	build_primitive_graph(tile->wpath, graph, letter);
+	if (!debug)
+		print_graph(graph, letter);
+	grow_graph(graph, letter);
+	if (!debug)
+		print_graph(graph, letter);
+	ft_del((void **)&graph);
 	return (0);
 }
 
@@ -436,7 +475,7 @@ int	build_polygons()
 
 	tiles = get_tile_dict();
 	i = -1;
-	while (++i < 256)
+	while (++i < 255)
 	{
 		if (!tiles[i])
 			continue ;
