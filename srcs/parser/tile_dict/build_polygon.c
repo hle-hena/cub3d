@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 10:55:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/24 09:17:17 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/24 18:37:17 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -426,6 +426,9 @@ void	build_primitive_graph(t_list *wpath, t_graph *graph, char *letter)
 		graph->links[j].end = &graph->nodes[found_end];
 		graph->links[j].center = wall->center;
 		graph->links[j].type = wall->mode;
+		graph->links[j].reflectance = wall->reflectance;
+		graph->links[j].visited[0] = 0;
+		graph->links[j].visited[1] = 0;
 		add_connection(&graph->nodes[found_start], &graph->links[j]);
 		if (found_end != found_start)
 			add_connection(&graph->nodes[found_end], &graph->links[j]);
@@ -456,6 +459,9 @@ void	grow_graph(t_graph *graph, char *letter)
 			graph->links[graph->nb_links].end = graph->links[i].end;
 			graph->links[graph->nb_links].center = graph->links[i].center;
 			graph->links[graph->nb_links].type = graph->links[i].type;
+			graph->links[graph->nb_links].reflectance = graph->links[i].reflectance;
+			graph->links[graph->nb_links].visited[0] = 0;
+			graph->links[graph->nb_links].visited[1] = 0;
 			graph->links[i].end = &graph->nodes[i_node];
 			if (graph->links[i].start != graph->links[graph->nb_links].end)
 				replace_connection(graph->links[graph->nb_links].end,
@@ -472,6 +478,183 @@ void	grow_graph(t_graph *graph, char *letter)
 	//should do something if it exit because of overflow
 }
 
+void	generate_angles(t_node *current, float *angles)
+{
+	int		j;
+	t_vec	out;
+
+	j = -1;
+	while (current->connect[++j])
+	{
+		if (current->connect[j]->type == 0
+			&& current->connect[j]->start == current)
+			out = (t_vec){current->connect[j]->end->coo.x - current->coo.x,
+				current->connect[j]->end->coo.y - current->coo.y};
+		else if (current->connect[j]->type == 0)
+			out = (t_vec){current->connect[j]->start->coo.x - current->coo.x,
+				current->connect[j]->start->coo.y - current->coo.y};
+		else
+			out = (t_vec){current->connect[j]->center.y - current->coo.y,
+				current->coo.x - current->connect[j]->center.x};
+		angles[j] = atan2(out.y, out.x);
+	}
+}
+
+void	switch_two(t_node *node, float *angles, int k)
+{
+	float	temp_f;
+	void	*temp_p;
+
+	temp_f = angles[k];
+	angles[k] = angles[k + 1];
+	angles[k + 1] = temp_f;
+	temp_p = node->connect[k];
+	node->connect[k] = node->connect[k + 1];
+	node->connect[k + 1] = temp_p;
+}
+
+void	sort_edges(t_graph *graph)
+{
+	int		i;
+	int		j;
+	int		k;
+	float	angles[512];
+
+	i = -1;
+	while (++i < graph->nb_nodes)
+	{
+		generate_angles(&graph->nodes[i], angles);
+		j = -1;
+		while (graph->nodes[i].connect[++j + 1])
+		{
+			k = -1;
+			while (graph->nodes[i].connect[++k + j + 1])
+			{
+				if (angles[k] > angles[k + 1])
+					switch_two(&graph->nodes[i], angles, k);
+			}
+		}
+	}
+}
+
+int	find_unvisited_edge(t_graph *graph, int *index)
+{
+	int	i;
+
+	i = -1;
+	while (++i < graph->nb_links)
+	{
+		if (graph->links[i].visited[0] == 0
+			|| graph->links[i].visited[1] == 0)
+		{
+			printf("Finding for adress %p\n", &graph->links[i]);
+			*index = i;
+			return (0);
+		}
+	}
+	return (1);
+}
+
+int	find_link(t_graph *graph, t_link *link)
+{
+	int	i;
+
+	i = -1;
+	while (++i < graph->nb_links)
+	{
+		if (graph->links[i].type == 0 && graph->links[i].start == link->start
+			&& graph->links[i].end == link->end && link->type == 0)
+			return (i);
+		else if (link->type == 1 &&graph->links[i].start == link->start
+			&& graph->links[i].end == link->end && graph->links[i].type == 1
+			&& fabs(graph->links[i].center.x - link->center.x) < 1e-6
+			&& fabs(graph->links[i].center.y - link->center.y) < 1e-6)
+			return (i);
+	}
+	return  (0);
+}
+
+void	copy_link(t_graph *to, t_link *src, t_node *current_node)
+{
+	int		found_start;
+	int		found_end;
+//need to normalise the second point for the circles so that if they are not on the circle, I place them on.
+	found_start = find_node(to->nodes, src->start->coo,
+		&to->nb_nodes, 1);
+	found_end = find_node(to->nodes, src->end->coo,
+		&to->nb_nodes, 1);
+	to->links[to->nb_links] = *src;
+	if (src->start == current_node)
+	{
+		src->visited[0] = 1;
+		to->links[to->nb_links].start = &to->nodes[found_start];
+		to->links[to->nb_links].end = &to->nodes[found_end];
+	}
+	else
+	{
+		src->visited[1] = 1;
+		to->links[to->nb_links].start = &to->nodes[found_start];
+		to->links[to->nb_links].end = &to->nodes[found_end];
+	}
+	to->nb_links++;
+}
+
+void	get_subgraph(t_graph *graph, t_graph *subgraph, int start_edge)
+{
+	t_link	*current_link;
+	t_node	*current_node;
+	t_node	*start_node;
+	int		i;
+
+	current_link = &graph->links[start_edge];
+	if (!current_link->visited[0])
+	{
+		start_node = current_link->start;
+		current_node = current_link->end;
+	}
+	else
+	{
+		current_node = current_link->start;
+		start_node = current_link->end;
+	}
+	copy_link(subgraph, &graph->links[start_edge], start_node);
+	while (current_node != start_node)
+	{
+		i = 0;
+		while (current_node->connect[i] != current_link)
+			i++;
+		current_link = current_node->connect[++i];
+		if (!current_link)
+			current_link = current_node->connect[0];
+		copy_link(subgraph, current_link, current_node);
+		if (current_node == current_link->start)
+			current_node = current_link->end;
+		else
+			current_node = current_link->start;
+	}
+}
+
+void	retrieve_outer_face(t_graph *graph, char *letter)
+{
+	int		index;
+	t_graph	*temp_graph;
+
+	temp_graph = malloc(sizeof(t_graph));
+	if (!temp_graph)
+		return (ft_perror(-1, "Internal error: malloc.", 0));
+	sort_edges(graph);
+	while (1)
+	{
+		if (find_unvisited_edge(graph, &index))
+			break ;
+		temp_graph->nb_links = 0;
+		temp_graph->nb_nodes = 0;
+		get_subgraph(graph, temp_graph, index);
+		print_graph(temp_graph, letter);
+	}
+	ft_del((void **)temp_graph);
+}
+
 int	build_polygon(t_tile *tile, char id)
 {
 	char	letter[2];
@@ -484,14 +667,14 @@ int	build_polygon(t_tile *tile, char id)
 ", letter, ". Expected at most 32 lines.", NULL}), 0), 1);
 	graph = malloc(sizeof(t_graph));
 	if (!graph)
-		return (ft_perror(-1, "Internal error: malloc.", 0),
-			 ft_del((void **)&graph), 1);
+		return (ft_perror(-1, "Internal error: malloc.", 0), 1);
 	build_primitive_graph(tile->wpath, graph, letter);
 	if (!debug)
 		print_graph(graph, letter);
 	grow_graph(graph, letter);
 	if (!debug)
 		print_graph(graph, letter);
+	retrieve_outer_face(graph, letter);
 	ft_del((void **)&graph);
 	return (0);
 }

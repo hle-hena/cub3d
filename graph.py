@@ -84,10 +84,12 @@ def draw_all_graphs(graphs):
         ax.set_xlabel("X")
         ax.set_ylabel("Y")
 
+        # Draw nodes
         for node in nodes:
             ax.plot(node.x, node.y, 'ko')
             ax.text(node.x, node.y + 0.01, f"({node.x:.2f}, {node.y:.2f})", fontsize=6, ha='center', color='blue')
 
+        # Draw links
         colors = generate_distinct_colors(len(links))
         for link, color in zip(links, colors):
             if link.type == 'line':
@@ -95,7 +97,12 @@ def draw_all_graphs(graphs):
             elif link.type == 'arc':
                 draw_arc(ax, link.start, link.end, link.center, color=color)
 
+        # Fixed 1x1 view centered at (0.5, 0.5)
+        pad = 0.05  # 5% padding on each side
+        ax.set_xlim(0 - pad, 1 + pad)
+        ax.set_ylim(0 - pad, 1 + pad)
         ax.grid(True)
+
 
     # Hide any unused subplots
     for i in range(n, rows * cols):
