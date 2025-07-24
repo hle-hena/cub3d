@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 10:55:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/23 17:20:46 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/24 09:17:17 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,8 +76,8 @@ int	find_node(t_node *nodes, t_vec coo, int *current, int should_create)
 	i = -1;
 	while (++i < *current)
 	{
-		if (fabs(nodes[i].coo.x - coo.x) < FLT_EPSILON
-			&& fabs(nodes[i].coo.y - coo.y) < FLT_EPSILON)
+		if (fabs(nodes[i].coo.x - coo.x) < 1e-6f
+			&& fabs(nodes[i].coo.y - coo.y) < 1e-6f)
 			return (i);
 	}
 	if (*current == 1023 || !should_create)
@@ -326,12 +326,13 @@ void	intersect_seg_arc(t_link *seg, t_link *arc, t_inter *inter, void (*f)(t_lin
 	f(seg, arc, (t_info_check){inter, dir, (-b + sqrt_d) / (2.0f * a)}, graph);
 }
 
-void	intersect_seg_seg(t_link *l1, t_link *l2, t_inter *inter)
+void	intersect_seg_seg(t_link *l1, t_link *l2, t_inter *inter, t_graph *graph)
 {
 	t_vec	s1;
 	t_vec	s2;
 	float	s;
 	float	t;
+	int		found;
 
 	s1.x = l1->end->coo.x - l1->start->coo.x;
 	s1.y = l1->end->coo.y - l1->start->coo.y;
@@ -341,19 +342,24 @@ void	intersect_seg_seg(t_link *l1, t_link *l2, t_inter *inter)
 		* (l1->start->coo.y - l2->start->coo.y)) / (-s2.x * s1.y + s1.x * s2.y);
 	t = ( s2.x * (l1->start->coo.y - l2->start->coo.y) - s2.y
 		* (l1->start->coo.x - l2->start->coo.x)) / (-s2.x * s1.y + s1.x * s2.y);
-	if (s >= 0 - FLT_EPSILON && s <= 1 + FLT_EPSILON && t > 0 && t < 1 && (t < inter->dist || inter->dist < 0)
-		&& (t > FLT_EPSILON && t < 1 - FLT_EPSILON))
+	if (s >= 0 && s <= 1 && t > 0 && t < 1 && (t < inter->dist || inter->dist < 0))
 	{
-		inter->coo.x = l1->start->coo.x + (t * s1.x);
-		inter->coo.y = l1->start->coo.y + (t * s1.y);
-		inter->dist = t;
+		s2.x = l1->start->coo.x + (t * s1.x);
+		s2.y = l1->start->coo.y + (t * s1.y);
+		found = find_node(graph->nodes, s2, &graph->nb_nodes, 0);
+		if (found == -1 || (&graph->nodes[found] != l1->start
+			&& &graph->nodes[found] != l1->end))
+		{
+			inter->coo = s2;
+			inter->dist = t;
+		}
 	}
 }
 
 void	intersect_switch(t_link *l1, t_link *l2, t_inter *inter, t_graph *graph)
 {
 	if (l1->type == 0 && l2->type == 0)
-		intersect_seg_seg(l1, l2, inter);
+		intersect_seg_seg(l1, l2, inter, graph);
 	else if (l1->type == 0)
 		intersect_seg_arc(l1, l2, inter, &check_possible_seg_arc, graph);
 	else if (l2->type == 0)
@@ -445,7 +451,7 @@ void	grow_graph(t_graph *graph, char *letter)
 		i_node = find_closest_inter(graph, i);
 		if (i_node != -1)
 		{
-			printf("\t\tSplitting the segment index [%d] at the coo {%.12f, %.12f}\n", i, graph->nodes[i_node].coo.x, graph->nodes[i_node].coo.y);
+			// printf("\t\tSplitting the segment index [%d] at the coo {%.12f, %.12f}\n", i, graph->nodes[i_node].coo.x, graph->nodes[i_node].coo.y);
 			graph->links[graph->nb_links].start = &graph->nodes[i_node];
 			graph->links[graph->nb_links].end = graph->links[i].end;
 			graph->links[graph->nb_links].center = graph->links[i].center;

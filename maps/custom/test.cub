@@ -27,8 +27,19 @@
 	wa ((0.6, 0.8), (0.6, 0.8), (0.6, 0.5))
 	wa ((0.8, 0.4), (0.8, 0.4), (0.5, 0.4))
 	wa ((0.8, 0.6), (0.8, 0.6), (0.5, 0.6))
-	#wl ((0, 0), (1, 1))
-	#wl ((0, 1), (1, 0))
+	wl ((0, 0), (1, 1))
+	wl ((0, 1), (1, 0))
+}
+" {
+	NO textures/simonkraft/bookshelf_01.xpm
+	SO textures/simonkraft/bookshelf_01.xpm
+	EA textures/simonkraft/bookshelf_01.xpm
+	WE textures/simonkraft/bookshelf_01.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+	wl ((0, 0.5), (0.5, 0.5))
+	wl ((0.2, 0.5), (1, 0.5))
 }
 # {
 	NO textures/simonkraft/bookshelf_01.xpm
