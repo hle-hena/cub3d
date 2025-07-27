@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/24 13:15:05 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/27 18:31:22 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -171,6 +171,7 @@ struct s_graph_link
 	int		type;
 	int		visited[2];
 	float	reflectance;
+	int		run_forward;
 };
 
 typedef struct s_graph

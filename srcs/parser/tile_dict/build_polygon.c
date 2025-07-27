@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 10:55:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/24 18:37:17 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/27 22:31:19 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -482,7 +482,9 @@ void	generate_angles(t_node *current, float *angles)
 {
 	int		j;
 	t_vec	out;
-
+//need to normalise the second point for the circles so that if they are not on the circle, I place them on.
+//yeah, but why ? I forgot ...
+//it is for the else of the arc. if the point isnt really the end points, it will fuck things up.
 	j = -1;
 	while (current->connect[++j])
 	{
@@ -494,8 +496,15 @@ void	generate_angles(t_node *current, float *angles)
 			out = (t_vec){current->connect[j]->start->coo.x - current->coo.x,
 				current->connect[j]->start->coo.y - current->coo.y};
 		else
-			out = (t_vec){current->connect[j]->center.y - current->coo.y,
-				current->coo.x - current->connect[j]->center.x};
+		{
+			t_vec radius = {
+				current->coo.x - current->connect[j]->center.x,
+				current->coo.y - current->connect[j]->center.y
+			};
+			out = (t_vec){-radius.y, radius.x};
+			if (current->connect[j]->end == current)
+				out = (t_vec){-out.x, -out.y};
+		}
 		angles[j] = atan2(out.y, out.x);
 	}
 }
@@ -578,23 +587,37 @@ void	copy_link(t_graph *to, t_link *src, t_node *current_node)
 {
 	int		found_start;
 	int		found_end;
-//need to normalise the second point for the circles so that if they are not on the circle, I place them on.
+
 	found_start = find_node(to->nodes, src->start->coo,
 		&to->nb_nodes, 1);
 	found_end = find_node(to->nodes, src->end->coo,
 		&to->nb_nodes, 1);
 	to->links[to->nb_links] = *src;
+	to->links[to->nb_links].run_forward = 1;
 	if (src->start == current_node)
 	{
 		src->visited[0] = 1;
+		if (src->start == src->end)
+			src->visited[1] = 1;
 		to->links[to->nb_links].start = &to->nodes[found_start];
 		to->links[to->nb_links].end = &to->nodes[found_end];
 	}
 	else
 	{
 		src->visited[1] = 1;
-		to->links[to->nb_links].start = &to->nodes[found_start];
-		to->links[to->nb_links].end = &to->nodes[found_end];
+		if (src->start == src->end)
+			src->visited[0] = 1;
+		if (src->type == 1)
+		{
+			to->links[to->nb_links].run_forward = 0;
+			to->links[to->nb_links].start = &to->nodes[found_start];
+			to->links[to->nb_links].end = &to->nodes[found_end];
+		}
+		else
+		{
+			to->links[to->nb_links].start = &to->nodes[found_end];
+			to->links[to->nb_links].end = &to->nodes[found_start];
+		}
 	}
 	to->nb_links++;
 }
@@ -634,14 +657,60 @@ void	get_subgraph(t_graph *graph, t_graph *subgraph, int start_edge)
 	}
 }
 
-void	retrieve_outer_face(t_graph *graph, char *letter)
+float	angle_from_center(t_vec center, t_vec point)
+{
+	return atan2f(point.y - center.y, point.x - center.x);
+}
+
+float	area_link(t_link *link)
+{
+	t_vec	a;
+	t_vec	b;
+	t_vec	theta;
+	float	r;
+	float	dtheta;
+
+	a = link->end->coo;
+	b = link->start->coo;
+	if (link->run_forward)
+		a = link->start->coo;
+	if (link->run_forward)
+		b = link->end->coo;
+	if (link->type == 0)
+		return (0.5f * (a.x * b.y - b.x * a.y));
+	r = sqrtf(vec_len2(vec_sub(a, link->center)));
+	theta.x = angle_from_center(link->center, a);
+	theta.y = angle_from_center(link->center, b);
+	dtheta = theta.y - theta.x;
+	if (dtheta <= 0)
+		dtheta += 2.0f * PI;
+	if (!link->run_forward)
+		dtheta = - (2.0f * PI - dtheta);
+	return (0.5f * (r * link->center.x * (sinf(theta.y) - sinf(theta.x))
+			- r * link->center.y * (cosf(theta.y) - cosf(theta.x))
+			+ r * r * dtheta));
+}
+
+float	polygon_area(t_graph *graph)
+{
+	int		i;
+	float	area;
+
+	area = 0;
+	i = -1;
+	while (++i < graph->nb_links)
+		area += area_link(&graph->links[i]);
+	return (area);
+}
+
+t_graph	*retrieve_outer_face(t_graph *graph, char *letter)
 {
 	int		index;
 	t_graph	*temp_graph;
 
 	temp_graph = malloc(sizeof(t_graph));
 	if (!temp_graph)
-		return (ft_perror(-1, "Internal error: malloc.", 0));
+		return (ft_perror(-1, "Internal error: malloc.", 0), NULL);
 	sort_edges(graph);
 	while (1)
 	{
@@ -650,15 +719,20 @@ void	retrieve_outer_face(t_graph *graph, char *letter)
 		temp_graph->nb_links = 0;
 		temp_graph->nb_nodes = 0;
 		get_subgraph(graph, temp_graph, index);
-		print_graph(temp_graph, letter);
+		if (debug)
+			print_graph(temp_graph, letter);
+		if (polygon_area(temp_graph) >= 0)
+			return (temp_graph);
 	}
-	ft_del((void **)temp_graph);
+	ft_del((void **)&temp_graph);
+	return (NULL);
 }
 
 int	build_polygon(t_tile *tile, char id)
 {
 	char	letter[2];
 	t_graph	*graph;
+	t_graph	*outer_face;
 
 	letter[0] = id;
 	letter[1] = 0;
@@ -672,9 +746,12 @@ int	build_polygon(t_tile *tile, char id)
 	if (!debug)
 		print_graph(graph, letter);
 	grow_graph(graph, letter);
-	if (!debug)
-		print_graph(graph, letter);
-	retrieve_outer_face(graph, letter);
+	outer_face = retrieve_outer_face(graph, letter);
+	if (outer_face && !debug)
+	{
+		print_graph(outer_face, letter);
+		ft_del((void **)&outer_face);
+	}
 	ft_del((void **)&graph);
 	return (0);
 }
@@ -692,6 +769,8 @@ int	build_polygons()
 			continue ;
 		if (build_polygon(tiles[i], i))
 			return (1);
+		// else
+		// 	break ;
 	}
 	return (0);
 }
