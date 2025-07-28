@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:28:34 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/01 10:41:21 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/28 14:15:20 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ void	type_switch(t_tile *tile, char *line, char *arg, int *err)
 		retrieve_line(tile, arg, err);
 	else if (ft_strncmp("wa ", line, 3) == 0)
 		retrieve_arc(tile, arg, err);
+	else if (ft_strncmp("wt ", line, 3) == 0)
+		retrieve_texture(&tile->wall, arg, err, "*");
 	else if (ft_strncmp("NO ", line, 3) == 0)
 		retrieve_texture(&tile->tex_no, arg, err, "NO");
 	else if (ft_strncmp("SO ", line, 3) == 0)
@@ -61,12 +63,14 @@ t_tile	*new_tile(void)
 	if (!new)
 		return (NULL);
 	new->wpath = NULL;
+	new->wall.img = NULL;
 	new->tex_ce.img = NULL;
 	new->tex_ea.img = NULL;
 	new->tex_fl.img = NULL;
 	new->tex_no.img = NULL;
 	new->tex_so.img = NULL;
 	new->tex_we.img = NULL;
+	new->wall.reflectance = 0;
 	new->tex_ce.reflectance = 0;
 	new->tex_ea.reflectance = 0;
 	new->tex_fl.reflectance = 0;

@@ -46,7 +46,7 @@ OBJ = $(SRCS:.c=.o)
 	@$(CC) $(FLAGS) -c $< -o $(<:.c=.o)
 	@printf "\r\033[K"
 
-all: FLAGS += -g
+all: FLAGS += -O3
 all: $(NAME)
 
 no: clear

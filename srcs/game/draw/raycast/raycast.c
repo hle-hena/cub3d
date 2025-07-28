@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/22 18:00:35 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/30 10:32:50 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/28 17:15:19 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ void	handle_hit(t_data *data, t_ray *ray, t_hit *hit)
 	hit->hit[ray->bounce].x = ray->origin.x + ray->dir.x * ray->precise_dist;
 	hit->hit[ray->bounce].y = ray->origin.y + ray->dir.y * ray->precise_dist;
 	hit_light(data, ray, hit, hit->wall[ray->bounce]);
-	hit->texture[ray->bounce] = tile->tex_ea.img;
+	hit->texture[ray->bounce] = hit->wall[ray->bounce].texture.img;
 	hit->bounces = ray->bounce;
 	hit->dist[ray->bounce] = ray->precise_dist;
 	if (ray->bounce != 0)

@@ -51,6 +51,7 @@
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
 	W 1
+	wt textures/simonkraft/bookshelf_01.xpm
 	wa ((0.5, 0), (0.5, 0), (0.5, 0.5)), 1
 }
 . {
@@ -61,6 +62,7 @@
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
 	W 1
+	wt textures/simonkraft/bookshelf_01.xpm
 	wa ((0.5, 0), (0.5, 0), (0.5, 0.5)), 0.2
 }
 , {
@@ -70,6 +72,7 @@
 	WE 200,200,200
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
+	wt textures/simonkraft/bookshelf_01.xpm
 	W 1
 	wa ((0.5, 0), (0.5, 0), (0.5, 0.5)), 0.6
 }

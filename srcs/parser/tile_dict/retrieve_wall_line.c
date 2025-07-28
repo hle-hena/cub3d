@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 10:52:00 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/30 17:30:55 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/28 16:10:36 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@ void	retrieve_line(t_tile *tile, char *arg, int *err)
 		return (*err = 1, VOID);
 	if (skip_pattern(&arg, " ) )"))
 		return (*err = 1, VOID);
-	line->texture = tile->tex_no;
+	line->texture.img = NULL;
 	line->normal = normalize((t_vec){
 			-line->end.y + line->start.y,
 			line->end.x - line->start.x});
@@ -114,7 +114,7 @@ void	retrieve_arc(t_tile *tile, char *arg, int *err)
 		return (*err = 1, VOID);
 	if (skip_pattern(&arg, " ) )"))
 		return (*err = 1, VOID);
-	line->texture = tile->tex_no;
+	line->texture.img = NULL;
 	line->normal = normalize((t_vec){
 			-line->end.y + line->start.y,
 			line->end.x - line->start.x});

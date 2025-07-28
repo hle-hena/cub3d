@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 10:55:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/27 22:31:19 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/28 14:37:32 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -209,7 +209,7 @@ void	check_possible_arc_seg(t_link *seg, t_link *arc, t_info_check check, t_grap
 	float	total_angle;
 	int		found;
 
-	if (check.t < 0.0f || check.t > 1.0f)
+	if (check.t < 0 - 1e-4f || check.t > 1.0f + 1e-4f)
 		return ;
 	hit = vec_add(seg->start->coo, vec_scale(check.dir, check.t));
 	v_hit = vec_unit(vec_sub(hit, arc->center));
@@ -728,12 +728,42 @@ t_graph	*retrieve_outer_face(t_graph *graph, char *letter)
 	return (NULL);
 }
 
+int	copy_graph(t_graph *outer_face, t_tile *tile)
+{
+	int		i;
+	t_wpath	*temp;
+
+	i = -1;
+	ft_lstclear(&tile->wpath, ft_del);
+	tile->wpath = NULL;
+	while (++i < outer_face->nb_links)
+	{
+		temp = malloc(sizeof(t_wpath));
+		if (!temp)
+			return (1);
+		temp->start = outer_face->links[i].start->coo;
+		temp->center = outer_face->links[i].center;
+		temp->end = outer_face->links[i].end->coo;
+		temp->mode = outer_face->links[i].type;
+		temp->reflectance = outer_face->links[i].reflectance;
+		temp->pos = 0;
+		temp->normal = normalize((t_vec){-temp->end.y + temp->start.y,
+				temp->end.x - temp->start.x});
+		temp->texture = tile->wall;
+		// temp->texture = tile->tex_no;
+		ft_lstadd_back(&tile->wpath, ft_lstnew(temp));
+	}
+	return (0);
+}
+
 int	build_polygon(t_tile *tile, char id)
 {
 	char	letter[2];
 	t_graph	*graph;
 	t_graph	*outer_face;
 
+	if (((t_wpath *)tile->wpath->content)->texture.img)
+		return (0);
 	letter[0] = id;
 	letter[1] = 0;
 	if (ft_lstsize(tile->wpath) >= 32)
@@ -750,9 +780,10 @@ int	build_polygon(t_tile *tile, char id)
 	if (outer_face && !debug)
 	{
 		print_graph(outer_face, letter);
-		ft_del((void **)&outer_face);
+		copy_graph(outer_face, tile);
 	}
 	ft_del((void **)&graph);
+	ft_del((void **)&outer_face);
 	return (0);
 }
 
@@ -769,8 +800,6 @@ int	build_polygons()
 			continue ;
 		if (build_polygon(tiles[i], i))
 			return (1);
-		// else
-		// 	break ;
 	}
 	return (0);
 }

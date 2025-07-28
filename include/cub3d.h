@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/27 18:31:22 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/28 14:13:30 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -197,6 +197,7 @@ typedef struct s_wpath
 typedef struct s_tile
 {
 	t_list		*wpath;
+	t_text		wall;
 	t_text		tex_no;
 	t_text		tex_so;
 	t_text		tex_we;
@@ -205,6 +206,18 @@ typedef struct s_tile
 	t_text		tex_fl;
 	int			is_wall;
 }	t_tile;
+
+//idealy, the struct should become this :                                                                  
+/* 
+typedef struct s_tile
+{
+	t_list		*wpath;
+	t_text		wall;
+	t_text		tex_ce;
+	t_text		tex_fl;
+	int			is_wall;
+}	t_tile;
+ */
 
 typedef struct s_map
 {
