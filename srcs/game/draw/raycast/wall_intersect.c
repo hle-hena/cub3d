@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 13:37:04 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/09 19:08:49 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/29 13:56:29 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,7 @@ static inline t_wpath	line(t_point curr, t_wpath base)
 {
 	return ((t_wpath){(t_vec){base.start.x + curr.x, base.start.y + curr.y},
 		(t_vec){base.end.x + curr.x, base.end.y + curr.y}, (t_vec){base.center.x
-			+ curr.x, base.center.y + curr.y}, (t_text){0}, (t_vec){0}, 0, 0, 0});
+			+ curr.x, base.center.y + curr.y}, (t_text){0}, (t_vec){0}, 0, 0, 0, 1, 0});
 }
 
 int	is_invalid_hit(t_ray *ray, t_wpath *wall, float dist)
@@ -194,7 +194,8 @@ int	does_hit(t_list	*wpath, t_ray *ray, t_wpath *wall)
 		{
 			*wall = *(t_wpath *)wpath->content;
 			dist = temp;
-			wall->pos = percent;
+			wall->pos = percent * (wall->pos_end - wall->pos_start)
+				+ wall->pos_start;
 			if (((t_wpath *)wpath->content)->mode == 1)
 				wall->normal = normal;
 		}

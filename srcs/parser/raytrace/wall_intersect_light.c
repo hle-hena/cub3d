@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 11:10:35 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/05 15:58:31 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/29 12:46:05 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,7 +138,7 @@ static inline t_wpath	line(t_point curr, t_wpath base)
 		(base.start.y + curr.y) * LMAP_PRECISION}, (t_vec){(base.end.x + curr.x)
 				* LMAP_PRECISION, (base.end.y + curr.y) * LMAP_PRECISION},
 		(t_vec){(base.center.x + curr.x) * LMAP_PRECISION, (base.center.y
-		+ curr.y) * LMAP_PRECISION}, (t_text){0}, (t_vec){0}, 0, 0, 0});
+		+ curr.y) * LMAP_PRECISION}, (t_text){0}, (t_vec){0}, 0, 0, 0, 1, 0});
 }
 
 static inline float	angle(t_vec ray_dir, t_vec normal)
@@ -162,9 +162,9 @@ static inline int	is_valid_hit(t_trace *ray, float dist)
 		return (0);
 	hit.x = ray->origin.x + ray->dir.x * dist;
 	hit.y = ray->origin.y + ray->dir.y * dist;
-	if ((ray->dir.x > 0 && floorf(hit.x) > ray->curr.x)
+	if ((ray->dir.x > 0 && floorf(hit.x) > ray->curr.x + FLT_EPSILON)
 		|| (ray->dir.x < 0 && floorf(hit.x) < ray->curr.x)
-		|| (ray->dir.y > 0 && floorf(hit.y) > ray->curr.y)
+		|| (ray->dir.y > 0 && floorf(hit.y) > ray->curr.y + FLT_EPSILON)
 		|| (ray->dir.y < 0 && floorf(hit.y) < ray->curr.y))
 		return (0);
 	ray->precise_dist = ray->last_dist + dist;

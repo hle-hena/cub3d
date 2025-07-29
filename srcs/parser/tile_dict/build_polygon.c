@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 10:55:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/28 14:37:32 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/29 11:29:59 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -691,24 +691,91 @@ float	area_link(t_link *link)
 			+ r * r * dtheta));
 }
 
-float	polygon_area(t_graph *graph)
+float	arc_sweep_angle(t_link *arc)
+{
+	t_vec	ac;
+	t_vec	bc;
+	float	angle;
+
+	ac = (t_vec){arc->start->coo.x - arc->center.x,
+		arc->start->coo.y - arc->center.y};
+	bc = (t_vec){arc->end->coo.x - arc->center.x,
+		arc->end->coo.y - arc->center.y};
+	angle = atan2(bc.y, bc.x) - atan2(ac.y, ac.x);
+	if (angle <= -PI) angle += 2 * PI;
+	if (angle > PI) angle -= 2 * PI;
+	if (arc->start == arc->end)
+		return (2 * PI);
+	return (angle);
+}
+
+float	perimeter_link(t_link *link)
+{
+	float	radius;
+	float	theta;
+
+	if (link->type == 0)
+		return (sqrtf(vec_len2(vec_sub(link->end->coo, link->start->coo))));
+	radius = sqrtf(vec_len2(vec_sub(link->start->coo, link->center)));
+	theta = arc_sweep_angle(link);
+	return (fabsf(radius * theta));
+}
+
+float	polygon_area(t_graph *graph, float *perimeter)
 {
 	int		i;
 	float	area;
 
+	*perimeter = 0;
 	area = 0;
 	i = -1;
 	while (++i < graph->nb_links)
+	{
 		area += area_link(&graph->links[i]);
+		*perimeter += perimeter_link(&graph->links[i]);
+	}
 	return (area);
 }
 
-t_graph	*retrieve_outer_face(t_graph *graph, char *letter)
+t_graph	*add_face(t_graph *outer_face, t_graph *new, float *perimeter, float found)
+{
+	int	i;
+	int	found_start;
+	int	found_end;
+
+	if (!outer_face)
+		*perimeter = 0;
+	if (!outer_face)
+		outer_face = ft_calloc(1, sizeof(t_graph));
+	if (!outer_face)
+		return (ft_perror(-1, "Internal error: malloc.", 0), NULL);
+	i = -1;
+	*perimeter += found;
+	while (++i < new->nb_links)
+	{
+		found_start = find_node(outer_face->nodes, new->links[i].start->coo,
+			&outer_face->nb_nodes, 1);
+		found_end = find_node(outer_face->nodes, new->links[i].end->coo,
+			&outer_face->nb_nodes, 1);
+		outer_face->links[outer_face->nb_links] = new->links[i];
+		outer_face->links[outer_face->nb_links].start =
+			&outer_face->nodes[found_start];
+		outer_face->links[outer_face->nb_links].end =
+			&outer_face->nodes[found_end];
+		++outer_face->nb_links;
+	}
+	return (outer_face);
+}
+
+t_graph	*retrieve_outer_face(t_graph *graph, char *letter, float *perimeter)
 {
 	int		index;
 	t_graph	*temp_graph;
+	t_graph	*outer_face;
+	float	temp;
 
 	temp_graph = malloc(sizeof(t_graph));
+	outer_face = NULL;
 	if (!temp_graph)
 		return (ft_perror(-1, "Internal error: malloc.", 0), NULL);
 	sort_edges(graph);
@@ -721,19 +788,21 @@ t_graph	*retrieve_outer_face(t_graph *graph, char *letter)
 		get_subgraph(graph, temp_graph, index);
 		if (debug)
 			print_graph(temp_graph, letter);
-		if (polygon_area(temp_graph) >= 0)
-			return (temp_graph);
+		if (polygon_area(temp_graph, &temp) >= 0)
+			outer_face = add_face(outer_face, temp_graph, perimeter, temp);
 	}
 	ft_del((void **)&temp_graph);
-	return (NULL);
+	return (outer_face);
 }
 
-int	copy_graph(t_graph *outer_face, t_tile *tile)
+int	copy_graph(t_graph *outer_face, t_tile *tile, float perimeter)
 {
 	int		i;
 	t_wpath	*temp;
+	float	perim;
 
 	i = -1;
+	perim = 0;
 	ft_lstclear(&tile->wpath, ft_del);
 	tile->wpath = NULL;
 	while (++i < outer_face->nb_links)
@@ -750,7 +819,9 @@ int	copy_graph(t_graph *outer_face, t_tile *tile)
 		temp->normal = normalize((t_vec){-temp->end.y + temp->start.y,
 				temp->end.x - temp->start.x});
 		temp->texture = tile->wall;
-		// temp->texture = tile->tex_no;
+		temp->pos_start = perim;
+		perim += perimeter_link(&outer_face->links[i]) / perimeter;
+		temp->pos_end = perim;
 		ft_lstadd_back(&tile->wpath, ft_lstnew(temp));
 	}
 	return (0);
@@ -761,6 +832,7 @@ int	build_polygon(t_tile *tile, char id)
 	char	letter[2];
 	t_graph	*graph;
 	t_graph	*outer_face;
+	float	perimeter;
 
 	if (((t_wpath *)tile->wpath->content)->texture.img)
 		return (0);
@@ -776,11 +848,12 @@ int	build_polygon(t_tile *tile, char id)
 	if (!debug)
 		print_graph(graph, letter);
 	grow_graph(graph, letter);
-	outer_face = retrieve_outer_face(graph, letter);
-	if (outer_face && !debug)
+	outer_face = retrieve_outer_face(graph, letter, &perimeter);
+	if (outer_face)
 	{
-		print_graph(outer_face, letter);
-		copy_graph(outer_face, tile);
+		if (!debug)
+			print_graph(outer_face, letter);
+		copy_graph(outer_face, tile, perimeter);
 	}
 	ft_del((void **)&graph);
 	ft_del((void **)&outer_face);

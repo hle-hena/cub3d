@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/28 14:13:30 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/29 14:07:37 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -191,6 +191,8 @@ typedef struct s_wpath
 	t_vec	normal;
 	float	reflectance;
 	float	pos;
+	float	pos_start;
+	float	pos_end;
 	int		mode;
 }	t_wpath;
 
@@ -456,5 +458,12 @@ void		init_trace(t_trace *ray, t_vec dir, t_vec origin, float emittance);
 t_flight	*find_flight(t_data *data, t_point pos, t_wpath wall);
 
 void		print_dict(t_data *data);
+
+
+
+
+int			skip_pattern(char **arg, char *pattern);
+
+
 
 #endif

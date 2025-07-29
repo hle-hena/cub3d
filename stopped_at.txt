@@ -1,6 +1,4 @@
-Need to detect double and overlapped lines to simplify them. Also need to split the graph in potential multiple graph I think ?
-Or maybe just add all of the graph that I can find to be outer face ?
-
+Need to detect double and overlapped lines to simplify them.
 
 
 Found an issue, the light can leak when going up x or y I think ?

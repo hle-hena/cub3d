@@ -6,36 +6,11 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 10:52:00 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/28 16:10:36 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/29 14:29:17 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
-
-static inline int	skip_pattern(char **arg, char *pattern)
-{
-	int	i;
-
-	i = 0;
-	while (pattern[i])
-	{
-		if (pattern[i] != **arg)
-		{
-			if (!**arg)
-				return (1);
-			if (pattern[i] == ' ')
-			{
-				i++;
-				continue ;
-			}
-			return (1);
-		}
-		if (pattern[i] != ' ')
-			i++;
-		(*arg)++;
-	}
-	return (0);
-}
 
 static inline int	retrieve_coo(char **arg, int min, int max, t_vec *coo)
 {
@@ -96,6 +71,8 @@ void	retrieve_line(t_tile *tile, char *arg, int *err)
 void	retrieve_arc(t_tile *tile, char *arg, int *err)
 {
 	t_wpath	*line;
+	// float	r1;
+	// float	r2;
 
 	line = malloc(sizeof(t_wpath));
 	if (!line)
@@ -120,6 +97,10 @@ void	retrieve_arc(t_tile *tile, char *arg, int *err)
 			line->end.x - line->start.x});
 	line->reflectance = 0;
 	line->mode = 1;
+	// r1 = sqrtf(vec_len2(vec_sub(line->start, line->center)));
+	// r2 = sqrtf(vec_len2(vec_sub(line->end, line->center)));
+	// if (fabsf(r1 - r2) > 1e-4f)
+	// 	return (ft_del((void **)&line), *err = 1, VOID);
 	if (retrieve_reflectance(&arg, &line->reflectance))
 		return (*err = 1, VOID);
 	add_link(&tile->wpath, line);

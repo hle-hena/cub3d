@@ -13,7 +13,7 @@ LIBFT = $(LIBFT_DIR)/libft.a
 
 SRCS = $(addprefix srcs/, \
 	$(addprefix clean/, clean_data.c clean_map.c)\
-	$(addprefix utils/, add_link.c)\
+	$(addprefix utils/, add_link.c skip_pattern.c)\
 	$(addprefix parser/, parser.c\
 		$(addprefix tile_dict/, build_polygon.c \
 			hash_map.c is_dict_full.c retrieve_lonely.c \
