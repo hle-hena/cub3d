@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:17:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/25 09:38:59 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/30 13:07:27 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ int	clean_map(void)
 			remove_img(data, tiles[i]->tex_we.img);
 			remove_img(data, tiles[i]->tex_ce.img);
 			remove_img(data, tiles[i]->tex_fl.img);
+			ft_lstclear(&tiles[i]->wpath, ft_del);
 			ft_del((void **)&tiles[i]);
 		}
 	}

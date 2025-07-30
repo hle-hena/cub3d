@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 21:54:54 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/29 10:28:37 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/30 13:05:04 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,27 @@ void	is_text_missing(void *img, char *identifier, int id, int *missing)
 		letter[0] = id;
 		letter[1] = 0;
 		*missing = 1;
-		ft_perror(-1, ft_strsjoin((char *[]){"Missing ", identifier, "\tfor id ",
-			letter, NULL}), 1);
+		ft_perror(-1, ft_strsjoin((char *[]){"Missing texture for ", identifier,
+			"\tfor id ", letter, NULL}), 1);
 	}
+}
+
+int	has_walls(t_tile *tile, int id)
+{
+	char	letter[2];
+	int		missing;
+
+	missing = 0;
+	if (!tile->wpath)
+	{
+		letter[0] = id;
+		letter[1] = 0;
+		ft_perror(-1, ft_strsjoin((char *[]){"Missing walls\tfor id ",
+			letter, NULL}), 1);
+		return (1);
+	}
+	is_text_missing(tile->wall.img, "wt", id, &missing);
+	return (missing);
 }
 
 void	fill_preset(t_tile **tiles)
@@ -127,7 +145,8 @@ int	is_dict_full(t_map *map, int err)
 				if (err)
 					return (ft_perror(-1, "Internal error : malloc", 0), 1);
 			}
-			is_text_missing(tiles[i]->wpath, "the walls", i, &missing);
+			else if (has_walls(tiles[i], i))
+				return (1);
 			is_text_missing(tiles[i]->tex_ce.img, "C", i, &missing);
 			is_text_missing(tiles[i]->tex_fl.img, "F", i, &missing);
 			is_value_missing(tiles[i]->is_wall, "W", i, &missing);

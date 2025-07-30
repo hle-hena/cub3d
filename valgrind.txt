@@ -1,0 +1,245 @@
+==334475== Memcheck, a memory error detector
+==334475== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==334475== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==334475== Command: ./cub3d maps/custom/parser.cub
+==334475== 
+This is the graph of 1:
+	A line is connecting {0.000000000000, 0.000000000000} to {1.000000000000, 1.000000000000}
+Finding for adress 0x58b3040
+This is the graph of 1:
+	A line is connecting {0.000000000000, 0.000000000000} to {1.000000000000, 1.000000000000}
+	A line is connecting {1.000000000000, 1.000000000000} to {0.000000000000, 0.000000000000}
+Doing (2.50, 2.50) for 1.00
+Switched method. Currently doing the new method
+FPS : 0.41 | Avg : 0.49Key up : [65307]
+FPS : 0.41 | Avg : 0.48End of cub3d
+==334475== 
+==334475== HEAP SUMMARY:
+==334475==     in use at exit: 101,336 bytes in 5,990 blocks
+==334475==   total heap usage: 9,983 allocs, 3,993 frees, 49,690,299 bytes allocated
+==334475== 
+==334475== 24 bytes in 1 blocks are definitely lost in loss record 1 of 19
+==334475==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==334475==    by 0x41A0C8: ft_realloc (in /home/hle-hena/Documents/42_projects/cub3d/cub3d)
+==334475==    by 0x40CBC7: retrieve_light (retrieve_light.c:98)
+==334475==    by 0x408E28: retrieve_lonely (retrieve_lonely.c:75)
+==334475==    by 0x409FF6: retrieve_tile_dict (retrieve_tile_dict.c:58)
+==334475==    by 0x4040AE: load_map (parser.c:59)
+==334475==    by 0x4161EB: main (main.c:112)
+==334475== 
+==334475== 32 bytes in 2 blocks are indirectly lost in loss record 2 of 19
+==334475==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==334475==    by 0x40CDF6: new_flight (find_flight.c:19)
+==334475==    by 0x40CED3: find_flight (find_flight.c:38)
+==334475==    by 0x40D74F: light_wall (handle_light.c:64)
+==334475==    by 0x40D0A6: handle_light (handle_light.c:151)
+==334475==    by 0x40DE95: raytrace (raytrace.c:57)
+==334475==    by 0x40BFC9: raytrace_source (load.c:107)
+==334475==    by 0x40C142: create_lmap (load.c:131)
+==334475==    by 0x416214: main (main.c:115)
+==334475== 
+==334475== 64 (32 direct, 32 indirect) bytes in 2 blocks are definitely lost in loss record 3 of 19
+==334475==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==334475==    by 0x419F3C: ft_calloc (in /home/hle-hena/Documents/42_projects/cub3d/cub3d)
+==334475==    by 0x41902A: ft_lstnew (in /home/hle-hena/Documents/42_projects/cub3d/cub3d)
+==334475==    by 0x403DDE: add_link (add_link.c:21)
+==334475==    by 0x40CEE4: find_flight (find_flight.c:39)
+==334475==    by 0x40D74F: light_wall (handle_light.c:64)
+==334475==    by 0x40D0A6: handle_light (handle_light.c:151)
+==334475==    by 0x40DE95: raytrace (raytrace.c:57)
+==334475==    by 0x40BFC9: raytrace_source (load.c:107)
+==334475==    by 0x40C142: create_lmap (load.c:131)
+==334475==    by 0x416214: main (main.c:115)
+==334475== 
+==334475== 960 bytes in 60 blocks are indirectly lost in loss record 4 of 19
+==334475==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==334475==    by 0x40CDF6: new_flight (find_flight.c:19)
+==334475==    by 0x40CED3: find_flight (find_flight.c:38)
+==334475==    by 0x40D581: light_wall (handle_light.c:53)
+==334475==    by 0x40D0A6: handle_light (handle_light.c:151)
+==334475==    by 0x40DE95: raytrace (raytrace.c:57)
+==334475==    by 0x40BFC9: raytrace_source (load.c:107)
+==334475==    by 0x40C142: create_lmap (load.c:131)
+==334475==    by 0x416214: main (main.c:115)
+==334475== 
+==334475== 1,184 bytes in 74 blocks are indirectly lost in loss record 5 of 19
+==334475==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==334475==    by 0x40CDF6: new_flight (find_flight.c:19)
+==334475==    by 0x40CED3: find_flight (find_flight.c:38)
+==334475==    by 0x40D7EA: light_wall (handle_light.c:67)
+==334475==    by 0x40D0A6: handle_light (handle_light.c:151)
+==334475==    by 0x40DE95: raytrace (raytrace.c:57)
+==334475==    by 0x40BFC9: raytrace_source (load.c:107)
+==334475==    by 0x40C142: create_lmap (load.c:131)
+==334475==    by 0x416214: main (main.c:115)
+==334475== 
+==334475== 1,920 (960 direct, 960 indirect) bytes in 60 blocks are definitely lost in loss record 6 of 19
+==334475==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==334475==    by 0x419F3C: ft_calloc (in /home/hle-hena/Documents/42_projects/cub3d/cub3d)
+==334475==    by 0x41902A: ft_lstnew (in /home/hle-hena/Documents/42_projects/cub3d/cub3d)
+==334475==    by 0x403DDE: add_link (add_link.c:21)
+==334475==    by 0x40CEE4: find_flight (find_flight.c:39)
+==334475==    by 0x40D581: light_wall (handle_light.c:53)
+==334475==    by 0x40D0A6: handle_light (handle_light.c:151)
+==334475==    by 0x40DE95: raytrace (raytrace.c:57)
+==334475==    by 0x40BFC9: raytrace_source (load.c:107)
+==334475==    by 0x40C142: create_lmap (load.c:131)
+==334475==    by 0x416214: main (main.c:115)
+==334475== 
+==334475== 2,112 bytes in 132 blocks are indirectly lost in loss record 7 of 19
+==334475==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==334475==    by 0x40CDF6: new_flight (find_flight.c:19)
+==334475==    by 0x40CED3: find_flight (find_flight.c:38)
+==334475==    by 0x40D4EB: light_wall (handle_light.c:50)
+==334475==    by 0x40D0A6: handle_light (handle_light.c:151)
+==334475==    by 0x40DE95: raytrace (raytrace.c:57)
+==334475==    by 0x40BFC9: raytrace_source (load.c:107)
+==334475==    by 0x40C142: create_lmap (load.c:131)
+==334475==    by 0x416214: main (main.c:115)
+==334475== 
+==334475== 2,112 bytes in 132 blocks are indirectly lost in loss record 8 of 19
+==334475==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==334475==    by 0x40CDF6: new_flight (find_flight.c:19)
+==334475==    by 0x40CED3: find_flight (find_flight.c:38)
+==334475==    by 0x40D895: light_wall (handle_light.c:71)
+==334475==    by 0x40D0A6: handle_light (handle_light.c:151)
+==334475==    by 0x40DE95: raytrace (raytrace.c:57)
+==334475==    by 0x40BFC9: raytrace_source (load.c:107)
+==334475==    by 0x40C142: create_lmap (load.c:131)
+==334475==    by 0x416214: main (main.c:115)
+==334475== 
+==334475== 2,368 (1,184 direct, 1,184 indirect) bytes in 74 blocks are definitely lost in loss record 9 of 19
+==334475==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==334475==    by 0x419F3C: ft_calloc (in /home/hle-hena/Documents/42_projects/cub3d/cub3d)
+==334475==    by 0x41902A: ft_lstnew (in /home/hle-hena/Documents/42_projects/cub3d/cub3d)
+==334475==    by 0x403DDE: add_link (add_link.c:21)
+==334475==    by 0x40CEE4: find_flight (find_flight.c:39)
+==334475==    by 0x40D7EA: light_wall (handle_light.c:67)
+==334475==    by 0x40D0A6: handle_light (handle_light.c:151)
+==334475==    by 0x40DE95: raytrace (raytrace.c:57)
+==334475==    by 0x40BFC9: raytrace_source (load.c:107)
+==334475==    by 0x40C142: create_lmap (load.c:131)
+==334475==    by 0x416214: main (main.c:115)
+==334475== 
+==334475== 2,448 bytes in 153 blocks are indirectly lost in loss record 10 of 19
+==334475==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==334475==    by 0x40CDF6: new_flight (find_flight.c:19)
+==334475==    by 0x40CED3: find_flight (find_flight.c:38)
+==334475==    by 0x40D936: light_wall (handle_light.c:74)
+==334475==    by 0x40D0A6: handle_light (handle_light.c:151)
+==334475==    by 0x40DE95: raytrace (raytrace.c:57)
+==334475==    by 0x40BFC9: raytrace_source (load.c:107)
+==334475==    by 0x40C142: create_lmap (load.c:131)
+==334475==    by 0x416214: main (main.c:115)
+==334475== 
+==334475== 2,480 bytes in 155 blocks are indirectly lost in loss record 11 of 19
+==334475==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==334475==    by 0x40CDF6: new_flight (find_flight.c:19)
+==334475==    by 0x40CED3: find_flight (find_flight.c:38)
+==334475==    by 0x40D6B9: light_wall (handle_light.c:61)
+==334475==    by 0x40D0A6: handle_light (handle_light.c:151)
+==334475==    by 0x40DE95: raytrace (raytrace.c:57)
+==334475==    by 0x40BFC9: raytrace_source (load.c:107)
+==334475==    by 0x40C142: create_lmap (load.c:131)
+==334475==    by 0x416214: main (main.c:115)
+==334475== 
+==334475== 4,224 (2,112 direct, 2,112 indirect) bytes in 132 blocks are definitely lost in loss record 12 of 19
+==334475==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==334475==    by 0x419F3C: ft_calloc (in /home/hle-hena/Documents/42_projects/cub3d/cub3d)
+==334475==    by 0x41902A: ft_lstnew (in /home/hle-hena/Documents/42_projects/cub3d/cub3d)
+==334475==    by 0x403DDE: add_link (add_link.c:21)
+==334475==    by 0x40CEE4: find_flight (find_flight.c:39)
+==334475==    by 0x40D4EB: light_wall (handle_light.c:50)
+==334475==    by 0x40D0A6: handle_light (handle_light.c:151)
+==334475==    by 0x40DE95: raytrace (raytrace.c:57)
+==334475==    by 0x40BFC9: raytrace_source (load.c:107)
+==334475==    by 0x40C142: create_lmap (load.c:131)
+==334475==    by 0x416214: main (main.c:115)
+==334475== 
+==334475== 4,224 (2,112 direct, 2,112 indirect) bytes in 132 blocks are definitely lost in loss record 13 of 19
+==334475==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==334475==    by 0x419F3C: ft_calloc (in /home/hle-hena/Documents/42_projects/cub3d/cub3d)
+==334475==    by 0x41902A: ft_lstnew (in /home/hle-hena/Documents/42_projects/cub3d/cub3d)
+==334475==    by 0x403DDE: add_link (add_link.c:21)
+==334475==    by 0x40CEE4: find_flight (find_flight.c:39)
+==334475==    by 0x40D895: light_wall (handle_light.c:71)
+==334475==    by 0x40D0A6: handle_light (handle_light.c:151)
+==334475==    by 0x40DE95: raytrace (raytrace.c:57)
+==334475==    by 0x40BFC9: raytrace_source (load.c:107)
+==334475==    by 0x40C142: create_lmap (load.c:131)
+==334475==    by 0x416214: main (main.c:115)
+==334475== 
+==334475== 4,896 (2,448 direct, 2,448 indirect) bytes in 153 blocks are definitely lost in loss record 14 of 19
+==334475==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==334475==    by 0x419F3C: ft_calloc (in /home/hle-hena/Documents/42_projects/cub3d/cub3d)
+==334475==    by 0x41902A: ft_lstnew (in /home/hle-hena/Documents/42_projects/cub3d/cub3d)
+==334475==    by 0x403DDE: add_link (add_link.c:21)
+==334475==    by 0x40CEE4: find_flight (find_flight.c:39)
+==334475==    by 0x40D936: light_wall (handle_light.c:74)
+==334475==    by 0x40D0A6: handle_light (handle_light.c:151)
+==334475==    by 0x40DE95: raytrace (raytrace.c:57)
+==334475==    by 0x40BFC9: raytrace_source (load.c:107)
+==334475==    by 0x40C142: create_lmap (load.c:131)
+==334475==    by 0x416214: main (main.c:115)
+==334475== 
+==334475== 4,960 (2,480 direct, 2,480 indirect) bytes in 155 blocks are definitely lost in loss record 15 of 19
+==334475==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==334475==    by 0x419F3C: ft_calloc (in /home/hle-hena/Documents/42_projects/cub3d/cub3d)
+==334475==    by 0x41902A: ft_lstnew (in /home/hle-hena/Documents/42_projects/cub3d/cub3d)
+==334475==    by 0x403DDE: add_link (add_link.c:21)
+==334475==    by 0x40CEE4: find_flight (find_flight.c:39)
+==334475==    by 0x40D6B9: light_wall (handle_light.c:61)
+==334475==    by 0x40D0A6: handle_light (handle_light.c:151)
+==334475==    by 0x40DE95: raytrace (raytrace.c:57)
+==334475==    by 0x40BFC9: raytrace_source (load.c:107)
+==334475==    by 0x40C142: create_lmap (load.c:131)
+==334475==    by 0x416214: main (main.c:115)
+==334475== 
+==334475== 5,504 bytes in 1 blocks are still reachable in loss record 16 of 19
+==334475==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==334475==    by 0x415F38: init_draw_threads (main.c:85)
+==334475==    by 0x416249: main (main.c:123)
+==334475== 
+==334475== 20,608 bytes in 1,288 blocks are indirectly lost in loss record 17 of 19
+==334475==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==334475==    by 0x40CDF6: new_flight (find_flight.c:19)
+==334475==    by 0x40CED3: find_flight (find_flight.c:38)
+==334475==    by 0x40D3C4: light_wall (handle_light.c:39)
+==334475==    by 0x40D0A6: handle_light (handle_light.c:151)
+==334475==    by 0x40DE95: raytrace (raytrace.c:57)
+==334475==    by 0x40BFC9: raytrace_source (load.c:107)
+==334475==    by 0x40C142: create_lmap (load.c:131)
+==334475==    by 0x416214: main (main.c:115)
+==334475== 
+==334475== 31,936 bytes in 1,996 blocks are definitely lost in loss record 18 of 19
+==334475==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==334475==    by 0x419F3C: ft_calloc (in /home/hle-hena/Documents/42_projects/cub3d/cub3d)
+==334475==    by 0x41902A: ft_lstnew (in /home/hle-hena/Documents/42_projects/cub3d/cub3d)
+==334475==    by 0x403DDE: add_link (add_link.c:21)
+==334475==    by 0x40BE42: add_color (load.c:67)
+==334475==    by 0x40BD3D: add_lmap (load.c:90)
+==334475==    by 0x40C15A: create_lmap (load.c:132)
+==334475==    by 0x416214: main (main.c:115)
+==334475== 
+==334475== 41,216 (20,608 direct, 20,608 indirect) bytes in 1,288 blocks are definitely lost in loss record 19 of 19
+==334475==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==334475==    by 0x419F3C: ft_calloc (in /home/hle-hena/Documents/42_projects/cub3d/cub3d)
+==334475==    by 0x41902A: ft_lstnew (in /home/hle-hena/Documents/42_projects/cub3d/cub3d)
+==334475==    by 0x403DDE: add_link (add_link.c:21)
+==334475==    by 0x40CEE4: find_flight (find_flight.c:39)
+==334475==    by 0x40D3C4: light_wall (handle_light.c:39)
+==334475==    by 0x40D0A6: handle_light (handle_light.c:151)
+==334475==    by 0x40DE95: raytrace (raytrace.c:57)
+==334475==    by 0x40BFC9: raytrace_source (load.c:107)
+==334475==    by 0x40C142: create_lmap (load.c:131)
+==334475==    by 0x416214: main (main.c:115)
+==334475== 
+==334475== LEAK SUMMARY:
+==334475==    definitely lost: 63,896 bytes in 3,993 blocks
+==334475==    indirectly lost: 31,936 bytes in 1,996 blocks
+==334475==      possibly lost: 0 bytes in 0 blocks
+==334475==    still reachable: 5,504 bytes in 1 blocks
+==334475==         suppressed: 0 bytes in 0 blocks
+==334475== 
+==334475== For lists of detected and suppressed errors, rerun with: -s
+==334475== ERROR SUMMARY: 10 errors from 10 contexts (suppressed: 1 from 1)

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 18:13:11 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/25 09:45:16 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/30 12:38:29 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ extension in asset ", line, ".", NULL}), 1), *err = 1, VOID);
 		return (ft_perror(-1, ft_strsjoin((char *[]){"Invalid usage. Assets \
 should be in .xpm. Got ", line, ".", NULL}), 1), *err = 1, VOID);
 	*img = get_img_hash(line, err);
+	ft_del((void **)&line);
 	if (!*img)
 		(ft_perror(-1, "Something went wrong retrieving the image in the \
 hash_map.", 0), *err = 1);
@@ -74,7 +75,7 @@ void	retrieve_texture(t_text *texture, char *line, int *err, char *id)
 	char	*arg;
 	char	*reflectance;
 
-	if (texture->img)//Should see if I need to NULL it at start.
+	if (texture->img)
 		return (ft_perror(-1, ft_strsjoin((char *[]){"Duplicate of identifier ",
 						id, ".", NULL}), 1), *err = 1, VOID);
 	get_arg(line, &arg, &reflectance, err);

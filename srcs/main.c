@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:05:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/17 15:47:49 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/30 16:49:59 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,9 @@ void	init_mlx(t_data *data)
 
 	data->empty = ft_calloc(1, sizeof(t_void));
 	data->empty->flight = ft_calloc(1, sizeof(t_flight));
-	data->empty->texture.img = malloc(sizeof(t_img));
-	data->empty->texture.img = mlx_new_image(data->mlx, 1, 1);
-	data->empty->texture.img->data = (int *)mlx_get_data_addr(data->empty->texture.img,
+	data->empty->texture.img = ft_calloc(1, sizeof(t_img));
+	data->empty->texture.img->img = mlx_new_image(data->mlx, 1, 1);
+	data->empty->texture.img->data = (int *)mlx_get_data_addr(data->empty->texture.img->img,
 		&data->empty->texture.img->bpp, &data->empty->texture.img->size_line,
 		&data->empty->texture.img->endian);
 	data->empty->texture.img->bpp /= 8;

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:28:34 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/28 14:15:20 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/30 12:57:48 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void	type_switch(t_tile *tile, char *line, char *arg, int *err)
 	else if (ft_strncmp("wa ", line, 3) == 0)
 		retrieve_arc(tile, arg, err);
 	else if (ft_strncmp("wt ", line, 3) == 0)
-		retrieve_texture(&tile->wall, arg, err, "*");
+		retrieve_texture(&tile->wall, arg, err, "wt");
 	else if (ft_strncmp("NO ", line, 3) == 0)
 		retrieve_texture(&tile->tex_no, arg, err, "NO");
 	else if (ft_strncmp("SO ", line, 3) == 0)
@@ -87,15 +87,16 @@ void	retrieve_tile(t_tile **tiles, int map_fd, char *line, int *err)
 
 	if (*err)
 		return ;
-	if (!*tiles)
-		*tiles = new_tile();
+	if (*tiles)
+		return (ft_perror(-1, "Re definition of a tile.", 0), *err = 1, VOID);
+	*tiles = new_tile();
 	if (!*tiles)
 		return (ft_perror(-1, "Internal error: malloc.", 0), *err = 1, VOID);
 	while (1)
 	{
 		temp = get_next_line(map_fd);
 		if (!temp)
-			return (ft_perror(-1, "Unexpected end of file.", 0), *err = 1, VOID);
+			return (ft_perror(-1, "Unexpected EOF.", 0), *err = 1, VOID);
 		line = ft_strtrim(temp, "\t\n ");
 		ft_del((void **)&temp);
 		if (!line)

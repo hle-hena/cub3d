@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 10:18:57 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/17 15:03:51 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/30 16:33:24 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,27 +25,52 @@ void	close_threads(t_data *data)
 		pthread_mutex_unlock(&data->thread_pool[i].mutex);
 		pthread_join(data->threads[i], NULL);
 	}
+	ft_del((void **)&data->threads);
 }
 
-int	clean_data(void)
+void	clean_mlx(t_data *data)
 {
-	t_data	*data;
-	int		i;
+	int	i;
 
-	data = get_data();
-	clean_map();
-	close_threads(data);
-	// mlx_do_key_autorepeaton(data->mlx);
 	i = -1;
 	while (++i < IMG_BUFFER)
 	{
 		if (data->img[i].img)
 			mlx_destroy_image(data->mlx, data->img[i].img);
 	}
+	if (data->empty->texture.img->img)
+		mlx_destroy_image(data->mlx, data->empty->texture.img->img);
 	if (data->win)
 		mlx_destroy_window(data->mlx, data->win);
 	if (data->mlx)
 		mlx_destroy_display(data->mlx);
+	ft_del((void **)&data->empty->flight);
+	ft_del((void **)&data->empty->texture.img);
+	ft_del((void **)&data->empty);
+}
+
+void	clean_lmap(t_data *data)
+{
+	int	i;
+
+	i = -1;
+	ft_del((void **)&data->lmap.lights);
+	printf("{%d, %d}\n", data->lmap.len, data->lmap.wid);
+	while (++i < data->lmap.len	* data->lmap.wid)
+	{
+		ft_lstclear(&data->lmap.lmap[i].flight, ft_del);
+	}
+}
+
+int	clean_data(void)
+{
+	t_data	*data;
+
+	data = get_data();
+	clean_map();
+	close_threads(data);
+	// mlx_do_key_autorepeaton(data->mlx);
+	clean_mlx(data);
 	if (data->draw)
 		ft_del((void **)&data->draw);//probably not the right way to do it I think ?
 	if (*get_cast_table())

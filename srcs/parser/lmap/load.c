@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:08:29 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/09 19:23:21 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/30 16:47:29 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,7 @@ void	raytrace_source(t_data *data, t_light light)
 int	create_lmap(t_data *data)
 {
 	int			i;
+	int			j;
 	t_lmap		*lmap;
 	t_tlight	*temp;
 
@@ -129,6 +130,9 @@ int	create_lmap(t_data *data)
 	{
 		raytrace_source(data, lmap->lights[i]);
 		add_lmap(data, temp, data->lmap.lmap);
+		j = -1;
+		while (++j < data->lmap.wid * data->lmap.len)
+			ft_lstclear(&data->lmap.lmap[j].flight, ft_del);
 		ft_bzero(data->lmap.lmap, lmap->wid * lmap->len * sizeof(t_tlight));
 	}
 	ft_del((void **)&data->lmap.lmap);
