@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/29 14:07:37 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/31 13:39:19 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -463,6 +463,7 @@ void		print_dict(t_data *data);
 
 
 int			skip_pattern(char **arg, char *pattern);
+t_flight	*new_flight(t_vec normal);
 
 
 

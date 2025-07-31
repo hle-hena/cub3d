@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:08:29 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/30 16:47:29 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/31 13:41:27 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,12 +46,14 @@ static inline int	add_col_val_physical(int col1, int col2, float weight1,
 static inline void add_color(t_tlight *final, t_tlight *temp)
 {
 	t_list		*found;
+	t_list		*temp_lst;
 	t_flight	*final_flight;
 	t_flight	*temp_flight;
 
-	while (temp->flight)
+	temp_lst = temp->flight;
+	while (temp_lst)
 	{
-		temp_flight = (t_flight *)temp->flight->content;
+		temp_flight = (t_flight *)temp_lst->content;
 		found = ft_lstchr(final->flight,
 			&temp_flight->normal, is_correct_flight);
 		if (found)
@@ -64,8 +66,15 @@ static inline void add_color(t_tlight *final, t_tlight *temp)
 				final_flight->emittance = 1;
 		}
 		else
-			add_link(&final->flight, temp_flight);
-		temp->flight = temp->flight->next;
+		{
+			final_flight = new_flight(temp_flight->normal);
+			if (!final_flight)
+				return ;//probably an error to print, and clean.
+			final_flight->color = temp_flight->color;
+			final_flight->emittance = temp_flight->emittance;
+			add_link(&final->flight, final_flight);
+		}
+		temp_lst = temp_lst->next;
 	}
 	final->ce_fl.color = add_col_val_physical(final->ce_fl.color,
 		temp->ce_fl.color, final->ce_fl.emittance, temp->ce_fl.emittance);
@@ -131,7 +140,7 @@ int	create_lmap(t_data *data)
 		raytrace_source(data, lmap->lights[i]);
 		add_lmap(data, temp, data->lmap.lmap);
 		j = -1;
-		while (++j < data->lmap.wid * data->lmap.len)
+		while (++j < data->lmap.len	* data->lmap.wid)
 			ft_lstclear(&data->lmap.lmap[j].flight, ft_del);
 		ft_bzero(data->lmap.lmap, lmap->wid * lmap->len * sizeof(t_tlight));
 	}

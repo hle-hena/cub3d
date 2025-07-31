@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 10:18:57 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/30 16:33:24 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/31 11:47:46 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ void	close_threads(t_data *data)
 		pthread_join(data->threads[i], NULL);
 	}
 	ft_del((void **)&data->threads);
+	ft_del((void **)&data->thread_pool);
 }
 
 void	clean_mlx(t_data *data)
@@ -71,6 +72,7 @@ int	clean_data(void)
 	close_threads(data);
 	// mlx_do_key_autorepeaton(data->mlx);
 	clean_mlx(data);
+	clean_lmap(data);
 	if (data->draw)
 		ft_del((void **)&data->draw);//probably not the right way to do it I think ?
 	if (*get_cast_table())
