@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 10:18:57 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/31 11:47:46 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/31 16:03:59 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,14 +39,17 @@ void	clean_mlx(t_data *data)
 		if (data->img[i].img)
 			mlx_destroy_image(data->mlx, data->img[i].img);
 	}
-	if (data->empty->texture.img->img)
-		mlx_destroy_image(data->mlx, data->empty->texture.img->img);
+	if (data->empty)
+	{
+		if (data->empty->texture.img && data->empty->texture.img->img)
+			mlx_destroy_image(data->mlx, data->empty->texture.img->img);
+		ft_del((void **)&data->empty->flight);
+		ft_del((void **)&data->empty->texture.img);
+	}
 	if (data->win)
 		mlx_destroy_window(data->mlx, data->win);
 	if (data->mlx)
 		mlx_destroy_display(data->mlx);
-	ft_del((void **)&data->empty->flight);
-	ft_del((void **)&data->empty->texture.img);
 	ft_del((void **)&data->empty);
 }
 
@@ -56,7 +59,6 @@ void	clean_lmap(t_data *data)
 
 	i = -1;
 	ft_del((void **)&data->lmap.lights);
-	printf("{%d, %d}\n", data->lmap.len, data->lmap.wid);
 	while (++i < data->lmap.len	* data->lmap.wid)
 	{
 		ft_lstclear(&data->lmap.lmap[i].flight, ft_del);
@@ -74,7 +76,7 @@ int	clean_data(void)
 	clean_mlx(data);
 	clean_lmap(data);
 	if (data->draw)
-		ft_del((void **)&data->draw);//probably not the right way to do it I think ?
+		ft_del((void **)&data->draw);
 	if (*get_cast_table())
 		ft_del((void **)get_cast_table());
 	if (data->lmap.lmap)

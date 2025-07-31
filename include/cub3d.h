@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/31 13:39:19 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/31 17:28:20 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -444,7 +444,7 @@ int			point_is_in_mini_map(t_data *data, t_point point);
 t_hit		raycast(t_data *data, t_vec dir, t_vec origin);
 t_vec		**get_cast_table(void);
 
-int			ft_atoi_err(char *arg, int *index);
+int			ft_atoi_err(char **arg);
 
 void		fps_counter(t_data *data);
 

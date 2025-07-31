@@ -6,32 +6,31 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 12:49:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/12 15:27:59 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/31 17:08:08 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-int	ft_atoi_err(char *arg, int *index)
+int	ft_atoi_err(char **arg)
 {
 	int	nb;
 	int	digits;
 
 	nb = 0;
 	digits = 0;
-	if (!arg)
+	if (!(*arg))
 		return (-1);
-	while (ft_isspace(*arg))
-		(arg++, ((*index)++));
-	if (!*arg || !ft_isdigit(*arg))
+	while (ft_isspace(**arg))
+		(*arg)++;
+	if (!**arg || !ft_isdigit(**arg))
 		return (-1);
-	while (*arg == '0' && ft_isdigit(*(arg + 1)))
-		(arg++, ((*index)++));
-	while (ft_isdigit(*arg))
+	while (**arg == '0' && ft_isdigit(*((*arg) + 1)))
+		(*arg)++;
+	while (ft_isdigit(**arg))
 	{
-		nb = nb * 10 + (*arg - '0');
-		(*index)++;
-		arg++;
+		nb = nb * 10 + (**arg - '0');
+		(*arg)++;
 		digits++;
 		if (nb > 255)
 			return (-1);
@@ -67,19 +66,26 @@ void	retrieve_texture_color(t_img **img, char *line, int *err)
 	if (ft_strnstr(line, ".xpm", ft_strlen(line)))
 		return (ft_perror(-1, "Assets should be in a subfolder.", 0), *err = 1,
 			VOID);
-	color.re = ft_atoi_err(line, &i);
-	if (color.re == -1 || line[i] != ',')
-		return (ft_perror(-1, ft_strsjoin((char *[]){"Expected a positive numbe\
-r under 255 as color 1. Instead got ", line, ".", NULL}), 1), *err = 1, VOID);
-	i++;
-	color.gr = ft_atoi_err(&line[i], &i);
-	if (color.gr == -1 || line[i] != ',')
-		return (ft_perror(-1, ft_strsjoin((char *[]){"Expected a positive numbe\
-r under 255 as color 2. Instead got ", line, ".", NULL}), 1), *err = 1, VOID);
-	i++;
-	color.bl = ft_atoi_err(&line[i], &i);
-	if (color.bl == -1 || line[i])
-		return (ft_perror(-1, ft_strsjoin((char *[]){"Expected a positive numbe\
-r under 255 as color 3. Instead got ", line, ".", NULL}), 1), *err = 1, VOID);
+	color.re = ft_atoi_err(&line);
+	if (color.re == -1)
+		return (ft_perror(-1, "Expected a positive number under 255 as red.\
+", 0), *err = 1, VOID);
+	if (skip_pattern(&line, " , "))
+		return (ft_perror(-1, "Wrong pattern recognised for an rgb color.", 0),
+			*err = 1, VOID);
+	color.gr = ft_atoi_err(&line);
+	if (color.gr == -1)
+		return (ft_perror(-1, "Expected a positive number under 255 as green.\
+", 0), *err = 1, VOID);
+	if (skip_pattern(&line, " , "))
+		return (ft_perror(-1, "Wrong pattern recognised for an rgb color.", 0),
+			*err = 1, VOID);
+	color.bl = ft_atoi_err(&line);
+	if (color.bl == -1)
+		return (ft_perror(-1, "Expected a positive number under 255 as blue.\
+", 0), *err = 1, VOID);
+	if (*line)
+		return (ft_perror(-1, "Expected a \\n after the last color.", 0),
+			*err = 1, VOID);
 	set_img_color(img, line, color, err);
 }

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:08:29 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/31 13:41:27 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/31 16:07:10 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,7 +133,7 @@ int	create_lmap(t_data *data)
 	if (!lmap->lmap || !temp)
 		return (1);
 	if (!lmap->lights)
-		return (0);
+		return (ft_del((void **)&temp), 0);
 	i = -1;
 	while (++i < lmap->nb_ls)
 	{

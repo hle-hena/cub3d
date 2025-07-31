@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 18:13:11 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/30 12:38:29 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/31 17:09:24 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@ extension in asset ", line, ".", NULL}), 1), *err = 1, VOID);
 		return (ft_perror(-1, ft_strsjoin((char *[]){"Invalid usage. Assets \
 should be in .xpm. Got ", line, ".", NULL}), 1), *err = 1, VOID);
 	*img = get_img_hash(line, err);
-	ft_del((void **)&line);
 	if (!*img)
 		(ft_perror(-1, "Something went wrong retrieving the image in the \
 hash_map.", 0), *err = 1);
@@ -35,29 +34,23 @@ void	get_arg(char *line, char **arg, char **reflectance, int *err)
 	char	**splited;
 	char	*temp;
 	int		len;
-	int		i;
 
-	splited = ft_split(line, ' ');
+	splited = ft_split(line, ':');
 	if (!splited)
 		return (*err = 1, ft_perror(-1, "Internal error: malloc", 0), VOID);
 	len = ft_strslen(splited);
+	if (len > 2)
+		return (*err = 1, ft_perror(-1, "Please, don't input a texture that \
+contains a :.", 0), VOID);
 	temp = NULL;
 	if (len > 1)
 	{
-		i = -1;
-		while (++i < len - 1)
-		{
-			*arg = ft_strjoin(temp, splited[i]);
-			ft_del((void **)&temp);
-			if (!*arg)
-				return (*err = 1, ft_perror(-1, "Internal error: malloc", 0),
-					ft_free_tab((void **)splited, len), VOID);
-			temp = *arg;
-		}
-		*reflectance = ft_strdup(splited[i]);
-		if (!*reflectance)
+		*arg = ft_strdup(splited[0]);
+		*reflectance = ft_strdup(splited[1]);
+		if (!*reflectance || !arg)
 			return (*err = 1, ft_perror(-1, "Internal error: malloc", 0),
-				ft_free_tab((void **)splited, len), ft_del((void **)&(*arg)), VOID);
+				ft_free_tab((void **)splited, len), ft_del((void **)&(*arg)),
+				ft_del((void **)&(*reflectance)), VOID);
 	}
 	else
 	{
@@ -80,11 +73,15 @@ void	retrieve_texture(t_text *texture, char *line, int *err, char *id)
 						id, ".", NULL}), 1), *err = 1, VOID);
 	get_arg(line, &arg, &reflectance, err);
 	if (*err)
-		return ;
+		return (ft_del((void **)&arg), ft_del((void **)&reflect_light), VOID);
 	if (ft_strchr(arg, '/'))
 		retrieve_texture_path(&texture->img, arg, err);
 	else
 		retrieve_texture_color(&texture->img, arg, err);
+	ft_del((void **)&arg);
+	if (*err)
+		return ;
 	if (reflectance)
 		retrieve_texture_val(texture, reflectance, err);
+	ft_del((void **)&reflectance);
 }

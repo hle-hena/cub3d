@@ -1,7 +1,7 @@
 1 {
 	C textures/custom/461223113.xpm
 	F textures/custom/461223113.xpm
-	wt textures/simonkraft/bookshelf.xpm
+	wt 200,200,200
 	wl ((0, 0), (1, 1))
 	W 1
 }

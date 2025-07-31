@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 10:55:35 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/22 11:15:09 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/31 16:59:18 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,28 +33,29 @@ t_vec	retrieve_light_pos(char **line, int *err)
 t_col	retrieve_light_color(char **line, int *err)
 {
 	t_col	color;
-	int		i;
 
-	i = 1;
-	color.re = ft_atoi_err(&(*line)[i], &i);
-	if (color.re == -1 || (*line)[i] != ',')
-		return (ft_perror(-1, ft_strsjoin((char *[]){"Unexpected char in '\
-", *line, "'. Expected ',' after the red value.", NULL}), 1),
+	(*line)++;
+	color.re = ft_atoi_err(line);
+	if (color.re == -1)
+		return (ft_perror(-1, "Expected a positive number under 255 as red.\
+", 0), *err = 1, (t_col){0});
+	if (skip_pattern(line, " , "))
+		return (ft_perror(-1, "Wrong pattern recognised for an rgb color.", 0),
 			*err = 1, (t_col){0});
-	i++;
-	color.gr = ft_atoi_err(&(*line)[i], &i);
-	if (color.gr == -1 || (*line)[i] != ',')
-		return (ft_perror(-1, ft_strsjoin((char *[]){"Unexpected char in '\
-", *line, "'. Expected ',' after the blue value.", NULL}), 1),
+	color.gr = ft_atoi_err(line);
+	if (color.gr == -1)
+		return (ft_perror(-1, "Expected a positive number under 255 as green.\
+", 0), *err = 1, (t_col){0});
+	if (skip_pattern(line, " , "))
+		return (ft_perror(-1, "Wrong pattern recognised for an rgb color.", 0),
 			*err = 1, (t_col){0});
-	i++;
-	color.bl = ft_atoi_err(&(*line)[i], &i);
-	if (color.bl == -1 || (*line)[i] != '}')
-		return (ft_perror(-1, ft_strsjoin((char *[]){"Unexpected char in '\
-", *line, "'. Expected '}' after the green value.", NULL}), 1),
+	color.bl = ft_atoi_err(line);
+	if (color.bl == -1)
+		return (ft_perror(-1, "Expected a positive number under 255 as bl.\
+", 0), *err = 1, (t_col){0});
+	if (skip_pattern(line, " } "))
+		return (ft_perror(-1, "Wrong pattern recognised for an rgb color.", 0),
 			*err = 1, (t_col){0});
-	i++;
-	*line += i;
 	return (color);
 }
 

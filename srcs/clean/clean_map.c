@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:17:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/30 13:07:27 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/07/31 15:13:32 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void	clean_hash(t_data *data)
 	while (++i != HASH_SIZE)
 	{
 		if (!hash_table[i])
-			continue;
+			continue ;
 		ft_del((void **)&hash_table[i]->path);
 		hash_table[i]->endian = 0;
 		remove_img(data, hash_table[i]);
@@ -64,6 +64,7 @@ int	clean_map(void)
 			remove_img(data, tiles[i]->tex_we.img);
 			remove_img(data, tiles[i]->tex_ce.img);
 			remove_img(data, tiles[i]->tex_fl.img);
+			remove_img(data, tiles[i]->wall.img);
 			ft_lstclear(&tiles[i]->wpath, ft_del);
 			ft_del((void **)&tiles[i]);
 		}
