@@ -1,4 +1,6 @@
 Need to detect double and overlapped lines to simplify them.
+Need to do the double line thing. To not let light leak on both side of a wall.
+Need to normalise the len of the second point of the arcs.
 
 
 Found an issue, the light can leak when going up x or y I think ?

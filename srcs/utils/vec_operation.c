@@ -1,28 +1,38 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   mouse.c                                            :+:      :+:    :+:   */
+/*   vec_operation.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/12 21:48:07 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/04 10:46:19 by hle-hena         ###   ########.fr       */
+/*   Created: 2025/08/04 13:45:19 by hle-hena          #+#    #+#             */
+/*   Updated: 2025/08/04 13:52:39 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-int	mouse_move(int x, int y, t_data *data)
+t_vec	vec_sub(t_vec a, t_vec b)
 {
-	static int	mouse_pos = -1;
+	return ((t_vec){a.x - b.x, a.y - b.y});
+}
 
-	if (mouse_pos == -1)
-		mouse_pos = x;
-	data->event.rot = x - mouse_pos;
-	if (x <= 0)
-		mlx_mouse_move(data->mlx, data->win, data->win_w - 2, y);
-	else if (x >= data->win_w - 1)
-		mlx_mouse_move(data->mlx, data->win, 1, y);
-	mouse_pos = x;
-	return (0);
+t_vec	vec_add(t_vec a, t_vec b)
+{
+	return ((t_vec){a.x + b.x, a.y + b.y});
+}
+
+float	vec_dot(t_vec a, t_vec b)
+{
+	return (a.x * b.x + a.y * b.y);
+}
+
+float	vec_cross(t_vec a, t_vec b)
+{
+	return (a.x * b.y - a.y * b.x);
+}
+
+t_vec	vec_scale(t_vec a, float s)
+{
+	return ((t_vec){a.x * s, a.y * s});
 }

@@ -6,11 +6,14 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 23:18:32 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/01 12:21:27 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/04 14:03:09 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
+
+/* To put a grey like background behind the map
+
 
 void	draw_disk(t_data *data, t_point center, int rad, int color)
 {
@@ -32,6 +35,7 @@ void	draw_disk(t_data *data, t_point center, int rad, int color)
 		current.y++;
 	}
 }
+ */
 
 void	draw_circle(t_data *data, t_point center, int radius, int color)
 {

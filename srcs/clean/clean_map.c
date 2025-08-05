@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:17:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/31 15:13:32 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/04 10:32:18 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,17 @@ void	remove_img(t_data *data, t_img *texture)
 			mlx_destroy_image(data->mlx, texture->img);
 		ft_del((void **)&texture);
 	}
+}
+
+void	remove_all_img(t_data *data, t_tile *tile)
+{
+	remove_img(data, tile->tex_no.img);
+	remove_img(data, tile->tex_so.img);
+	remove_img(data, tile->tex_ea.img);
+	remove_img(data, tile->tex_we.img);
+	remove_img(data, tile->tex_ce.img);
+	remove_img(data, tile->tex_fl.img);
+	remove_img(data, tile->wall.img);
 }
 
 void	clean_hash(t_data *data)
@@ -58,19 +69,12 @@ int	clean_map(void)
 	{
 		if (tiles[i])
 		{
-			remove_img(data, tiles[i]->tex_no.img);
-			remove_img(data, tiles[i]->tex_so.img);
-			remove_img(data, tiles[i]->tex_ea.img);
-			remove_img(data, tiles[i]->tex_we.img);
-			remove_img(data, tiles[i]->tex_ce.img);
-			remove_img(data, tiles[i]->tex_fl.img);
-			remove_img(data, tiles[i]->wall.img);
+			remove_all_img(data, tiles[i]);
 			ft_lstclear(&tiles[i]->wpath, ft_del);
 			ft_del((void **)&tiles[i]);
 		}
 	}
 	clean_hash(data);
-	if (map->matrix)
-		ft_del((void **)&map->matrix);
+	ft_del((void **)&map->matrix);
 	return (0);
 }

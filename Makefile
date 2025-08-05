@@ -13,8 +13,9 @@ LIBFT = $(LIBFT_DIR)/libft.a
 
 SRCS = $(addprefix srcs/, \
 	$(addprefix clean/, clean_data.c clean_map.c)\
-	$(addprefix utils/, add_link.c skip_pattern.c)\
-	$(addprefix parser/, parser.c\
+	$(addprefix utils/, add_link.c skip_pattern.c vec_operation.c vec_utils.c \
+		$(addprefix geometry/, intersect_sarc.c))\
+	$(addprefix parser/, parser.c \
 		$(addprefix tile_dict/, build_polygon.c \
 			hash_map.c is_dict_full.c retrieve_lonely.c \
 			retrieve_player.c retrieve_texture_color.c retrieve_texture_val.c \

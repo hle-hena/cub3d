@@ -6,13 +6,14 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/22 18:00:35 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/28 17:15:19 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/04 11:53:00 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-static inline void	hit_light(t_data *data, t_ray *ray, t_hit *hit, t_wpath wall)
+static inline void	hit_light(t_data *data, t_ray *ray, t_hit *hit,
+	t_wpath wall)
 {
 	t_point		light_point;
 	t_tlight	*tlight;
@@ -30,6 +31,23 @@ static inline void	hit_light(t_data *data, t_ray *ray, t_hit *hit, t_wpath wall)
 		hit->light[ray->bounce] = data->empty->flight;
 }
 
+static inline void	test_value(t_point curr, float dir, int *is_out,
+	int *should_stop)
+{
+	if (curr.x < 0)
+	{
+		*is_out = 1;
+		if (dir <= 0)
+			*should_stop = 1;
+	}
+	else if (curr.x >= curr.y)
+	{
+		*is_out = 1;
+		if (dir >= 0)
+			*should_stop = 1;
+	}
+}
+
 static inline int	is_outside(t_data *data, t_ray *ray, t_hit *hit)
 {
 	int	is_out;
@@ -37,30 +55,10 @@ static inline int	is_outside(t_data *data, t_ray *ray, t_hit *hit)
 
 	is_out = 0;
 	should_stop = 0;
-	if (ray->curr.x < 0)
-	{
-		is_out = 1;
-		if (ray->dir.x <= 0)
-			should_stop = 1;
-	}
-	if (ray->curr.y < 0)
-	{
-		is_out = 1;
-		if (ray->dir.y <= 0)
-			should_stop = 1;
-	}
-	if (ray->curr.x >= data->map->wid)
-	{
-		is_out = 1;
-		if (ray->dir.x >= 0)
-			should_stop = 1;
-	}
-	if (ray->curr.y >= data->map->len)
-	{
-		is_out = 1;
-		if (ray->dir.y >= 0)
-			should_stop = 1;
-	}
+	test_value((t_point){ray->curr.x, data->map->wid},
+		ray->dir.x, &is_out, &should_stop);
+	test_value((t_point){ray->curr.y, data->map->len},
+		ray->dir.y, &is_out, &should_stop);
 	if (should_stop)
 	{
 		hit->dist[ray->bounce] = ray->precise_dist;
@@ -77,8 +75,8 @@ void	handle_hit(t_data *data, t_ray *ray, t_hit *hit)
 
 	if (is_outside(data, ray, hit))
 		return ;
-	tile = get_tile_dict()[*(data->map->matrix + ray->curr.x +
-		ray->curr.y * data->map->wid)];
+	tile = get_tile_dict()[*(data->map->matrix + ray->curr.x
+			+ ray->curr.y * data->map->wid)];
 	if (!tile)
 		return ;
 	if (!tile->is_wall)

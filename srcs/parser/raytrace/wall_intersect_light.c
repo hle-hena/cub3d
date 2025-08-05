@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 11:10:35 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/29 12:46:05 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/04 14:00:10 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,37 +30,6 @@ static inline t_vec	get_wall_direction(t_vec wall_start, t_vec wall_end,
 	return ((t_vec){nx, ny});
 }
 */
-
-static inline t_vec vec_sub(t_vec a, t_vec b) {
-	return (t_vec){a.x - b.x, a.y - b.y};
-}
-
-static inline t_vec vec_add(t_vec a, t_vec b) {
-	return (t_vec){a.x + b.x, a.y + b.y};
-}
-
-static inline t_vec vec_scale(t_vec a, float s) {
-	return (t_vec){a.x * s, a.y * s};
-}
-
-static inline float vec_dot(t_vec a, t_vec b) {
-	return a.x * b.x + a.y * b.y;
-}
-
-static inline float vec_cross(t_vec a, t_vec b) {
-	return a.x * b.y - a.y * b.x;
-}
-
-static inline float vec_len2(t_vec a) {
-	return a.x * a.x + a.y * a.y;
-}
-
-static inline t_vec vec_normalize(t_vec a) {
-	float len = sqrtf(vec_len2(a));
-	if (len < FLT_EPSILON)
-		return (t_vec){0, 0};
-	return vec_scale(a, 1.0f / len);
-}
 
 static inline float	intersect_arc(t_vec origin, t_vec dir, t_wpath arc,
 	t_vec *normal_out)

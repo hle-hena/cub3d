@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/31 17:28:20 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/05 16:15:10 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,13 @@
 # include <stdio.h>
 # include <pthread.h>
 # include <immintrin.h>
+
+# define ADD_8 _mm256_add_ps
+# define SUB_8 _mm256_sub_ps
+# define MUL_8 _mm256_mul_ps
+# define SET_8 _mm256_set1_ps
+# define LOAD_8 _mm256_load_ps
+# define BLEND_8 _mm256_blendv_ps
 
 // # define FLT_EPSILON 1e-4f
 # define FLT_EPSILON 1.19209289550781250000000000000000000e-7F
@@ -143,6 +150,8 @@ typedef struct s_light_map
 typedef struct s_intersection
 {
 	t_vec	coo;
+	t_vec	normal;
+	float	pos;
 	float	dist;
 }	t_inter;
 
@@ -173,6 +182,16 @@ struct s_graph_link
 	float	reflectance;
 	int		run_forward;
 };
+
+typedef struct s_info_arc
+{
+	t_vec	v_hit;	
+	t_vec	v_end;	
+	t_vec	v_start;
+	t_vec	hit;
+	float	total_angle;
+	int		is_full_circle;
+}	t_info_arc;
 
 typedef struct s_graph
 {
@@ -312,6 +331,20 @@ typedef struct s_void
 	t_flight	*flight;
 }	t_void;
 
+typedef struct s_simd_utils
+{
+	__m256	one;
+	__m256	div;
+	__m256	mul;
+}	t_sutils;
+
+typedef struct s_col_256
+{
+	__m256	r;
+	__m256	g;
+	__m256	b;
+}	t_col_256;
+
 typedef struct s_col_simd
 {
 	float	r[8]
@@ -330,6 +363,7 @@ typedef struct s_simd_info
 	float emittance[MAX_BOUNCE][8]__attribute__	((aligned(32)));
 	float refl_val[MAX_BOUNCE][8]__attribute__	((aligned(32)));
 	int nb_hit	[8]__attribute__				((aligned(32)));
+	t_sutils									*utils;
 }	t_simd;
 
 typedef struct s_thread_draw
@@ -368,8 +402,8 @@ typedef struct s_data
 	int			draw_thread;
 	t_th_draw	*thread_pool;
 	pthread_t	*threads;
-	int			option;
 	int			img_buffer;
+	t_sutils	simd_utils;
 }	t_data;
 
 # define LMAP_PRECISION 129
@@ -413,7 +447,6 @@ int			does_hit(t_list	*wpath, t_ray *ray, t_wpath *wall);
 void		handle_reflexion(t_data *data, t_hit *hit, t_ray *ray,
 				t_wpath wall);
 void		init_ray(t_ray *ray, t_vec dir, t_vec origin);
-t_vec		normalize(t_vec v);
 void		handle_hit(t_data *data, t_ray *ray, t_hit *hit);
 
 void		loop(void);
@@ -424,15 +457,11 @@ int			key_up(int keycode, t_data *data);
 int			mouse_down(int button, int x, int y, t_data *data);
 int			mouse_up(int button, int x, int y, t_data *data);
 int			mouse_move(int x, int y, t_data *data);
-t_col		rev_calc_color(int col);
 int			calc_color(t_col col);
-int			interpolate_color(int col1, int col2, float percent);
-int			ft_get_pixel_color(t_data *data, t_point point);
 
 float		ft_atof_err(char *str, float min, float max, char **last);
 void		cast_rays(t_data *data);
 
-int			point_is_in_fov(t_data *data, t_point point);
 void		draw_player(t_data *data, t_point center, float theta);
 void		ft_put_pixel(t_data *data, t_point point, int color);
 void		draw_tile(t_data *data, t_point start, t_trig vals, int color);
@@ -446,7 +475,7 @@ t_vec		**get_cast_table(void);
 
 int			ft_atoi_err(char **arg);
 
-void		fps_counter(t_data *data);
+void		fps_counter(t_data *data, t_uint64 now);
 
 int			create_lmap(t_data *data);
 void		raytrace(t_data *data, t_light light, t_vec dir);
@@ -461,10 +490,16 @@ void		print_dict(t_data *data);
 
 
 
-
 int			skip_pattern(char **arg, char *pattern);
 t_flight	*new_flight(t_vec normal);
 
-
+t_vec		vec_sub(t_vec a, t_vec b);
+t_vec		vec_add(t_vec a, t_vec b);
+float		vec_dot(t_vec a, t_vec b);
+float		vec_cross(t_vec a, t_vec b);
+t_vec		vec_scale(t_vec a, float s);
+float		vec_len2(t_vec a);
+t_vec		vec_normalize(t_vec a);
+t_inter		check_solutions_sarc(float *t, t_vec origin, t_vec dir, t_wpath arc);
 
 #endif

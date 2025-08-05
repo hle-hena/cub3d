@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 10:55:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/29 11:29:59 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/05 15:12:50 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,35 +40,6 @@ void	print_graph(t_graph *graph, char *letter)
 	// printf("\tStarting to grow the graph.\n");
 }
 
-static inline t_vec vec_sub(t_vec a, t_vec b) {
-	return (t_vec){a.x - b.x, a.y - b.y};
-}
-
-static inline t_vec vec_add(t_vec a, t_vec b) {
-	return (t_vec){a.x + b.x, a.y + b.y};
-}
-
-static inline t_vec vec_scale(t_vec a, float s) {
-	return (t_vec){a.x * s, a.y * s};
-}
-
-static inline float vec_dot(t_vec a, t_vec b) {
-	return a.x * b.x + a.y * b.y;
-}
-
-static inline float vec_cross(t_vec a, t_vec b) {
-	return a.x * b.y - a.y * b.x;
-}
-
-static inline float vec_len2(t_vec a) {
-	return a.x * a.x + a.y * a.y;
-}
-
-static inline t_vec	vec_unit(t_vec a)
-{
-	return (vec_scale(a, 1 / sqrtf(vec_len2(a))));
-}
-
 int	find_node(t_node *nodes, t_vec coo, int *current, int should_create)
 {
 	int	i;
@@ -99,9 +70,9 @@ int	on_arc(t_link *C, t_vec hit, t_inter *inter, int can_hit_border)
 	float	total_angle;
 
 	(void)can_hit_border;
-	v_hit = vec_unit(vec_sub(hit, C->center));
-	v_end = vec_unit(vec_sub(C->end->coo, C->center));
-	v_start = vec_unit(vec_sub(C->start->coo, C->center));
+	v_hit = vec_normalize(vec_sub(hit, C->center));
+	v_end = vec_normalize(vec_sub(C->end->coo, C->center));
+	v_start = vec_normalize(vec_sub(C->start->coo, C->center));
 	if (C->start->coo.x == C->end->coo.x && C->start->coo.y == C->end->coo.y)
 	{
 		angle = acosf(vec_dot(v_start, v_hit)) / (2.0f * PI);
@@ -212,9 +183,9 @@ void	check_possible_arc_seg(t_link *seg, t_link *arc, t_info_check check, t_grap
 	if (check.t < 0 - 1e-4f || check.t > 1.0f + 1e-4f)
 		return ;
 	hit = vec_add(seg->start->coo, vec_scale(check.dir, check.t));
-	v_hit = vec_unit(vec_sub(hit, arc->center));
-	v_end = vec_unit(vec_sub(arc->end->coo, arc->center));
-	v_start = vec_unit(vec_sub(arc->start->coo, arc->center));
+	v_hit = vec_normalize(vec_sub(hit, arc->center));
+	v_end = vec_normalize(vec_sub(arc->end->coo, arc->center));
+	v_start = vec_normalize(vec_sub(arc->start->coo, arc->center));
 	if (arc->start->coo.x == arc->end->coo.x && arc->start->coo.y == arc->end->coo.y)
 	{
 		angle = acosf(vec_dot(v_start, v_hit)) / (2.0f * PI);
@@ -283,9 +254,9 @@ void	check_possible_seg_arc(t_link *seg, t_link *arc, t_info_check check, t_grap
 		}
 		return ;
 	}
-	v_hit = vec_unit(vec_sub(hit, arc->center));
-	v_end = vec_unit(vec_sub(arc->end->coo, arc->center));
-	v_start = vec_unit(vec_sub(arc->start->coo, arc->center));
+	v_hit = vec_normalize(vec_sub(hit, arc->center));
+	v_end = vec_normalize(vec_sub(arc->end->coo, arc->center));
+	v_start = vec_normalize(vec_sub(arc->start->coo, arc->center));
 	if (vec_cross(v_start, v_end) >= 0)
 		on_arc = (vec_cross(v_start, v_hit) >= -FLT_EPSILON
 			&& vec_cross(v_hit, v_end) >= -FLT_EPSILON);
@@ -816,7 +787,7 @@ int	copy_graph(t_graph *outer_face, t_tile *tile, float perimeter)
 		temp->mode = outer_face->links[i].type;
 		temp->reflectance = outer_face->links[i].reflectance;
 		temp->pos = 0;
-		temp->normal = normalize((t_vec){-temp->end.y + temp->start.y,
+		temp->normal = vec_normalize((t_vec){-temp->end.y + temp->start.y,
 				temp->end.x - temp->start.x});
 		temp->texture = tile->wall;
 		temp->pos_start = perim;

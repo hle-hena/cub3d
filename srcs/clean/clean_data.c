@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 10:18:57 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/31 16:03:59 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/04 10:32:56 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ void	clean_lmap(t_data *data)
 
 	i = -1;
 	ft_del((void **)&data->lmap.lights);
-	while (++i < data->lmap.len	* data->lmap.wid)
+	while (++i < data->lmap.len * data->lmap.wid)
 	{
 		ft_lstclear(&data->lmap.lmap[i].flight, ft_del);
 	}
@@ -72,7 +72,7 @@ int	clean_data(void)
 	data = get_data();
 	clean_map();
 	close_threads(data);
-	// mlx_do_key_autorepeaton(data->mlx);
+	mlx_do_key_autorepeaton(data->mlx);
 	clean_mlx(data);
 	clean_lmap(data);
 	if (data->draw)

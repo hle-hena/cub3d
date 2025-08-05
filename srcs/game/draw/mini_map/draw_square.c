@@ -6,16 +6,16 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 22:15:19 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/13 16:37:41 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/05 17:06:49 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-static inline void	rotate_point(t_point *draw, t_point curr, t_point player,
+static inline void	rotate_point(t_point *draw, t_vec curr, t_point player,
 	t_trig vals)
 {
-	t_point	centered;
+	t_vec	centered;
 
 	centered.x = curr.x - player.x;
 	centered.y = curr.y - player.y;
@@ -26,7 +26,7 @@ static inline void	rotate_point(t_point *draw, t_point curr, t_point player,
 int	tile_is_visible(t_data *data, t_point player, t_trig vals, t_point start)
 {
 	t_point	corners[4];
-	t_point	tmp;
+	t_vec	tmp;
 	int		*dx;
 	int		*dy;
 	int		i;
@@ -49,7 +49,7 @@ int	tile_is_visible(t_data *data, t_point player, t_trig vals, t_point start)
 
 void	draw_tile(t_data *data, t_point start, t_trig vals, int color)
 {
-	t_point	curr;
+	t_vec	curr;
 	t_point	draw;
 	t_point	player;
 
@@ -58,18 +58,18 @@ void	draw_tile(t_data *data, t_point start, t_trig vals, int color)
 	if (!tile_is_visible(data, player, vals, start))
 		return ;
 	curr.y = start.y;
-	while (curr.y != start.y + data->map->mini_map_scale)
+	while (curr.y != start.y + data->map->mini_map_scale - 2)
 	{
 		curr.x = start.x;
-		while (curr.x != start.x + data->map->mini_map_scale)
+		while (curr.x != start.x + data->map->mini_map_scale - 2)
 		{
 			rotate_point(&draw, curr, player, vals);
 			draw.x += data->map->mini_map.x;
 			draw.y += data->map->mini_map.y;
 			if (point_is_in_mini_map(data, draw))
 				ft_put_pixel(data, draw, color);
-			curr.x++;
+			curr.x += 0.5f;
 		}
-		curr.y++;
+		curr.y += 0.5f;
 	}
 }

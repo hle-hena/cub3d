@@ -6,20 +6,13 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/25 18:40:06 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/05 16:53:02 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-	// struct timespec start, end;
-	// clock_gettime(CLOCK_MONOTONIC, &start);
-	// CODE TO BENCHMARK
-	// clock_gettime(CLOCK_MONOTONIC, &end);
-	// long ms = (end.tv_sec - start.tv_sec) * 1000000000L + (end.tv_nsec - start.tv_nsec);
-	// printf("Took %ldns\n", ms);
-
-static inline t_col	color_blend(int base_color, int light_color, float emittance)
+t_col	color_blend(int base_color, int light_color, float emittance)
 {
 	int		em;
 	t_col	base;
@@ -42,7 +35,7 @@ static inline t_col	color_blend(int base_color, int light_color, float emittance
 	return (final);
 }
 
-static inline void	set_pixels(t_data *data, int *img, int color)
+void	set_pixels(t_data *data, int *img, int color)
 {
 	*(img) = color;
 	*(img + 1) = color;
@@ -50,24 +43,18 @@ static inline void	set_pixels(t_data *data, int *img, int color)
 	*(img + data->img[0].size_line + 1) = color;
 }
 
-void get_colors_simd(t_simd info, int out_colors[8])
+void	get_colors_simd(t_simd info, int out_colors[8])
 {
-	__m256	prev_r;
-	__m256	prev_g;
-	__m256	prev_b;
-	__m256	curr_r;
-	__m256	curr_g;
-	__m256	curr_b;
-	__m256	refl;
-	__m256	inv_refl;
-	__m256	one;
-	__m256	div;
-	__m256	mul;
-	__m256	mask;
-	__m256	nb_hit;
-	__m256	curr_hit;
-	int		i;
-	int		max_hit;
+	t_col_256	prev;
+	t_col_256	curr;
+	__m256		refl;
+	__m256		inv_refl;
+	__m256		mask;
+	__m256		nb_hit;
+	__m256		curr_hit;
+	int			i;
+	int			max_hit;
+
 	max_hit = 0;
 	i = -1;
 	while (++i < 8)
@@ -75,68 +62,35 @@ void get_colors_simd(t_simd info, int out_colors[8])
 		if (info.nb_hit[i] > max_hit)
 			max_hit = info.nb_hit[i];
 	}
-	one = _mm256_set1_ps(1);
-	div = _mm256_set1_ps((float)1 / 255);
-	mul = _mm256_set1_ps(255);
 	nb_hit = _mm256_cvtepi32_ps(_mm256_load_si256((__m256i *)info.nb_hit));
-	prev_r = _mm256_mul_ps(_mm256_load_ps(info.fallback.r), div);
-	prev_g = _mm256_mul_ps(_mm256_load_ps(info.fallback.g), div);
-	prev_b = _mm256_mul_ps(_mm256_load_ps(info.fallback.b), div);
+	prev.r = MUL_8(LOAD_8(info.fallback.r), info.utils->div);
+	prev.g = MUL_8(LOAD_8(info.fallback.g), info.utils->div);
+	prev.b = MUL_8(LOAD_8(info.fallback.b), info.utils->div);
 	while (--max_hit >= 0)
 	{
-		curr_r = _mm256_mul_ps(_mm256_load_ps(info.textures[max_hit].r), div);
-		curr_g = _mm256_mul_ps(_mm256_load_ps(info.textures[max_hit].g), div);
-		curr_b = _mm256_mul_ps(_mm256_load_ps(info.textures[max_hit].b), div);
-		curr_hit = _mm256_set1_ps((float)max_hit);
-		refl = _mm256_load_ps(info.refl_val[max_hit]);
-		inv_refl = _mm256_sub_ps(one, refl);
+		curr.r = MUL_8(LOAD_8(info.textures[max_hit].r), info.utils->div);
+		curr.g = MUL_8(LOAD_8(info.textures[max_hit].g), info.utils->div);
+		curr.b = MUL_8(LOAD_8(info.textures[max_hit].b), info.utils->div);
+		curr_hit = SET_8((float)max_hit);
+		refl = LOAD_8(info.refl_val[max_hit]);
+		inv_refl = SUB_8(info.utils->one, refl);
 		mask = _mm256_cmp_ps(curr_hit, nb_hit, _CMP_LT_OQ);
-		prev_r = _mm256_blendv_ps(
-			prev_r,
-			_mm256_add_ps(
-				_mm256_mul_ps(
-					curr_r,
-					_mm256_mul_ps(refl, prev_r)
-				),
-				_mm256_mul_ps(
-					_mm256_mul_ps(inv_refl, curr_r),
-					_mm256_mul_ps(_mm256_load_ps(info.light_color[max_hit].r), div)
-				)
-			),
-			mask
-		);
-		prev_g = _mm256_blendv_ps(
-			prev_g,
-			_mm256_add_ps(
-				_mm256_mul_ps(
-					curr_g,
-					_mm256_mul_ps(refl, prev_g)
-				),
-				_mm256_mul_ps(
-					_mm256_mul_ps(inv_refl, curr_g),
-					_mm256_mul_ps(_mm256_load_ps(info.light_color[max_hit].g), div)
-				)
-			),
-			mask
-		);
-		prev_b = _mm256_blendv_ps(
-			prev_b,
-			_mm256_add_ps(
-				_mm256_mul_ps(
-					curr_b,
-					_mm256_mul_ps(refl, prev_b)
-				),
-				_mm256_mul_ps(
-					_mm256_mul_ps(inv_refl, curr_b),
-					_mm256_mul_ps(_mm256_load_ps(info.light_color[max_hit].b), div)
-				)
-			),
-			mask
-		);
+		prev.r = BLEND_8(prev.r, ADD_8(MUL_8(curr.r, MUL_8(refl, prev.r)),
+					MUL_8(MUL_8(inv_refl, curr.r),
+						MUL_8(LOAD_8(info.light_color[max_hit].r),
+							info.utils->div))), mask);
+		prev.g = BLEND_8(prev.g, ADD_8(MUL_8(curr.g, MUL_8(refl, prev.g)),
+					MUL_8(MUL_8(inv_refl, curr.g),
+						MUL_8(LOAD_8(info.light_color[max_hit].g),
+							info.utils->div))), mask);
+		prev.b = BLEND_8(prev.b, ADD_8(MUL_8(curr.b, MUL_8(refl, prev.b)),
+					MUL_8(MUL_8(inv_refl, curr.b),
+						MUL_8(LOAD_8(info.light_color[max_hit].b),
+							info.utils->div))), mask);
 	}
-	__m256i r_int = _mm256_cvtps_epi32(_mm256_mul_ps(prev_r, mul));
-	__m256i g_int = _mm256_cvtps_epi32(_mm256_mul_ps(prev_g, mul));
-	__m256i b_int = _mm256_cvtps_epi32(_mm256_mul_ps(prev_b, mul));
+	__m256i r_int = _mm256_cvtps_epi32(MUL_8(prev.r, info.utils->mul));
+	__m256i g_int = _mm256_cvtps_epi32(MUL_8(prev.g, info.utils->mul));
+	__m256i b_int = _mm256_cvtps_epi32(MUL_8(prev.b, info.utils->mul));
 	__m256i packed = _mm256_or_si256(
 		_mm256_or_si256(
 			_mm256_slli_epi32(r_int, 16),
@@ -148,7 +102,7 @@ void get_colors_simd(t_simd info, int out_colors[8])
 }
 
 //This function is cache-miss-read heavy ...
-static inline void	setup_color(t_draw *draw, t_th_draw *td, t_col fallback, int nb_hit)
+void	setup_color(t_draw *draw, t_th_draw *td, t_col fallback, int nb_hit)
 {
 	int	col;
 
@@ -173,7 +127,7 @@ static inline void	setup_color(t_draw *draw, t_th_draw *td, t_col fallback, int 
 	}
 }
 
-static inline t_vec reflect_across_mirror(t_vec point, t_draw *draw, t_point curr, int *bounce)
+t_vec reflect_across_mirror(t_vec point, t_draw *draw, t_point curr, int *bounce)
 {
 	t_vec	normal;
 	t_vec	hit;
@@ -195,7 +149,7 @@ static inline t_vec reflect_across_mirror(t_vec point, t_draw *draw, t_point cur
 	return (point);
 }
 
-static inline void	draw_ceil(t_data *data, t_th_draw *td, t_point curr, t_rdir ray, t_draw *draw)
+void	draw_ceil(t_data *data, t_th_draw *td, t_point curr, t_rdir ray, t_draw *draw)
 {
 	int			bounce;
 	int			offset;
@@ -232,7 +186,7 @@ static inline void	draw_ceil(t_data *data, t_th_draw *td, t_point curr, t_rdir r
 	setup_color(draw, td, color, bounce);
 }
 
-static inline void draw_floor(t_data *data, t_th_draw *td, t_point curr, t_rdir ray, t_draw *draw)
+void draw_floor(t_data *data, t_th_draw *td, t_point curr, t_rdir ray, t_draw *draw)
 {
 	int			bounce;
 	int			offset;
@@ -269,7 +223,7 @@ static inline void draw_floor(t_data *data, t_th_draw *td, t_point curr, t_rdir 
 	setup_color(draw, td, color, bounce);
 }
 
-static inline void	draw_wall(t_th_draw *td, t_draw *draw)
+void	draw_wall(t_th_draw *td, t_draw *draw)
 {
 	t_col	temp;
 
@@ -283,7 +237,7 @@ static inline void	draw_wall(t_th_draw *td, t_draw *draw)
 #define BLOCK_X 16
 #define BLOCK_Y 16
 
-static inline void	draw_blocked_eight(t_data *data, t_th_draw *td, int **img, int *new_line)
+void	draw_blocked_eight(t_data *data, t_th_draw *td, int **img, int *new_line)
 {
 	int	color[8] __attribute__((aligned(32)));
 	int	i;
@@ -389,6 +343,7 @@ void	draw_walls(t_data *data)
 		pthread_mutex_lock(&data->thread_pool[i].mutex);
 		data->thread_pool[i].ray_dir = ray_dir;
 		data->thread_pool[i].info = (t_simd){0};
+		data->thread_pool[i].info.utils = &data->simd_utils;
 		data->thread_pool[i].done = 0;
 		data->thread_pool[i].ready = 1;
 		pthread_cond_signal(&data->thread_pool[i].cond_start);

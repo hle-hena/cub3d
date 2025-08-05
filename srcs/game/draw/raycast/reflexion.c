@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 13:42:01 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/28 10:39:11 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/05 15:08:18 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,29 +40,15 @@ void	calc_ray(t_ray *ray)
 	ray->precise_dist = 0;
 }
 
-static inline float	dot(t_vec a, t_vec b)
-{
-	return (a.x * b.x + a.y * b.y);
-}
-
 static inline t_vec	reflect(t_vec dir, t_vec normal)
 {
 	float	d;
 	t_vec	reflected;
 
-	d = dot(dir, normal);
+	d = vec_dot(dir, normal);
 	reflected.x = dir.x - 2.0f * d * normal.x;
 	reflected.y = dir.y - 2.0f * d * normal.y;
 	return (reflected);
-}
-
-t_vec	normalize(t_vec v)
-{
-	//I don't think that func is supposed to be here x)
-	float	len = sqrtf(v.x * v.x + v.y * v.y);
-	if (len == 0.0f)
-		return (t_vec){0, 0};
-	return (t_vec){v.x / len, v.y / len};
 }
 
 void	handle_reflexion(t_data *data, t_hit *hit, t_ray *ray, t_wpath wall)

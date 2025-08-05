@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:05:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/31 10:56:23 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/05 16:25:31 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,9 @@ void	init_utils(t_data *data)
 	fill_cast_table(data, &err);
 	if (err)
 		ft_perror(1, NULL, 0);
+	data->simd_utils.div = _mm256_set1_ps(1.0f / 255);
+	data->simd_utils.mul = _mm256_set1_ps(255);
+	data->simd_utils.one = _mm256_set1_ps(1);
 }
 
 void init_draw_threads(t_data *data)
@@ -84,7 +87,6 @@ void init_draw_threads(t_data *data)
 	data->threads = malloc(data->draw_thread * sizeof(pthread_t));
 	slice = data->render_w / data->draw_thread;
 	i = -1;
-	data->option = 1;
 	while (++i < data->draw_thread)
 	{
 		data->thread_pool[i].start_x = i * slice;
@@ -106,7 +108,7 @@ int	main(int ac, char **av)
 
 	data = get_data();
 	data->mlx = mlx_init();
-	// mlx_do_key_autorepeatoff(data->mlx);
+	mlx_do_key_autorepeatoff(data->mlx);
 	data->map = load_map(ac, av);
 	if (data->map)
 	{
