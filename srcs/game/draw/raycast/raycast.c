@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/22 18:00:35 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/04 11:53:00 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/06 10:32:25 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ void	handle_hit(t_data *data, t_ray *ray, t_hit *hit)
 
 	if (is_outside(data, ray, hit))
 		return ;
-	tile = get_tile_dict()[*(data->map->matrix + ray->curr.x
+	tile = get_tile_dict()[*(data->map->map + ray->curr.x
 			+ ray->curr.y * data->map->wid)];
 	if (!tile)
 		return ;

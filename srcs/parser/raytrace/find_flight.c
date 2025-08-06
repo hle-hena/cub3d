@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 11:58:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/28 12:01:50 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/06 15:09:28 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ t_flight	*new_flight(t_vec normal)
 	flight->color = 0;
 	flight->emittance = 0;
 	flight->normal = normal;
+	flight->ibuffer = 0;
 	return (flight);
 }
 

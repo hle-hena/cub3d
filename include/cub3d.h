@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/05 16:15:10 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/06 16:59:32 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,6 +123,7 @@ typedef struct s_light
 	t_vec	pos;
 	t_col	color;
 	float	emittance;
+	int		index;
 }	t_light;
 
 typedef struct s_light_face
@@ -130,6 +131,7 @@ typedef struct s_light_face
 	t_vec	normal;
 	float	emittance;
 	int		color;
+	int		ibuffer;
 }	t_flight;
 
 typedef struct s_light_tile
@@ -242,7 +244,7 @@ typedef struct s_tile
 
 typedef struct s_map
 {
-	int			*matrix;
+	int			*map;
 	char		void_char;
 	char		replace_tile;
 	int			len;
@@ -283,7 +285,7 @@ typedef struct s_draw
 {
 	float		reflectance[MAX_BOUNCE];
 	int			light_color[MAX_BOUNCE];
-	float		light_emittance[MAX_BOUNCE];
+	float		light_emit[MAX_BOUNCE];
 	int			tex_pos_fp[MAX_BOUNCE];
 	int			tex_sizeline[MAX_BOUNCE];
 	int			step_fp[MAX_BOUNCE];
@@ -345,6 +347,13 @@ typedef struct s_col_256
 	__m256	b;
 }	t_col_256;
 
+typedef struct s_col_256i
+{
+	__m256i	r;
+	__m256i	g;
+	__m256i	b;
+}	t_col_256i;
+
 typedef struct s_col_simd
 {
 	float	r[8]
@@ -370,6 +379,7 @@ typedef struct s_thread_draw
 {
 	t_simd			info;
 	int				current_pix;
+	int				bounces;
 	t_rdir			ray_dir;
 	int				start_x;
 	int				end_x;
@@ -407,6 +417,8 @@ typedef struct s_data
 }	t_data;
 
 # define LMAP_PRECISION 129
+# define BLOCK_X 16
+# define BLOCK_Y 16//Should probably find a way to do that dynamically, because on smaller screens, it might need to be 8 for exemple.
 
 int			build_polygons();
 
@@ -501,5 +513,20 @@ t_vec		vec_scale(t_vec a, float s);
 float		vec_len2(t_vec a);
 t_vec		vec_normalize(t_vec a);
 t_inter		check_solutions_sarc(float *t, t_vec origin, t_vec dir, t_wpath arc);
+
+void		start_threads(t_data *data);
+void		draw_walls(t_th_draw *td);
+void		get_colors_simd(t_simd info, int out_colors[8]);
+t_col		color_blend(int base_color, int light_color, float emittance);
+void		draw_wall(t_th_draw *td, t_draw *draw);
+void		draw_floor(t_data *data, t_th_draw *td, t_point curr, t_draw *draw);
+void		draw_ceil(t_data *data, t_th_draw *td, t_point curr, t_draw *draw);
+void		setup_color(t_draw *draw, t_th_draw *td, t_col fallback, int nb_hit);
+
+int			add_col_val_physical(int col1, int col2, float weight1, float weight2);
+void		light_floor(t_data *data, t_trace *ray, t_light light);
+void		light_wall(t_data *data, t_trace *ray, t_wpath wall,
+	t_light light);
+t_inter	light_intersect(t_vec origin, t_vec dir, t_wpath path_to_inter);
 
 #endif

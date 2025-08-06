@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:08:29 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/31 16:07:10 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/06 17:05:35 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,84 +22,24 @@ static inline float	to_srgb(float c)
 	return (sqrtf(c) * 255.0f);
 }
 
-static inline int	add_col_val_physical(int col1, int col2, float weight1,
+int	add_col_val_physical(int col1, int col2, float weight1,
 	float weight2)
 {
-	float r1 = to_linear((col1 >> 16) & 0xFF) * weight1;
-	float g1 = to_linear((col1 >> 8) & 0xFF) * weight1;
-	float b1 = to_linear(col1 & 0xFF) * weight1;
-	float r2 = to_linear((col2 >> 16) & 0xFF) * weight2;
-	float g2 = to_linear((col2 >> 8) & 0xFF) * weight2;
-	float b2 = to_linear(col2 & 0xFF) * weight2;
-	float r = r1 + r2;
-	float g = g1 + g2;
-	float b = b1 + b2;
-	int ri = (int)to_srgb(r);
-	int gi = (int)to_srgb(g);
-	int bi = (int)to_srgb(b);
-	if (ri > 255) ri = 255;
-	if (gi > 255) gi = 255;
-	if (bi > 255) bi = 255;
-	return (ri << 16) | (gi << 8) | bi;
-}
+	t_col	final;
 
-static inline void add_color(t_tlight *final, t_tlight *temp)
-{
-	t_list		*found;
-	t_list		*temp_lst;
-	t_flight	*final_flight;
-	t_flight	*temp_flight;
-
-	temp_lst = temp->flight;
-	while (temp_lst)
-	{
-		temp_flight = (t_flight *)temp_lst->content;
-		found = ft_lstchr(final->flight,
-			&temp_flight->normal, is_correct_flight);
-		if (found)
-		{
-			final_flight = (t_flight *)found->content;
-			final_flight->color = add_col_val_physical(final_flight->color,
-				temp_flight->color, final_flight->emittance, temp_flight->emittance);
-			final_flight->emittance += temp_flight->emittance;
-			if (final_flight->emittance > 1)
-				final_flight->emittance = 1;
-		}
-		else
-		{
-			final_flight = new_flight(temp_flight->normal);
-			if (!final_flight)
-				return ;//probably an error to print, and clean.
-			final_flight->color = temp_flight->color;
-			final_flight->emittance = temp_flight->emittance;
-			add_link(&final->flight, final_flight);
-		}
-		temp_lst = temp_lst->next;
-	}
-	final->ce_fl.color = add_col_val_physical(final->ce_fl.color,
-		temp->ce_fl.color, final->ce_fl.emittance, temp->ce_fl.emittance);
-	final->ce_fl.emittance += temp->ce_fl.emittance;
-	if (final->ce_fl.emittance > 1)
-		final->ce_fl.emittance = 1;
-}
-
-void	add_lmap(t_data *data, t_tlight *final, t_tlight *temp)
-{
-	int		x;
-	int		y;
-	int		i;
-
-	y = -1;
-	i = 0;
-	while (++y < data->lmap.len)
-	{
-		x = -1;
-		while (++x < data->lmap.wid)
-		{
-			add_color(final + i, temp + i);
-			i++;
-		}
-	}
+	final.re = (int)to_srgb((weight1 * to_linear((col1 >> 16) & 0xFF))
+			+ (to_linear((col2 >> 16) & 0xFF) * weight2));
+	final.gr = (int)to_srgb((weight1 * to_linear((col1 >> 8) & 0xFF))
+			+ (to_linear((col2 >> 8) & 0xFF) * weight2));
+	final.bl = (int)to_srgb((weight1 * to_linear(col1 & 0xFF))
+			+ (to_linear(col2 & 0xFF) * weight2));
+	if (final.re > 255)
+		final.re = 255;
+	if (final.gr > 255)
+		final.gr = 255;
+	if (final.bl > 255)
+		final.bl = 255;
+	return ((final.re << 16) | (final.gr << 8) | final.bl);
 }
 
 void	raytrace_source(t_data *data, t_light light)
@@ -108,7 +48,8 @@ void	raytrace_source(t_data *data, t_light light)
 	t_vec	dir;
 
 	deg = 0;
-	printf("Doing (%.2f, %.2f) for %.2f\n", light.pos.x, light.pos.y, light.emittance);
+	printf("Doing (%.2f, %.2f) for %.2f\n", light.pos.x,
+		light.pos.y, light.emittance);
 	while (deg < 360)
 	{
 		dir.x = cos(deg * PI / 180);
@@ -121,30 +62,21 @@ void	raytrace_source(t_data *data, t_light light)
 int	create_lmap(t_data *data)
 {
 	int			i;
-	int			j;
 	t_lmap		*lmap;
-	t_tlight	*temp;
 
 	lmap = &data->lmap;
 	lmap->wid = data->map->wid * LMAP_PRECISION;
 	lmap->len = data->map->len * LMAP_PRECISION;
 	data->lmap.lmap = ft_calloc(lmap->wid * lmap->len, sizeof(t_tlight));
-	temp = ft_calloc(lmap->wid * lmap->len, sizeof(t_tlight));
-	if (!lmap->lmap || !temp)
+	if (!lmap->lmap)
 		return (1);
 	if (!lmap->lights)
-		return (ft_del((void **)&temp), 0);
+		return (0);
 	i = -1;
 	while (++i < lmap->nb_ls)
 	{
+		lmap->lights[i].index = i + 1;
 		raytrace_source(data, lmap->lights[i]);
-		add_lmap(data, temp, data->lmap.lmap);
-		j = -1;
-		while (++j < data->lmap.len	* data->lmap.wid)
-			ft_lstclear(&data->lmap.lmap[j].flight, ft_del);
-		ft_bzero(data->lmap.lmap, lmap->wid * lmap->len * sizeof(t_tlight));
 	}
-	ft_del((void **)&data->lmap.lmap);
-	data->lmap.lmap = temp;
 	return (0);
 }

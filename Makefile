@@ -24,20 +24,22 @@ SRCS = $(addprefix srcs/, \
 		$(addprefix map/, is_map_valid.c retrieve_map.c)\
 		$(addprefix lmap/, load.c retrieve_light.c)\
 		$(addprefix raytrace/, find_flight.c handle_light.c raytrace_utils.c\
-			raytrace.c reflect_light.c wall_intersect_light.c)\
+			raytrace.c reflect_light.c wall_intersect_light.c light_face.c\
+			intersect_check.c)\
 	)\
 	$(addprefix mlx_utils/, color.c loop.c put_pixel.c)\
 	$(addprefix game/, \
 		$(addprefix draw/, \
 			$(addprefix mini_map/, draw_circle.c draw_line.c draw_mini_map.c \
 				draw_player.c draw_square.c)\
-			$(addprefix raycast/, draw_map.c lookup.c raycast_utils.c \
-				raycast.c reflexion.c wall_intersect.c)\
+			$(addprefix raycast/, cast_rays.c draw.c draw_threads.c \
+				get_colors.c lookup.c raycast_utils.c raycast.c reflexion.c \
+				setup_color.c wall_intersect.c)\
 		)\
 		$(addprefix hooks/, key.c loop.c mouse.c)\
 		$(addprefix status/, fps.c)\
 	)\
-	main.c debug.c\
+	main.c\
 )
 
 OBJ = $(SRCS:.c=.o)

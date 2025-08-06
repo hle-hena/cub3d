@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 10:13:01 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/09 18:11:30 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/06 16:56:37 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,9 @@ int	is_correct_flight(void *content, void *to_find)
 void	init_trace(t_trace *ray, t_vec dir, t_vec origin, float emittance)
 {
 	origin = (t_vec){origin.x * LMAP_PRECISION, origin.y * LMAP_PRECISION};
+	*ray = (t_trace){.bounce = 0, .origin = origin, .dir = dir, .running = 1,
+		.precise_dist = 0, .last_dist = 0, .emittance = emittance,
+		.base_emittance = emittance};
 	ray->step.x = 1;
 	if (dir.x < 0)
 		ray->step.x = -1;
@@ -47,12 +50,4 @@ void	init_trace(t_trace *ray, t_vec dir, t_vec origin, float emittance)
 	else
 		ray->dist.y = (ceilf(origin.y) - origin.y) * ray->slope.y;
 	ray->curr = (t_point){floorf(origin.x), floorf(origin.y)};
-	ray->bounce = 0;
-	ray->origin = origin;
-	ray->dir = dir;
-	ray->running = 1;
-	ray->precise_dist = 0;
-	ray->last_dist = 0;
-	ray->emittance = emittance;
-	ray->base_emittance = emittance;
 }

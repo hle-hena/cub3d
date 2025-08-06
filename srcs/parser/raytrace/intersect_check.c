@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   wall_intersect.c                                   :+:      :+:    :+:   */
+/*   intersect_check.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/25 13:37:04 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/06 13:10:10 by hle-hena         ###   ########.fr       */
+/*   Created: 2025/08/06 16:58:51 by hle-hena          #+#    #+#             */
+/*   Updated: 2025/08/06 16:59:15 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,46 +52,9 @@ static inline t_inter	intersect_sseg(t_vec origin, t_vec dir, t_wpath seg)
 	return ((t_inter){(t_vec){0}, (t_vec){0}, -1, -1});
 }
 
-t_inter	distance_intersect(t_vec origin, t_vec dir, t_wpath path_to_inter)
+t_inter	light_intersect(t_vec origin, t_vec dir, t_wpath path_to_inter)
 {
 	if (path_to_inter.mode == 1)
 		return (intersect_sarc(origin, dir, path_to_inter));
 	return (intersect_sseg(origin, dir, path_to_inter));
-}
-
-static inline t_wpath	line(t_point curr, t_wpath base)
-{
-	return ((t_wpath){(t_vec){base.start.x + curr.x, base.start.y + curr.y},
-		(t_vec){base.end.x + curr.x, base.end.y + curr.y}, (t_vec){base.center.x
-			+ curr.x, base.center.y + curr.y}, (t_text){0}, (t_vec){0}, 0, 0, 0,
-			1, base.mode});
-}
-
-//For more fun, you can try to play with the wall normal.
-int	does_hit(t_list	*wpath, t_ray *ray, t_wpath *wall)
-{
-	t_inter	inter;
-	float	closest_dist;
-
-	closest_dist = -1;
-	while (wpath)
-	{
-		inter = distance_intersect(ray->origin, ray->dir,
-				line(ray->curr, *(t_wpath *)wpath->content));
-		if (inter.pos > 0 - FLT_EPSILON
-			&& (inter.dist < closest_dist || closest_dist == -1))
-		{
-			*wall = *(t_wpath *)wpath->content;
-			closest_dist = inter.dist;
-			wall->pos = inter.pos * (wall->pos_end - wall->pos_start)
-				+ wall->pos_start;
-			if (wall->mode == 1)
-				wall->normal = inter.normal;
-		}
-		wpath = wpath->next;
-	}
-	if (closest_dist < 0)
-		return (0);
-	ray->precise_dist = closest_dist;
-	return (1);
 }

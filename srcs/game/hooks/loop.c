@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 21:49:44 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/04 11:28:28 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/06 10:32:25 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 		{
 			int wall_x = (int)(data->map->player.x + delta.x);
 			int wall_y = (int)(data->map->player.y + delta.y);
-			if (!get_tile_dict()[*(data->map->matrix + (int)data->map->player.y
+			if (!get_tile_dict()[*(data->map->map + (int)data->map->player.y
 				* data->map->wid + wall_x)]->is_wall)
 				data->map->player.x += delta.x;
 			else
@@ -36,7 +36,7 @@
 				else if (delta.x < 0)
 					data->map->player.x = wall_x + 1.01f;
 			}
-			if (!get_tile_dict()[*(data->map->matrix + (int)wall_y *
+			if (!get_tile_dict()[*(data->map->map + (int)wall_y *
 					data->map->wid + (int)data->map->player.x)]->is_wall)
 				data->map->player.y += delta.y;
 			else

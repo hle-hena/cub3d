@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 12:49:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/31 17:08:08 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/06 11:36:29 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,8 @@ void	retrieve_texture_color(t_img **img, char *line, int *err)
 		return (ft_perror(-1, "Expected a positive number under 255 as blue.\
 ", 0), *err = 1, VOID);
 	if (*line)
-		return (ft_perror(-1, "Expected a \\n after the last color.", 0),
+		return (ft_perror(-1, "Expected a \\n after the last color. \
+If you wanted to put a reflectance do ': [value]'.", 0),//need to do the same message for the texture.
 			*err = 1, VOID);
 	set_img_color(img, line, color, err);
 }

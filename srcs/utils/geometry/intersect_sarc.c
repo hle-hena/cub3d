@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 10:58:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/05 15:03:30 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/06 15:33:40 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ t_inter	check_solutions_sarc(float *t, t_vec origin, t_vec dir, t_wpath arc)
 	info = (t_info_arc){(t_vec){0}, vec_normalize(vec_sub(arc.end, arc.center)),
 		vec_normalize(vec_sub(arc.start, arc.center)), (t_vec){0}, 0, 0};
 	info.is_full_circle = fabsf(arc.start.x - arc.end.x) < FLT_EPSILON
-		&& fabsf(arc.start.x - arc.end.x) < FLT_EPSILON;
+		&& fabsf(arc.start.y - arc.end.y) < FLT_EPSILON;
 	info.total_angle = acosf(vec_dot(info.v_start, info.v_end));
 	if (vec_cross(info.v_start, info.v_end) < 0)
 		info.total_angle = (2.0f * PI) - info.total_angle;

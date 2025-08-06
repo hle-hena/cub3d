@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 18:02:27 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/24 11:16:47 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/06 15:07:03 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,15 +48,15 @@ void	set_map(t_map *map, t_list *grid, int *err)
 	resize_lines(grid, map->void_char, map->wid, err);
 	if (*err)
 		return (ft_lstclear(&grid, ft_del), (void)0);
-	map->matrix = malloc((map->len * map->wid) * sizeof(int));
-	if (!map->matrix)
+	map->map = malloc((map->len * map->wid) * sizeof(int));
+	if (!map->map)
 		return (ft_perror(-1, "cub3d: Internal error: malloc", 0),
 			ft_lstclear(&grid, ft_del), *err = 1, (void)0);
 	while (grid)
 	{
 		i = -1;
 		while (++i < map->wid)
-			*(map->matrix + len * map->wid + i) = ((char *)grid->content)[i];
+			*(map->map + len * map->wid + i) = ((char *)grid->content)[i];
 		len++;
 		next = grid->next;
 		ft_del((void **)&grid->content);
@@ -116,10 +116,8 @@ void	retrieve_map(t_map *map, char *line, int map_fd, int *err)
 	int		wid;
 
 	grid = NULL;
-	while (1)
+	while (line)
 	{
-		if (!line)
-			break ;
 		if (ft_strncmp(line, "\n", 2) == 0)
 		{
 			ft_del((void **)&line);
@@ -133,10 +131,9 @@ void	retrieve_map(t_map *map, char *line, int map_fd, int *err)
 			return (ft_lstclear(&grid, ft_del), ft_del((void **)&line),
 				*err = 1, (void)0);
 		line[wid] = 0;
-		add_link(&grid, line);//This is absolutly wild, should not do that lmaoo
+		add_link(&grid, line);
 		map->len++;
-		if (wid > map->wid)
-			map->wid = wid;
+		map->wid = ft_max(wid, map->wid);
 		line = get_next_line(map_fd);
 	}
 	set_map(map, grid, err);

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 10:55:35 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/31 16:59:18 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/06 14:17:45 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,14 @@ t_col	retrieve_light_color(char **line, int *err)
 	return (color);
 }
 
+int	finished(char **line, int *err)
+{
+	if (**line != ')' && **line != ',')
+		(ft_perror(0, ft_strsjoin((char *[]){"The separator in the light is \
+wrong. expected ',' or ')'. Got '", *line, "'.", NULL}), 1), *err = 1);
+	return (**line != ')');
+}
+
 int	retrieve_light_info(t_lmap *lmap, char **line, int *err)
 {
 	if (**line == '(')
@@ -71,7 +79,7 @@ definition.", 0), *err = 1, 0);
 	else if (**line == '{')
 	{
 		if (lmap->lights[lmap->nb_ls].color.re != -1)
-		return (ft_perror(-1, "Duplicated color in a light \
+			return (ft_perror(-1, "Duplicated color in a light \
 definition.", 0), *err = 1, 0);
 		lmap->lights[lmap->nb_ls].color = retrieve_light_color(line, err);
 	}
@@ -85,10 +93,7 @@ definition.", 0), *err = 1, 0);
 			return (ft_perror(-1, "The value given for the emittance is not \
 correct.", 0), *err = 1, 0);
 	}
-	if (**line != ')' && **line != ',')
-		(ft_perror(0, ft_strsjoin((char *[]){"The separator in the light is \
-wrong. expected ',' or ')'. Got '", *line, "'.", NULL}), 1), *err = 1);
-	return (**line != ')');
+	return (finished(line, err));
 }
 
 void	retrieve_light(char *line, int *err)
@@ -97,7 +102,7 @@ void	retrieve_light(char *line, int *err)
 
 	lmap = &get_data()->lmap;
 	lmap->lights = ft_realloc(lmap->lights, (lmap->nb_ls + 1) * sizeof(t_light),
-		lmap->nb_ls * sizeof(t_light));
+			lmap->nb_ls * sizeof(t_light));
 	lmap->lights[lmap->nb_ls].pos.y = -1;
 	lmap->lights[lmap->nb_ls].emittance = -1;
 	lmap->lights[lmap->nb_ls].color = (t_col){-1, -1, -1};
@@ -112,9 +117,9 @@ void	retrieve_light(char *line, int *err)
 	if (lmap->lights[lmap->nb_ls].pos.y == -1)
 		return (ft_perror(0, "A light is missing its coordinates.", 0),
 			*err = 1, VOID);
-	if (lmap->lights[lmap->nb_ls].emittance == -1)
+	if (lmap->lights[lmap->nb_ls].emittance < 0)
 		lmap->lights[lmap->nb_ls].emittance = 1;
-	if (lmap->lights[lmap->nb_ls].color.bl == -1)
+	if (lmap->lights[lmap->nb_ls].color.bl < 0)
 		lmap->lights[lmap->nb_ls].color = (t_col){255, 255, 255};
 	lmap->nb_ls++;
 	return ;

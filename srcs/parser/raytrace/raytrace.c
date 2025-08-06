@@ -6,30 +6,11 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 10:11:09 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/05 11:25:06 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/06 16:05:07 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
-
-static inline void	light_floor(t_data *data, t_trace *ray, t_light light)
-{
-	float	emittance;
-
-	if (ray->curr.x < 0 || ray->curr.x >= data->lmap.wid || ray->curr.y < 0
-		|| ray->curr.y >= data->lmap.len)
-		return ;
-	emittance = ray->emittance;
-	if (emittance < (data->lmap.lmap + ray->curr.x + ray->curr.y
-			* data->map->wid * LMAP_PRECISION)->ce_fl.emittance)
-		return ;
-	(data->lmap.lmap + ray->curr.x + ray->curr.y * data->map->wid
-		* LMAP_PRECISION)->ce_fl.color = calc_color((t_col){light.color.re
-					* emittance, light.color.gr * emittance,
-					light.color.bl * emittance});
-	(data->lmap.lmap + ray->curr.x + ray->curr.y * data->map->wid
-		* LMAP_PRECISION)->ce_fl.emittance = emittance;
-}
 
 void	raytrace(t_data *data, t_light light, t_vec dir)
 {
