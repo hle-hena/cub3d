@@ -1,25 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_lstchr.c                                        :+:      :+:    :+:   */
+/*   clear_lines.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/19 11:51:28 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/07 10:58:17 by hle-hena         ###   ########.fr       */
+/*   Created: 2025/08/07 12:43:49 by hle-hena          #+#    #+#             */
+/*   Updated: 2025/08/07 12:44:48 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../libft.h"
+#include "cub3d.h"
 
-t_list	*ft_lstchr(t_list *lst, void *to_find, float utils,
-	int (*cmp)(void *, void *, float))
+void	clear_n_lines(int n)
 {
-	while (lst)
-	{
-		if (cmp(lst->content, to_find, utils))
-			return (lst);
-		lst = lst->next;
-	}
-	return (NULL);
+	while (--n >= 0)
+		printf("\001\033[1A\033[2K\r\002");
 }

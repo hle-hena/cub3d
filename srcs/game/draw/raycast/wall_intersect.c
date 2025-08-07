@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 13:37:04 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/06 13:10:10 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/07 16:14:16 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,6 @@ static inline t_wpath	line(t_point curr, t_wpath base)
 			1, base.mode});
 }
 
-//For more fun, you can try to play with the wall normal.
 int	does_hit(t_list	*wpath, t_ray *ray, t_wpath *wall)
 {
 	t_inter	inter;
@@ -85,6 +84,7 @@ int	does_hit(t_list	*wpath, t_ray *ray, t_wpath *wall)
 			closest_dist = inter.dist;
 			wall->pos = inter.pos * (wall->pos_end - wall->pos_start)
 				+ wall->pos_start;
+			// need to remove this in theory.
 			if (wall->mode == 1)
 				wall->normal = inter.normal;
 		}

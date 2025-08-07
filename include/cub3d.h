@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/06 16:59:32 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/07 16:25:12 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -264,7 +264,7 @@ typedef struct s_events
 	int		echap;
 }	t_event;
 
-# define MAX_BOUNCE 4
+# define MAX_BOUNCE 8
 
 typedef struct s_hit
 {
@@ -454,7 +454,7 @@ int			is_map_valid(t_map *map, t_tile **tiles, int err);
 
 void		add_link(t_list **lst, void *content);
 
-int			is_correct_flight(void *content, void *to_find);
+int			is_correct_flight(void *content, void *to_find, float threshold);
 int			does_hit(t_list	*wpath, t_ray *ray, t_wpath *wall);
 void		handle_reflexion(t_data *data, t_hit *hit, t_ray *ray,
 				t_wpath wall);
@@ -528,5 +528,9 @@ void		light_floor(t_data *data, t_trace *ray, t_light light);
 void		light_wall(t_data *data, t_trace *ray, t_wpath wall,
 	t_light light);
 t_inter	light_intersect(t_vec origin, t_vec dir, t_wpath path_to_inter);
+void		add_base_wall(t_tile *tile, int *err);
+void		clear_n_lines(int n);
+void		new_image(t_data *data, t_img *img_struct, int width, int height);
+
 
 #endif

@@ -1,11 +1,8 @@
 . {
-	NO textures/simonkraft/bookshelf_01.xpm
-	SO textures/simonkraft/bookshelf_01.xpm
-	EA textures/simonkraft/bookshelf_01.xpm
-	WE textures/simonkraft/bookshelf_01.xpm
 	C textures/custom/461223113.xpm
 	F textures/custom/461223113.xpm
 	W 1
+	wt textures/simonkraft/bookshelf_01.xpm
 	wl ((1, 0), (0, 0))
 	wl ((0, 1), (0, 0))
 	wl ((1, 0), (1, 1))
@@ -16,10 +13,6 @@
 	wl ((0.4, 0), (1, 0.6))
 }
 ! {
-	NO textures/simonkraft/cobblestone_01.xpm
-	SO textures/simonkraft/cobblestone_01.xpm
-	EA textures/simonkraft/cobblestone_01.xpm
-	WE textures/simonkraft/cobblestone_01.xpm
 	C textures/custom/461223113.xpm
 	F textures/custom/461223113.xpm
 	W 1
@@ -48,44 +41,30 @@
 	wl ((0.05, 0.05), (0.95, 0.05))
 }
 p {
-	NO textures/simonkraft/bookshelf_01.xpm
-	SO textures/simonkraft/bookshelf_01.xpm
-	EA textures/simonkraft/bookshelf_01.xpm
-	WE textures/simonkraft/bookshelf_01.xpm
 	C textures/custom/461223113.xpm
 	F textures/custom/461223113.xpm
 	W 1
+	wt textures/simonkraft/bookshelf_01.xpm
 	wl ((0, 0.5), (0.8, 0.5))
 	wl ((0.5, 0.5), (1, 0.5))
 }
 # {
-	NO textures/simonkraft/bookshelf_01.xpm
-	SO textures/simonkraft/bookshelf_01.xpm
-	EA textures/simonkraft/bookshelf_01.xpm
-	WE textures/simonkraft/bookshelf_01.xpm
 	C textures/custom/461223113.xpm
 	F textures/custom/461223113.xpm
 	W 1
+	wt textures/simonkraft/bookshelf_01.xpm
 	#wa ((0.4, 0.8), (0.4, 0.8), (0.4, 0.5))
 	wl ((0, 0), (1, 1))
 	wa ((0.6, 0.8), (0.6, 0.8), (0.6, 0.5))
 }
 1 {
-	NO textures/simonkraft/bookshelf_01.xpm
-	SO textures/simonkraft/cobblestone_01.xpm
-	EA textures/simonkraft/mossy_cobblestone1.xpm
-	WE textures/simonkraft/mycelium_top.xpm
 	C textures/custom/461223113.xpm
 	F textures/custom/461223113.xpm
 	W 1
 	wt textures/custom/white_metal.xpm
-	wa ((0.5, 0), (0.5, 0), (0.5, 0.5)), 0.8
+	wa ((0.5, 0), (0.5, 0), (0.5, 0.5)): 0.8
 }
 2 {
-	NO textures/simonkraft/bookshelf_01.xpm
-	SO textures/simonkraft/cobblestone_01.xpm
-	EA textures/simonkraft/mossy_cobblestone1.xpm
-	WE textures/simonkraft/mycelium_top.xpm
 	C textures/custom/461223113.xpm
 	F textures/custom/461223113.xpm
 	W 1

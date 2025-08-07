@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 09:19:48 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/19 16:57:29 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/07 15:49:03 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,9 +37,8 @@ float	ft_atof_err(char *str, float min, float max, char **last)
 				return (*last = str, -1);
 		}
 	}
-	if (nb < min)
-		return (*last = str, -1);
-	return (*last = str, nb);
+	*last = str;
+	return ((nb < min) * -1 + (!(nb < min)) * nb);
 }
 
 void	retrieve_texture_val(t_text *texture, char *arg, int *err)

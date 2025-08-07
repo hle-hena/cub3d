@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 12:49:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/06 11:36:29 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/07 16:11:35 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,12 +49,25 @@ void	set_img_color(t_img **img, char *line, t_col color, int *err)
 the opening of the image for '", line, "'.", NULL}), 1), *err = 1, VOID);
 	(*img)->height = 1;
 	(*img)->width = 1;
-	(*img)->data = (int *)mlx_get_data_addr((*img)->img, &(*img)->bpp, &(*img)->size_line,
-		&(*img)->endian);
+	(*img)->data = (int *)mlx_get_data_addr((*img)->img, &(*img)->bpp,
+			&(*img)->size_line, &(*img)->endian);
 	(*img)->bpp /= 8;
 	(*img)->size_line /= (*img)->bpp;
 	(*img)->endian = 0;
 	*(int *)(*img)->data = calc_color(color);
+}
+
+int	retrieve_color(char **line, int *color, int *err, char *color_name)
+{
+	*color = ft_atoi_err(line);
+	if (*err == -1)
+	{
+		ft_perror(-1, ft_strsjoin((char *[]){"Expected a positive number under\
+ 255 as ", color_name, ".", NULL}), 0);
+		*err = 1;
+		return (1);
+	}
+	return (0);
 }
 
 void	retrieve_texture_color(t_img **img, char *line, int *err)
@@ -66,27 +79,21 @@ void	retrieve_texture_color(t_img **img, char *line, int *err)
 	if (ft_strnstr(line, ".xpm", ft_strlen(line)))
 		return (ft_perror(-1, "Assets should be in a subfolder.", 0), *err = 1,
 			VOID);
-	color.re = ft_atoi_err(&line);
-	if (color.re == -1)
-		return (ft_perror(-1, "Expected a positive number under 255 as red.\
-", 0), *err = 1, VOID);
+	if (retrieve_color(&line, &color.re, err, "red"))
+		return ;
 	if (skip_pattern(&line, " , "))
 		return (ft_perror(-1, "Wrong pattern recognised for an rgb color.", 0),
 			*err = 1, VOID);
-	color.gr = ft_atoi_err(&line);
-	if (color.gr == -1)
-		return (ft_perror(-1, "Expected a positive number under 255 as green.\
-", 0), *err = 1, VOID);
+	if (retrieve_color(&line, &color.gr, err, "green"))
+		return ;
 	if (skip_pattern(&line, " , "))
 		return (ft_perror(-1, "Wrong pattern recognised for an rgb color.", 0),
 			*err = 1, VOID);
-	color.bl = ft_atoi_err(&line);
-	if (color.bl == -1)
-		return (ft_perror(-1, "Expected a positive number under 255 as blue.\
-", 0), *err = 1, VOID);
+	if (retrieve_color(&line, &color.bl, err, "blue"))
+		return ;
 	if (*line)
 		return (ft_perror(-1, "Expected a \\n after the last color. \
-If you wanted to put a reflectance do ': [value]'.", 0),//need to do the same message for the texture.
+If you wanted to put a reflectance do ': [value]'.", 0),
 			*err = 1, VOID);
 	set_img_color(img, line, color, err);
 }

@@ -8,10 +8,6 @@
 	W 1
 }
 2 {
-	NO 255,255,255
-	SO 255,255,255
-	EA 255,255,255
-	WE 255,255,255
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
 	W 1
@@ -19,10 +15,6 @@
 	wa ((1, 0.5), (0.5, 1), (0.5, 0.5))
 }
 3 {
-	NO 255,255,255
-	SO 255,255,255
-	EA 255,255,255
-	WE 255,255,255
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
 	W 1
@@ -30,10 +22,6 @@
 	wa ((0.5, 1), (0, 0.5), (0.5, 0.5))
 }
 4 {
-	NO 255,255,255
-	SO 255,255,255
-	EA 255,255,255
-	WE 255,255,255
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
 	W 1
@@ -41,10 +29,6 @@
 	wa ((0, 0.5), (0.5, 0), (0.5, 0.5))
 }
 5 {
-	NO 255,255,255
-	SO 255,255,255
-	EA 255,255,255
-	WE 255,255,255
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
 	W 1
@@ -52,18 +36,14 @@
 	wa ((0.5, 0), (1, 0.5), (0.5, 0.5))
 }
 6 {
-	NO 255,255,255
-	SO 255,255,255
-	EA 255,255,255
-	WE 255,255,255
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
 	W 1
 	wt 200,200,200
-	wa ((0.5, 0), (0.5, 0), (0.5, 0.1)), 0.8
-	wa ((0, 0.5), (0, 0.5), (0.1, 0.5)), 0.8
-	wa ((0.5, 1), (0.5, 1), (0.5, 0.9)), 0.8
-	wa ((1, 0.5), (1, 0.5), (0.9, 0.5)), 0.8
+	wa ((0.5, 0), (0.5, 0), (0.5, 0.1)): 0.8
+	wa ((0, 0.5), (0, 0.5), (0.1, 0.5)): 0.8
+	wa ((0.5, 1), (0.5, 1), (0.5, 0.9)): 0.8
+	wa ((1, 0.5), (1, 0.5), (0.9, 0.5)): 0.8
 }
 
 0 {

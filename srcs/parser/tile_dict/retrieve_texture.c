@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 18:13:11 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/31 17:09:24 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/07 15:27:27 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,13 +29,11 @@ should be in .xpm. Got ", line, ".", NULL}), 1), *err = 1, VOID);
 hash_map.", 0), *err = 1);
 }
 
-void	get_arg(char *line, char **arg, char **reflectance, int *err)
+void	get_arg(char **splited, char **arg, char **reflectance, int *err)
 {
-	char	**splited;
 	char	*temp;
 	int		len;
 
-	splited = ft_split(line, ':');
 	if (!splited)
 		return (*err = 1, ft_perror(-1, "Internal error: malloc", 0), VOID);
 	len = ft_strslen(splited);
@@ -51,16 +49,13 @@ contains a :.", 0), VOID);
 			return (*err = 1, ft_perror(-1, "Internal error: malloc", 0),
 				ft_free_tab((void **)splited, len), ft_del((void **)&(*arg)),
 				ft_del((void **)&(*reflectance)), VOID);
+		return (ft_free_tab((void **)splited, len), (void)0);
 	}
-	else
-	{
-		*arg = ft_strdup(splited[0]);
-		if (!*arg)
-			return (*err = 1, ft_perror(-1, "Internal error: malloc", 0),
-				ft_free_tab((void **)splited, len), VOID);
-		*reflectance = NULL;
-	}
+	*arg = ft_strdup(splited[0]);
+	*reflectance = NULL;
 	ft_free_tab((void **)splited, len);
+	if (!*arg)
+		return (*err = 1, ft_perror(-1, "Internal error: malloc", 0), (void)0);
 }
 
 void	retrieve_texture(t_text *texture, char *line, int *err, char *id)
@@ -70,8 +65,8 @@ void	retrieve_texture(t_text *texture, char *line, int *err, char *id)
 
 	if (texture->img)
 		return (ft_perror(-1, ft_strsjoin((char *[]){"Duplicate of identifier ",
-						id, ".", NULL}), 1), *err = 1, VOID);
-	get_arg(line, &arg, &reflectance, err);
+					id, ".", NULL}), 1), *err = 1, VOID);
+	get_arg(ft_split(line, ':'), &arg, &reflectance, err);
 	if (*err)
 		return (ft_del((void **)&arg), ft_del((void **)&reflect_light), VOID);
 	if (ft_strchr(arg, '/'))

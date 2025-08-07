@@ -44,37 +44,25 @@
 	W 0
 }
 # {
-	NO 200,200,200
-	SO 200,200,200
-	EA 200,200,200
-	WE 200,200,200
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
 	W 1
-	wt textures/simonkraft/bookshelf_01.xpm
-	wa ((0.5, 0), (0.5, 0), (0.5, 0.5)), 1
+	wt 200,200,200
+	wa ((0.5, 0), (0.5, 0), (0.5, 0.5)): 1
 }
 . {
-	NO 200,200,200
-	SO 200,200,200
-	EA 200,200,200
-	WE 200,200,200
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
 	W 1
-	wt textures/simonkraft/bookshelf_01.xpm
-	wa ((0.5, 0), (0.5, 0), (0.5, 0.5)), 0.2
+	wt 200,200,200
+	wa ((0.5, 0), (0.5, 0), (0.5, 0.5)): 0.2
 }
 , {
-	NO 200,200,200
-	SO 200,200,200
-	EA 200,200,200
-	WE 200,200,200
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
-	wt textures/simonkraft/bookshelf_01.xpm
 	W 1
-	wa ((0.5, 0), (0.5, 0), (0.5, 0.5)), 0.6
+	wt 200,200,200
+	wa ((0.5, 0), (0.5, 0), (0.5, 0.5)): 0.6
 }
 L ((4.5, 5.5), 1)
 #L ((4.5, 2.5), {255, 0, 255}, 1)

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 18:02:27 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/06 15:07:03 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/07 16:38:34 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,8 +95,8 @@ int	check_line(t_map *map, char *line)
 		{
 			if (map->player.y != -1)
 				return (ft_perror(-1, "Too many players.", 0), -1);
-			map->player.x = len;
-			map->player.y = map->len;
+			map->player.x = 0.5f + len;
+			map->player.y = 0.5f + map->len;
 			map->player.rot = 180 * (line[len] == 'W') + 90 * (line[len] == 'S')
 				+ 270 * (line[len] == 'N');
 			line[len] = map->replace_tile;

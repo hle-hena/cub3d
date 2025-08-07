@@ -6,13 +6,13 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 22:15:19 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/05 17:06:49 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/07 11:49:30 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-static inline void	rotate_point(t_point *draw, t_vec curr, t_point player,
+static inline void	rotate_point(t_point *draw, t_vec curr, t_vec player,
 	t_trig vals)
 {
 	t_vec	centered;
@@ -23,7 +23,7 @@ static inline void	rotate_point(t_point *draw, t_vec curr, t_point player,
 	draw->y = centered.x * vals.sin + centered.y * vals.cos;
 }
 
-int	tile_is_visible(t_data *data, t_point player, t_trig vals, t_point start)
+int	tile_is_visible(t_data *data, t_vec player, t_trig vals, t_point start)
 {
 	t_point	corners[4];
 	t_vec	tmp;
@@ -51,8 +51,9 @@ void	draw_tile(t_data *data, t_point start, t_trig vals, int color)
 {
 	t_vec	curr;
 	t_point	draw;
-	t_point	player;
+	t_vec	player;
 
+	//the minimap doest sync nicely with the player pos
 	player.x = data->map->player.x * data->map->mini_map_scale;
 	player.y = data->map->player.y * data->map->mini_map_scale;
 	if (!tile_is_visible(data, player, vals, start))

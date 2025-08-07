@@ -6,40 +6,31 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:08:29 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/06 17:05:35 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/07 16:47:21 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-static inline float	to_linear(float c)
+void	print_progress(float progress, int index, int nb_clear, int width)
 {
-	return ((c / 255.0f) * (c / 255.0f));
-}
+	int	i;
 
-static inline float	to_srgb(float c)
-{
-	return (sqrtf(c) * 255.0f);
-}
-
-int	add_col_val_physical(int col1, int col2, float weight1,
-	float weight2)
-{
-	t_col	final;
-
-	final.re = (int)to_srgb((weight1 * to_linear((col1 >> 16) & 0xFF))
-			+ (to_linear((col2 >> 16) & 0xFF) * weight2));
-	final.gr = (int)to_srgb((weight1 * to_linear((col1 >> 8) & 0xFF))
-			+ (to_linear((col2 >> 8) & 0xFF) * weight2));
-	final.bl = (int)to_srgb((weight1 * to_linear(col1 & 0xFF))
-			+ (to_linear(col2 & 0xFF) * weight2));
-	if (final.re > 255)
-		final.re = 255;
-	if (final.gr > 255)
-		final.gr = 255;
-	if (final.bl > 255)
-		final.bl = 255;
-	return ((final.re << 16) | (final.gr << 8) | final.bl);
+	if (nb_clear)
+		clear_n_lines(nb_clear);
+	if (index == 0)
+		printf("\001\033[94m\002Light map\t[");
+	else
+		printf("\001\033[34m\002    Light %3d\t[", index);
+	i = -1;
+	while (++i < width)
+	{
+		if (i < progress)
+			printf("=");
+		else
+			printf(" ");
+	}
+	printf("] %3.0f%%\n\001\033[0m", progress * 100 / width);
 }
 
 void	raytrace_source(t_data *data, t_light light)
@@ -48,15 +39,20 @@ void	raytrace_source(t_data *data, t_light light)
 	t_vec	dir;
 
 	deg = 0;
-	printf("Doing (%.2f, %.2f) for %.2f\n", light.pos.x,
-		light.pos.y, light.emittance);
+	print_progress(40.0f * (float)(light.index - 1) / data->lmap.nb_ls,
+		0, 2 * (light.index != 1), 40);
+	print_progress((deg / 360.0f) * 30, light.index, 0, 30);
 	while (deg < 360)
 	{
 		dir.x = cos(deg * PI / 180);
 		dir.y = sin(deg * PI / 180);
 		raytrace(data, light, dir);
-		deg += 0.002;
+		print_progress(30.0f * (deg / 360.0f), light.index, 1, 30);
+		deg += 0.01;
 	}
+	print_progress(40.0f * (float)(light.index) / data->lmap.nb_ls,
+		0, 2, 40);
+	print_progress(30, light.index, 0, 30);
 }
 
 int	create_lmap(t_data *data)
@@ -78,5 +74,6 @@ int	create_lmap(t_data *data)
 		lmap->lights[i].index = i + 1;
 		raytrace_source(data, lmap->lights[i]);
 	}
+	printf("\n\n");
 	return (0);
 }

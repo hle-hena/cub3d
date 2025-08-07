@@ -6,21 +6,21 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 10:13:01 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/06 16:56:37 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/07 10:56:03 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-int	is_correct_flight(void *content, void *to_find)
+int	is_correct_flight(void *content, void *to_find, float threshold)
 {
 	t_vec	cont_normal;
 	t_vec	find_normal;
 
 	cont_normal = ((t_flight *)content)->normal;
 	find_normal = *(t_vec *)to_find;
-	return (fabs(cont_normal.x - find_normal.x) < 0.1
-		&& fabs(cont_normal.y - find_normal.y) < 0.1);
+	return (fabs(cont_normal.x - find_normal.x) < threshold
+		&& fabs(cont_normal.y - find_normal.y) < threshold);
 }
 
 void	init_trace(t_trace *ray, t_vec dir, t_vec origin, float emittance)

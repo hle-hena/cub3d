@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 18:53:15 by marvin            #+#    #+#             */
-/*   Updated: 2025/07/22 11:14:34 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/07 10:58:27 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,8 @@ char	*ft_toupper(char *str);
 /********************************/
 void	ft_lstadd_back(t_list **lst, t_list *new);
 void	ft_lstadd_front(t_list **lst, t_list *new);
-t_list	*ft_lstchr(t_list *lst, void *to_find, int (*cmp)(void *, void *));
+t_list	*ft_lstchr(t_list *lst, void *to_find, float utils,
+	int (*cmp)(void *, void *, float));
 void	ft_lstclear(t_list **lst, void (*del)(void **));
 void	ft_lstdelink(t_list **prev, t_list **link, void (*del)(void **));
 int		ft_lstcountf(t_list *lst, int (*f)(t_list *));

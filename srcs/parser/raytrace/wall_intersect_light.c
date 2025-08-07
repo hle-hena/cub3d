@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 11:10:35 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/06 17:00:00 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/07 16:43:08 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,9 +62,9 @@ static inline int	is_valid_hit(t_trace *ray, float dist)
 		return (0);
 	hit.x = ray->origin.x + ray->dir.x * dist;
 	hit.y = ray->origin.y + ray->dir.y * dist;
-	if ((ray->dir.x > 0 && floorf(hit.x) > ray->curr.x + FLT_EPSILON)
+	if ((ray->dir.x > 0 && floorf(hit.x) > ray->curr.x)
 		|| (ray->dir.x < 0 && floorf(hit.x) < ray->curr.x)
-		|| (ray->dir.y > 0 && floorf(hit.y) > ray->curr.y + FLT_EPSILON)
+		|| (ray->dir.y > 0 && floorf(hit.y) > ray->curr.y)
 		|| (ray->dir.y < 0 && floorf(hit.y) < ray->curr.y))
 		return (0);
 	ray->precise_dist = ray->last_dist + dist;

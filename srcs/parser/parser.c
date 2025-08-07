@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:16:19 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/29 15:15:29 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/07 16:38:47 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,5 @@ t_map	*load_map(int ac, char **av)
 	retrieve_map(map, temp, map_fd, &err);
 	if (is_map_valid(map, get_tile_dict(), err))
 		return (NULL);
-	map->player.x += 0.5;
-	map->player.y += 0.5;
 	return (close(map_fd), map);
 }

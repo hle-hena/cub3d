@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/06 16:00:24 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/06 17:00:53 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/07 16:43:31 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,10 +45,12 @@ void	light_adjacent(t_data *data, t_trace *ray, t_wpath wall, t_light light)
 	emittance = ray->angle_factor * ray->emittance;
 	offset.x = ray->origin.x - (int)ray->origin.x;
 	offset.y = ray->origin.y - (int)ray->origin.y;
-	diag.x = ray->curr.x + (offset.x < 1.0f / 129) * -1
-		+ (offset.x > 1.0f - 1.0f / 129) * 1;
-	diag.y = ray->curr.y + (offset.y < 1.0f / 129) * -1
-		+ (offset.y > 1.0f - 1.0f / 129) * 1;
+	diag.x = ray->curr.x + (offset.x < 0.5f) * -1
+		+ (offset.x > 1.0f - 0.5f) * 1;
+	diag.y = ray->curr.y + (offset.y < 0.5f) * -1
+		+ (offset.y > 1.0f - 0.5f) * 1;
+	diag.x = ft_min(ft_max(diag.x, 0), data->lmap.wid - 1);
+	diag.y = ft_min(ft_max(diag.y, 0), data->lmap.len - 1);
 	direct.x = diag.x;
 	direct.y = ray->curr.y;
 	light_flight(find_flight(data, direct, wall), emittance, light);
@@ -63,10 +65,6 @@ void	light_wall(t_data *data, t_trace *ray, t_wpath wall,
 {
 	float		emittance;
 
-	ray->angle_factor = ray->angle_factor - pow(2.71828, -ray->angle_factor
-			* 0.1 * (ray->precise_dist / LMAP_PRECISION)) + 1;
-	if (ray->angle_factor > 1)
-		ray->angle_factor = 1;
 	emittance = ray->angle_factor * ray->emittance;
 	ray->curr = (t_point){(int)ray->origin.x, (int)ray->origin.y};
 	light_flight(find_flight(data, ray->curr, wall), emittance, light);

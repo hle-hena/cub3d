@@ -1,31 +1,25 @@
 5 {
-	NO 140,140,140 0.8
-	SO 140,140,140 0.8
-	EA 140,140,140 0.8
-	WE 140,140,140 0.8
+	NO 140,140,140: 0.8
+	SO 140,140,140: 0.8
+	EA 140,140,140: 0.8
+	WE 140,140,140: 0.8
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
 	W 1
 }
 1 {
-	NO 200,200,200 1
-	SO 200,200,200 1
-	EA 200,200,200 1
-	WE 200,200,200 1
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
 	W 1
-	wl ((1, 0), (0, 1)), 0.5
+	wt 200,200,200
+	wl ((1, 0), (0, 1)): 0.5
 }
 2 {
-	NO 200,200,200 1
-	SO 200,200,200 1
-	EA 200,200,200 1
-	WE 200,200,200 1
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
 	W 1
-	wl ((0, 0), (1, 1)), 0.5
+	wt 200,200,200
+	wl ((0, 0), (1, 1)): 0.5
 }
 0 {
 	NO 120,120,120

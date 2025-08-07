@@ -13,21 +13,22 @@ LIBFT = $(LIBFT_DIR)/libft.a
 
 SRCS = $(addprefix srcs/, \
 	$(addprefix clean/, clean_data.c clean_map.c)\
-	$(addprefix utils/, add_link.c skip_pattern.c vec_operation.c vec_utils.c \
+	$(addprefix utils/, add_link.c skip_pattern.c vec_operation.c vec_utils.c\
+		clear_lines.c\
 		$(addprefix geometry/, intersect_sarc.c))\
 	$(addprefix parser/, parser.c \
-		$(addprefix tile_dict/, build_polygon.c \
+		$(addprefix tile_dict/, build_polygon.c base_wall.c \
 			hash_map.c is_dict_full.c retrieve_lonely.c \
 			retrieve_player.c retrieve_texture_color.c retrieve_texture_val.c \
 			retrieve_texture.c retrieve_tile_dict.c retrieve_tile_info.c \
 			retrieve_value.c retrieve_wall_line.c)\
 		$(addprefix map/, is_map_valid.c retrieve_map.c)\
-		$(addprefix lmap/, load.c retrieve_light.c)\
+		$(addprefix lmap/, load.c retrieve_light.c add_color.c)\
 		$(addprefix raytrace/, find_flight.c handle_light.c raytrace_utils.c\
 			raytrace.c reflect_light.c wall_intersect_light.c light_face.c\
 			intersect_check.c)\
 	)\
-	$(addprefix mlx_utils/, color.c loop.c put_pixel.c)\
+	$(addprefix mlx_utils/, color.c loop.c put_pixel.c new_image.c)\
 	$(addprefix game/, \
 		$(addprefix draw/, \
 			$(addprefix mini_map/, draw_circle.c draw_line.c draw_mini_map.c \

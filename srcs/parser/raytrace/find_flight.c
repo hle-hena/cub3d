@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 11:58:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/06 15:09:28 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/07 15:00:55 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ t_flight	*find_flight(t_data *data, t_point pos, t_wpath wall)
 	t_flight	*flight;
 
 	tlight = (data->lmap.lmap + pos.x + pos.y * data->lmap.wid);
-	lst = ft_lstchr(tlight->flight, &wall.normal, is_correct_flight);
+	lst = ft_lstchr(tlight->flight, &wall.normal, 0.1f, is_correct_flight);
 	if (!lst)
 	{
 		flight = new_flight(wall.normal);

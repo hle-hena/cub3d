@@ -21,24 +21,18 @@ L ((6.5, 2.5), {0, 255, 0}, 1)
 L ((2.5, 6.5), {0, 0, 255}, 1)
 L ((6.5, 6.5), 1)
 . {
-	NO 125,125,125
-	SO 125,125,125
-	EA 125,125,125
-	WE 125,125,125
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
 	W 1
+	wt 125,125,125
 	wa ((0.5, 0), (0.5, 0), (0.5, 0.5))
 }
 # {
-	NO 200,200,200
-	SO 200,200,200
-	EA 200,200,200
-	WE 200,200,200
 	C textures/wolfenstein/wood.xpm
 	F textures/wolfenstein/grey_stone.xpm
 	W 1
-	wa ((0.5, 0), (0.5, 0), (0.5, 0.5)), 1
+	wt 200,200,200
+	wa ((0.5, 0), (0.5, 0), (0.5, 0.5)): 1
 }
 P=0
 
