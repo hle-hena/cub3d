@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/22 18:00:35 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/07 15:00:23 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/12 11:15:36 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,10 @@ static inline void	hit_light(t_data *data, t_ray *ray, t_hit *hit,
 	light_point.x = ft_max(ft_min(light_point.x, data->lmap.wid - 1), 0);
 	light_point.y = ft_max(ft_min(light_point.y, data->lmap.len - 1), 0);
 	tlight = (data->lmap.lmap + light_point.x + light_point.y * data->lmap.wid);
-	temp = ft_lstchr(tlight->flight, &wall.normal, 0.1, is_correct_flight);
+	temp = ft_lstchr(tlight->flight, &wall.normal, 0.01f, is_correct_flight);
+	if (temp)
+		return (hit->light[ray->bounce] = (t_flight *)temp->content, (void)0);
+	temp = ft_lstchr(tlight->flight, &wall.normal, 0.03f, is_correct_flight);
 	if (temp)
 		return (hit->light[ray->bounce] = (t_flight *)temp->content, (void)0);
 	hit->light[ray->bounce] = data->empty->flight;

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 13:37:04 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/07 16:14:16 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/12 17:14:54 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,11 @@ static inline t_inter	intersect_sseg(t_vec origin, t_vec dir, t_wpath seg)
 	delta = (t_vec){seg.start.x - origin.x, seg.start.y - origin.y};
 	t = (delta.x * -seg_dir.y + delta.y * seg_dir.x) / det;
 	u = (-dir.y * delta.x + dir.x * delta.y) / det;
+	seg_dir = vec_normalize((t_vec){-seg_dir.y, seg_dir.x});
+	if (vec_dot(dir, seg_dir) > 0)
+		return ((t_inter){(t_vec){0}, (t_vec){0}, -1, -1});
 	if (t >= 0 && u >= 0 && u <= 1)
-		return ((t_inter){(t_vec){0}, (t_vec){-seg_dir.y, seg_dir.x}, u, t});
+		return ((t_inter){(t_vec){0}, seg_dir, u, t});
 	return ((t_inter){(t_vec){0}, (t_vec){0}, -1, -1});
 }
 
@@ -64,7 +67,7 @@ static inline t_wpath	line(t_point curr, t_wpath base)
 	return ((t_wpath){(t_vec){base.start.x + curr.x, base.start.y + curr.y},
 		(t_vec){base.end.x + curr.x, base.end.y + curr.y}, (t_vec){base.center.x
 			+ curr.x, base.center.y + curr.y}, (t_text){0}, (t_vec){0}, 0, 0, 0,
-			1, base.mode});
+			1, base.mode, base.run_forward});
 }
 
 int	does_hit(t_list	*wpath, t_ray *ray, t_wpath *wall)
@@ -84,9 +87,8 @@ int	does_hit(t_list	*wpath, t_ray *ray, t_wpath *wall)
 			closest_dist = inter.dist;
 			wall->pos = inter.pos * (wall->pos_end - wall->pos_start)
 				+ wall->pos_start;
-			// need to remove this in theory.
-			if (wall->mode == 1)
-				wall->normal = inter.normal;
+			//the problem of lights come from this.
+			wall->normal = inter.normal;
 		}
 		wpath = wpath->next;
 	}

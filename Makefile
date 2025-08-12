@@ -17,7 +17,9 @@ SRCS = $(addprefix srcs/, \
 		clear_lines.c\
 		$(addprefix geometry/, intersect_sarc.c))\
 	$(addprefix parser/, parser.c \
-		$(addprefix tile_dict/, build_polygon.c base_wall.c \
+		$(addprefix polygon/, build_polygon.c find_outer_face.c graph_connection.c\
+			grow_graph.c primitive_graph.c polar_angles.c get_face.c area.c)\
+		$(addprefix tile_dict/, base_wall.c \
 			hash_map.c is_dict_full.c retrieve_lonely.c \
 			retrieve_player.c retrieve_texture_color.c retrieve_texture_val.c \
 			retrieve_texture.c retrieve_tile_dict.c retrieve_tile_info.c \

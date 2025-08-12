@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/07 16:25:12 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/12 16:20:21 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,6 +193,7 @@ typedef struct s_info_arc
 	t_vec	hit;
 	float	total_angle;
 	int		is_full_circle;
+	int		run_forward;
 }	t_info_arc;
 
 typedef struct s_graph
@@ -215,6 +216,7 @@ typedef struct s_wpath
 	float	pos_start;
 	float	pos_end;
 	int		mode;
+	int		run_forward;
 }	t_wpath;
 
 typedef struct s_tile
@@ -264,7 +266,7 @@ typedef struct s_events
 	int		echap;
 }	t_event;
 
-# define MAX_BOUNCE 8
+# define MAX_BOUNCE 6
 
 typedef struct s_hit
 {
@@ -531,6 +533,18 @@ t_inter	light_intersect(t_vec origin, t_vec dir, t_wpath path_to_inter);
 void		add_base_wall(t_tile *tile, int *err);
 void		clear_n_lines(int n);
 void		new_image(t_data *data, t_img *img_struct, int width, int height);
+
+int			build_primitive_graph(t_list *wpath, t_graph *graph);
+int			find_node(t_node *nodes, t_vec coo, int *current, int should_create);
+void		replace_connection(t_node *dest, t_link *to_replace, t_link *to_add);
+int			add_connection(t_node *dest, t_link *to_add);
+t_graph		*retrieve_outer_face(t_graph *graph, float *perimeter);
+float		perimeter_link(t_link *link);
+int			grow_graph(t_graph *graph);
+void		sort_edges(t_graph *graph);
+void		get_face(t_graph *subgraph, t_link *current_link);
+float		polygon_area(t_graph *graph, float *perimeter);
+
 
 
 #endif
