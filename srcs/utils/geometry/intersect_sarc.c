@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 10:58:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/12 17:34:30 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/13 12:18:28 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@ int	is_on_arc(t_info_arc info, t_vec dir, t_inter *out)
 
 	if (info.is_full_circle)
 	{
+		if ((vec_dot(info.v_hit, dir) < 0) && !info.run_forward)
+			return (0);
 		angle = acosf(vec_dot(info.v_start, info.v_hit)) / (2.0f * PI);
 		if (vec_cross(info.v_start, info.v_hit) < 0)
 			angle = 1.0f - angle;
@@ -72,4 +74,24 @@ t_inter	check_solutions_sarc(float *t, t_vec origin, t_vec dir, t_wpath arc)
 	if (is_on_arc(info, dir, &out2))
 		return (out2);
 	return (out1);
+}
+
+t_inter	intersect_sarc(t_vec origin, t_vec dir, t_wpath arc)
+{
+	t_vec	delta;
+	float	a;
+	float	b;
+	float	discriminant;
+	float	sqrt_d;
+
+	delta = vec_sub(origin, arc.center);
+	a = vec_dot(dir, dir);
+	b = 2.0f * vec_dot(dir, delta);
+	discriminant = (b * b) - 4.0f * a * (vec_dot(delta, delta)
+			- vec_len2(vec_sub(arc.start, arc.center)));
+	if (discriminant < 0.0f)
+		return ((t_inter){(t_vec){0}, (t_vec){0}, -1, -1});
+	sqrt_d = sqrtf(discriminant);
+	return (check_solutions_sarc((float [2]){(-b - sqrt_d) / (2.0f * a),
+			(-b + sqrt_d) / (2.0f * a)}, origin, dir, arc));
 }

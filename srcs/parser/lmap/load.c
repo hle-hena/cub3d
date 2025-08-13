@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:08:29 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/07 16:47:21 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/13 11:10:14 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,8 @@ int	create_lmap(t_data *data)
 	lmap->len = data->map->len * LMAP_PRECISION;
 	data->lmap.lmap = ft_calloc(lmap->wid * lmap->len, sizeof(t_tlight));
 	if (!lmap->lmap)
-		return (1);
+		return (ft_perror(-1, "The light map was too big and the malloc didn't \
+go through.", 0), 1);
 	if (!lmap->lights)
 		return (0);
 	i = -1;

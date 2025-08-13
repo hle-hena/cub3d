@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/12 16:20:21 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/13 17:02:55 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -500,8 +500,6 @@ int			does_light(t_list *wpath, t_trace *ray, t_wpath *wall);
 void		init_trace(t_trace *ray, t_vec dir, t_vec origin, float emittance);
 t_flight	*find_flight(t_data *data, t_point pos, t_wpath wall);
 
-void		print_dict(t_data *data);
-
 
 
 int			skip_pattern(char **arg, char *pattern);
@@ -514,7 +512,15 @@ float		vec_cross(t_vec a, t_vec b);
 t_vec		vec_scale(t_vec a, float s);
 float		vec_len2(t_vec a);
 t_vec		vec_normalize(t_vec a);
-t_inter		check_solutions_sarc(float *t, t_vec origin, t_vec dir, t_wpath arc);
+t_inter		intersect_sseg(t_vec origin, t_vec dir, t_wpath seg);
+t_inter		intersect_sarc(t_vec origin, t_vec dir, t_wpath arc);
+t_inter		intersect_s(t_vec origin, t_vec dir, t_wpath path_to_inter);
+t_inter		intersect_slseg(t_link *l1, t_link *l2, t_graph *graph);
+t_inter		intersect_alseg(t_link *seg, t_link *arc, t_graph *graph);
+t_inter		intersect_alarc(t_link *arc1, t_link *arc2, t_graph *graph);
+
+void		intersect_switch(t_link *l1, t_link *l2, t_inter *inter, t_graph *graph);
+void		intersect_links(t_link *l1, t_link *l2, t_inter *inter, t_graph *graph);
 
 void		start_threads(t_data *data);
 void		draw_walls(t_th_draw *td);
@@ -529,7 +535,6 @@ int			add_col_val_physical(int col1, int col2, float weight1, float weight2);
 void		light_floor(t_data *data, t_trace *ray, t_light light);
 void		light_wall(t_data *data, t_trace *ray, t_wpath wall,
 	t_light light);
-t_inter	light_intersect(t_vec origin, t_vec dir, t_wpath path_to_inter);
 void		add_base_wall(t_tile *tile, int *err);
 void		clear_n_lines(int n);
 void		new_image(t_data *data, t_img *img_struct, int width, int height);
@@ -544,7 +549,5 @@ int			grow_graph(t_graph *graph);
 void		sort_edges(t_graph *graph);
 void		get_face(t_graph *subgraph, t_link *current_link);
 float		polygon_area(t_graph *graph, float *perimeter);
-
-
 
 #endif

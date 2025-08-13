@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 10:55:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/12 16:24:20 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/13 17:06:38 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,10 @@ int	build_polygon(t_tile *tile, char id)
 		return (ft_del((void **)&graph), 1);
 	outer_face = retrieve_outer_face(graph, &perimeter);
 	if (outer_face)
+	{
+		print_graph(outer_face, letter);
 		copy_graph(outer_face, tile, perimeter);
+	}
 	ft_del((void **)&graph);
 	ft_del((void **)&outer_face);
 	return (0);

@@ -15,10 +15,11 @@ SRCS = $(addprefix srcs/, \
 	$(addprefix clean/, clean_data.c clean_map.c)\
 	$(addprefix utils/, add_link.c skip_pattern.c vec_operation.c vec_utils.c\
 		clear_lines.c\
-		$(addprefix geometry/, intersect_sarc.c))\
+		$(addprefix geometry/, intersect_sarc.c intersect_sseg.c intersect.c))\
 	$(addprefix parser/, parser.c \
 		$(addprefix polygon/, build_polygon.c find_outer_face.c graph_connection.c\
-			grow_graph.c primitive_graph.c polar_angles.c get_face.c area.c)\
+			grow_graph.c primitive_graph.c polar_angles.c get_face.c area.c\
+			intersect_links.c intersect_alink.c intersect_slink.c)\
 		$(addprefix tile_dict/, base_wall.c \
 			hash_map.c is_dict_full.c retrieve_lonely.c \
 			retrieve_player.c retrieve_texture_color.c retrieve_texture_val.c \
@@ -27,8 +28,7 @@ SRCS = $(addprefix srcs/, \
 		$(addprefix map/, is_map_valid.c retrieve_map.c)\
 		$(addprefix lmap/, load.c retrieve_light.c add_color.c)\
 		$(addprefix raytrace/, find_flight.c handle_light.c raytrace_utils.c\
-			raytrace.c reflect_light.c wall_intersect_light.c light_face.c\
-			intersect_check.c)\
+			raytrace.c reflect_light.c wall_intersect_light.c light_face.c)\
 	)\
 	$(addprefix mlx_utils/, color.c loop.c put_pixel.c new_image.c)\
 	$(addprefix game/, \

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 11:10:35 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/12 17:11:03 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/13 11:44:56 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,13 +61,12 @@ int	does_light(t_list *wpath, t_trace *ray, t_wpath *wall)
 	closest = -1;
 	while (wpath)
 	{
-		inter = light_intersect(ray->origin, ray->dir,
+		inter = intersect_s(ray->origin, ray->dir,
 				line(ray->real, *(t_wpath *)wpath->content));
 		if (inter.pos > 0 - FLT_EPSILON
 			&& (inter.dist < closest || closest < 0))
 		{
 			*wall = *(t_wpath *)wpath->content;
-			//if there is a problem with light
 			wall->normal = inter.normal;
 			closest = inter.dist;
 			ray->angle_factor = angle(ray->dir, wall->normal);
