@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 18:13:11 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/07 15:27:27 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/16 17:54:37 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ hash_map.", 0), *err = 1);
 
 void	get_arg(char **splited, char **arg, char **reflectance, int *err)
 {
-	char	*temp;
 	int		len;
 
 	if (!splited)
@@ -40,7 +39,6 @@ void	get_arg(char **splited, char **arg, char **reflectance, int *err)
 	if (len > 2)
 		return (*err = 1, ft_perror(-1, "Please, don't input a texture that \
 contains a :.", 0), VOID);
-	temp = NULL;
 	if (len > 1)
 	{
 		*arg = ft_strdup(splited[0]);

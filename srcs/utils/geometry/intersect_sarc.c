@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 10:58:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/13 12:18:28 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/17 18:40:11 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ int	is_on_arc(t_info_arc info, t_vec dir, t_inter *out)
 	int		inside_wall;
 	float	angle;
 
+	if (out->dist < 0)
+		return (0);
 	if (info.is_full_circle)
 	{
 		if ((vec_dot(info.v_hit, dir) < 0) && !info.run_forward)
@@ -54,7 +56,6 @@ t_inter	check_solutions_sarc(float *t, t_vec origin, t_vec dir, t_wpath arc)
 	t_inter		out1;
 	t_inter		out2;
 
-	//this function has a bug if you are inside of the arc or maybe just inside the tile ? It makes it do weird thing.
 	info = (t_info_arc){(t_vec){0}, vec_normalize(vec_sub(arc.end, arc.center)),
 		vec_normalize(vec_sub(arc.start, arc.center)), (t_vec){0}, 0, 0,
 		arc.run_forward};
@@ -67,12 +68,15 @@ t_inter	check_solutions_sarc(float *t, t_vec origin, t_vec dir, t_wpath arc)
 	out2 = (t_inter){(t_vec){0}, (t_vec){0}, -1, t[1]};
 	info.hit = vec_add(origin, vec_scale(dir, out1.dist));
 	info.v_hit = vec_normalize(vec_sub(info.hit, arc.center));
-	if (is_on_arc(info, dir, &out1) && out1.dist < out2.dist)
+	if (is_on_arc(info, dir, &out1)
+		&& (out1.dist < out2.dist || out2.dist < 0))
 		return (out1);
 	info.hit = vec_add(origin, vec_scale(dir, out2.dist));
 	info.v_hit = vec_normalize(vec_sub(info.hit, arc.center));
 	if (is_on_arc(info, dir, &out2))
 		return (out2);
+	if (out1.pos < 0)
+		return ((t_inter){(t_vec){0}, (t_vec){0}, -1, -1});
 	return (out1);
 }
 

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/13 17:02:55 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/17 19:26:26 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -516,10 +516,12 @@ t_inter		intersect_sseg(t_vec origin, t_vec dir, t_wpath seg);
 t_inter		intersect_sarc(t_vec origin, t_vec dir, t_wpath arc);
 t_inter		intersect_s(t_vec origin, t_vec dir, t_wpath path_to_inter);
 t_inter		intersect_slseg(t_link *l1, t_link *l2, t_graph *graph);
-t_inter		intersect_alseg(t_link *seg, t_link *arc, t_graph *graph);
+t_inter		intersect_alsl(t_link *seg, t_link *arc, t_graph *graph,
+		t_inter (*check)(float *, t_link *, t_link *, t_graph *));
+t_inter		check_solutions_alseg(float *t, t_link *seg, t_link *arc, t_graph *graph);
+t_inter		check_solutions_slarc(float *t, t_link *seg, t_link *arc, t_graph *graph);
 t_inter		intersect_alarc(t_link *arc1, t_link *arc2, t_graph *graph);
 
-void		intersect_switch(t_link *l1, t_link *l2, t_inter *inter, t_graph *graph);
 void		intersect_links(t_link *l1, t_link *l2, t_inter *inter, t_graph *graph);
 
 void		start_threads(t_data *data);

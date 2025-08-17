@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 12:49:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/07 16:11:35 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/16 17:54:14 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,9 +73,7 @@ int	retrieve_color(char **line, int *color, int *err, char *color_name)
 void	retrieve_texture_color(t_img **img, char *line, int *err)
 {
 	t_col	color;
-	int		i;
 
-	i = 0;
 	if (ft_strnstr(line, ".xpm", ft_strlen(line)))
 		return (ft_perror(-1, "Assets should be in a subfolder.", 0), *err = 1,
 			VOID);

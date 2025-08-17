@@ -6,27 +6,33 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 14:30:14 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/13 16:33:53 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/17 19:25:10 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-int	is_on_larc(t_info_arc info, t_link *seg, t_inter *out, t_graph *graph)
+int	is_on_larc(t_info_arc info, t_link *edge_check, t_inter *out, t_graph *graph)
 {
 	int		on_arc;
 	int		found;
 	float	angle;
 
-	if (out->dist < 0 - 1e-4f || out->dist > 1.0f + 1e-4f)
+	if (out->dist < 0 || out->dist > 1.0f)
 		return (0);
 	if (info.is_full_circle)
 	{
-		angle = acosf(vec_dot(info.v_start, info.v_hit)) / (2.0f * PI);
-		if (vec_cross(info.v_start, info.v_hit) < 0)
-			angle = 1.0f - angle;
-		*out = (t_inter){info.hit, info.v_hit, angle, out->dist};
-		return (1);
+		found = find_node(graph->nodes, info.hit, &graph->nb_nodes, 0);
+		if (found == -1 || (&graph->nodes[found] != edge_check->start
+			&& &graph->nodes[found] != edge_check->end))
+		{
+			angle = acosf(vec_dot(info.v_start, info.v_hit)) / (2.0f * PI);
+			if (vec_cross(info.v_start, info.v_hit) < 0)
+				angle = 1.0f - angle;
+			*out = (t_inter){info.hit, info.v_hit, angle, out->dist};
+			return (1);
+		}
+		return (0);
 	}
 	if (vec_cross(info.v_start, info.v_end) >= 0)
 		on_arc = (vec_cross(info.v_start, info.v_hit) >= -FLT_EPSILON
@@ -39,9 +45,8 @@ int	is_on_larc(t_info_arc info, t_link *seg, t_inter *out, t_graph *graph)
 		angle = (2.0f * PI) - angle;
 	angle /= info.total_angle;
 	found = find_node(graph->nodes, info.hit, &graph->nb_nodes, 0);
-	if (found == -1 || (&graph->nodes[found] != seg->start
-		&& &graph->nodes[found] != seg->end))
-		on_arc = 0;
+	on_arc = on_arc * (found == -1 || (&graph->nodes[found] != edge_check->start
+		&& &graph->nodes[found] != edge_check->end));
 	if (on_arc)
 		*out = (t_inter){info.hit, info.v_hit, angle, out->dist};
 	return (on_arc);
@@ -54,13 +59,12 @@ t_inter	check_solutions_slarc(float *t, t_link *seg, t_link *arc, t_graph *graph
 	t_inter		out2;
 	t_vec		dir;
 
-	//this function has a bug if you are inside of the arc or maybe just inside the tile ? It makes it do weird thing.
 	dir = vec_sub(seg->end->coo, seg->start->coo);
 	info = (t_info_arc){(t_vec){0}, vec_normalize(vec_sub(arc->end->coo, arc->center)),
 		vec_normalize(vec_sub(arc->start->coo, arc->center)), (t_vec){0}, 0, 0,
 		arc->run_forward};
-	info.is_full_circle = fabsf(arc->start->coo.x - arc->end->coo.x) < FLT_EPSILON
-		&& fabsf(arc->start->coo.y - arc->end->coo.y) < FLT_EPSILON;
+	info.is_full_circle = arc->start->coo.x == arc->end->coo.x
+		&& arc->start->coo.y == arc->end->coo.y;
 	info.total_angle = acosf(vec_dot(info.v_start, info.v_end));
 	if (vec_cross(info.v_start, info.v_end) < 0)
 		info.total_angle = (2.0f * PI) - info.total_angle;
@@ -68,16 +72,51 @@ t_inter	check_solutions_slarc(float *t, t_link *seg, t_link *arc, t_graph *graph
 	out2 = (t_inter){(t_vec){0}, (t_vec){0}, -1, t[1]};
 	info.hit = vec_add(seg->start->coo, vec_scale(dir, out1.dist));
 	info.v_hit = vec_normalize(vec_sub(info.hit, arc->center));
-	if (is_on_larc(info, seg, &out1, graph) && out1.dist < out2.dist)
+	if (is_on_larc(info, seg, &out1, graph)
+		&& (out1.dist < out2.dist || out2.dist < 0))
 		return (out1);
 	info.hit = vec_add(seg->start->coo, vec_scale(dir, out2.dist));
 	info.v_hit = vec_normalize(vec_sub(info.hit, arc->center));
 	if (is_on_larc(info, seg, &out2, graph))
 		return (out2);
+	if (out1.pos < 0)
+		return ((t_inter){(t_vec){0}, (t_vec){0}, -1, -1});
 	return (out1);
 }
 
-t_inter	intersect_alseg(t_link *seg, t_link *arc, t_graph *graph)
+t_inter	check_solutions_alseg(float *t, t_link *seg, t_link *arc, t_graph *graph)
+{
+	t_info_arc	info;
+	t_inter		out1;
+	t_inter		out2;
+	t_vec		dir;
+
+	dir = vec_sub(seg->end->coo, seg->start->coo);
+	info = (t_info_arc){(t_vec){0}, vec_normalize(vec_sub(arc->end->coo, arc->center)),
+		vec_normalize(vec_sub(arc->start->coo, arc->center)), (t_vec){0}, 0, 0,
+		arc->run_forward};
+	info.is_full_circle = arc->start->coo.x == arc->end->coo.x
+		&& arc->start->coo.y == arc->end->coo.y;
+	info.total_angle = acosf(vec_dot(info.v_start, info.v_end));
+	if (vec_cross(info.v_start, info.v_end) < 0)
+		info.total_angle = (2.0f * PI) - info.total_angle;
+	out1 = (t_inter){(t_vec){0}, (t_vec){0}, -1, t[0]};
+	out2 = (t_inter){(t_vec){0}, (t_vec){0}, -1, t[1]};
+	info.hit = vec_add(seg->start->coo, vec_scale(dir, out1.dist));
+	info.v_hit = vec_normalize(vec_sub(info.hit, arc->center));
+	is_on_larc(info, arc, &out1, graph);
+	info.hit = vec_add(seg->start->coo, vec_scale(dir, out2.dist));
+	info.v_hit = vec_normalize(vec_sub(info.hit, arc->center));
+	is_on_larc(info, arc, &out2, graph);
+	if ((out1.pos < 0 && out2.pos < 0))
+		return ((t_inter){(t_vec){0}, (t_vec){0}, -1, -1});
+	if (out1.pos > -0.5f && (out1.pos < out2.pos || out2.pos < 0))
+		return (out1);
+	return (out2);
+}
+
+t_inter	intersect_alsl(t_link *seg, t_link *arc, t_graph *graph,
+		t_inter (*check)(float *, t_link *, t_link *, t_graph *))
 {
 	t_vec	delta;
 	t_vec	dir;
@@ -94,7 +133,7 @@ t_inter	intersect_alseg(t_link *seg, t_link *arc, t_graph *graph)
 	if (discriminant < 0.0f)
 		return ((t_inter){(t_vec){0}, (t_vec){0}, -1, -1});
 	discriminant = sqrtf(discriminant);
-	return (check_solutions_slarc((float [2]){(-b - discriminant) / (2.0f * a),
+	return (check((float [2]){(-b - discriminant) / (2.0f * a),
 			(-b + discriminant) / (2.0f * a)}, seg, arc, graph));
 }
 
