@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/06 11:38:49 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/12 14:14:25 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/18 13:44:43 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@ void	init_draw_info_i(t_data *data, t_draw *draw, t_hit hit, int i)
 		hit.dist[i] = 0.0001f;
 	line_height = ft_max((int)(data->render_h * 2 / hit.dist[i]), 1);
 	tex_start = -line_height / 2 + data->render_h / 2;
-	tex_end = (float)line_height / 2 + data->render_h / 2;
+	tex_end = (float)line_height / 2 + data->render_h / 2
+		+ (hit.wall[i].reflectance < FLT_EPSILON);
 	draw->draw_start[i] = ft_max(tex_start, 0);
 	draw->draw_end[i] = ft_min(tex_end, data->render_h);
 	line_height = ft_max(tex_end - tex_start, 1);

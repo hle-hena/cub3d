@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 12:04:42 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/04 11:19:39 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/18 13:37:50 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ void	fps_counter(t_data *data, t_uint64 now)
 		last_fps_print_time = now;
 	}
 	elapsed = now - last_frame_time;
-	data->delta_t = (float)elapsed / FRAME_TIME_US;
+	data->delta_t = (float)elapsed / (1000000 / 60);
 	last_frame_time = now;
 	total_time += elapsed;
 	frame_count++;

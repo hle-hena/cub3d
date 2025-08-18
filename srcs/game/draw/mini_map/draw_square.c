@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 22:15:19 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/07 11:49:30 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/18 13:34:37 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,9 +53,8 @@ void	draw_tile(t_data *data, t_point start, t_trig vals, int color)
 	t_point	draw;
 	t_vec	player;
 
-	//the minimap doest sync nicely with the player pos
-	player.x = data->map->player.x * data->map->mini_map_scale;
-	player.y = data->map->player.y * data->map->mini_map_scale;
+	player.x = data->map->player.x * (data->map->mini_map_scale + 1);
+	player.y = data->map->player.y * (data->map->mini_map_scale + 1);
 	if (!tile_is_visible(data, player, vals, start))
 		return ;
 	curr.y = start.y;

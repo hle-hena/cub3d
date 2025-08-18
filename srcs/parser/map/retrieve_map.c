@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 18:02:27 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/07 16:38:34 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/18 14:06:39 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,7 @@ void	resize_lines(t_list *grid, char void_char, size_t max_wid, int *err)
 		}
 		temp = malloc((max_wid + 1) * sizeof(char));
 		if (!temp)
-			return (*err = 1, ft_perror(-1, "Internal error: malloc", 0),
-				(void)0);
+			return (*err = 1, ft_perror(-1, "Internal error: malloc", 0));
 		i = ft_strlcpy(temp, grid->content, max_wid + 1);
 		ft_memset(temp + i, void_char, max_wid - i);
 		temp[max_wid] = 0;
@@ -43,15 +42,15 @@ void	set_map(t_map *map, t_list *grid, int *err)
 	t_list	*next;
 
 	if (!grid)
-		return (ft_perror(-1, "Missing map.", 0), *err = 1, (void)0);
+		return (*err = 1, ft_perror(-1, "Missing map.", 0));
 	len = 0;
 	resize_lines(grid, map->void_char, map->wid, err);
 	if (*err)
-		return (ft_lstclear(&grid, ft_del), (void)0);
+		return (ft_lstclear(&grid, ft_del));
 	map->map = malloc((map->len * map->wid) * sizeof(int));
 	if (!map->map)
 		return (ft_perror(-1, "cub3d: Internal error: malloc", 0),
-			ft_lstclear(&grid, ft_del), *err = 1, (void)0);
+			*err = 1, ft_lstclear(&grid, ft_del));
 	while (grid)
 	{
 		i = -1;
@@ -128,8 +127,8 @@ void	retrieve_map(t_map *map, char *line, int map_fd, int *err)
 		}
 		wid = check_line(map, line);
 		if (wid == -1)
-			return (ft_lstclear(&grid, ft_del), ft_del((void **)&line),
-				*err = 1, (void)0);
+			return (ft_lstclear(&grid, ft_del), *err = 1,
+				ft_del((void **)&line));
 		line[wid] = 0;
 		add_link(&grid, line);
 		map->len++;

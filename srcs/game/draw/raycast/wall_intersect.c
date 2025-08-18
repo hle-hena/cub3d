@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 13:37:04 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/13 11:45:06 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/18 14:24:16 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ int	does_hit(t_list	*wpath, t_ray *ray, t_wpath *wall)
 	closest_dist = -1;
 	while (wpath)
 	{
-		inter = intersect_s(ray->origin, ray->dir,
+		inter = intersect_switch(ray->origin, ray->dir,
 				line(ray->curr, *(t_wpath *)wpath->content));
 		if (inter.pos > 0 - FLT_EPSILON
 			&& (inter.dist < closest_dist || closest_dist == -1))

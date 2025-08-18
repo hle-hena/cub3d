@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:28:34 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/07 15:51:48 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/18 14:04:01 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,11 +46,11 @@ void	retrieve_switch(t_tile *tile, char *line, int *err)
 	if (!line[0] || line[0] == '#')
 		return ;
 	if (!line[1 + (line[1] != 0)])
-		return (ft_perror(-1, ft_strsjoin((char *[]){"Empty line after \
-identifier at ", line, ".", NULL}), 1), *err = 1, VOID);
+		return (*err = 1, ft_perror(-1, ft_strsjoin((char *[]){"Empty line \
+after identifier at ", line, ".", NULL}), 1));
 	arg = ft_strtrim(line + 2, " \t\n");
 	if (!arg)
-		return (*err = 1, VOID);
+		return (*err = 1, ft_perror(1, "Internal error: malloc.", 0));
 	type_switch(tile, line, arg, err);
 	ft_del((void **)&arg);
 }
@@ -88,22 +88,21 @@ void	retrieve_tile(t_tile **tiles, int map_fd, char *line, int *err)
 	if (*err)
 		return ;
 	if (*tiles)
-		return (ft_perror(-1, "Re definition of a tile.", 0), *err = 1, VOID);
+		return (*err = 1, ft_perror(-1, "Re definition of a tile.", 0));
 	*tiles = new_tile();
 	if (!*tiles)
-		return (ft_perror(-1, "Internal error: malloc.", 0), *err = 1, VOID);
+		return (*err = 1, ft_perror(-1, "Internal error: malloc.", 0));
 	while (*err == 0)
 	{
 		temp = get_next_line(map_fd);
 		if (!temp)
-			return (ft_perror(-1, "Unexpected EOF.", 0), *err = 1, VOID);
+			return (*err = 1, ft_perror(-1, "Unexpected EOF.", 0));
 		line = ft_strtrim(temp, "\t\n ");
 		ft_del((void **)&temp);
 		if (!line)
-			return (ft_perror(-1, "Internal error: malloc.", 0),
-				*err = 1, VOID);
+			return (*err = 1, ft_perror(-1, "Internal error: malloc.", 0));
 		if (ft_strncmp("}", line, 2) == 0)
-			return (ft_del((void **)&line), VOID);
+			return (ft_del((void **)&line));
 		retrieve_switch(*tiles, line, err);
 		ft_del((void **)&line);
 	}

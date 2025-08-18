@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 09:19:48 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/07 15:49:03 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/18 14:00:44 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,9 +47,9 @@ void	retrieve_texture_val(t_text *texture, char *arg, int *err)
 
 	texture->reflectance = ft_atof_err(arg, 0, 1, &last);
 	if (texture->reflectance == -1)
-		return (ft_perror(-1, "Expected a postive number smaller than 1.", 0),
-			*err = 1, VOID);
+		return (*err = 1, ft_perror(-1, "Expected a postive number smaller \
+than 1.", 0));
 	if (*last != 0 && *last != '\n')
-		return (ft_perror(-1, "Expected end of line after reflectance.", 0),
-			*err = 1, VOID);
+		return (*err = 1, ft_perror(-1, "Expected end of line after \
+reflectance.", 0));
 }

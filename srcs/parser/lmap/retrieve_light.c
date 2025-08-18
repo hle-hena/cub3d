@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 10:55:35 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/06 14:17:45 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/18 13:54:21 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,8 +115,7 @@ void	retrieve_light(char *line, int *err)
 			line++;
 	}
 	if (lmap->lights[lmap->nb_ls].pos.y == -1)
-		return (ft_perror(0, "A light is missing its coordinates.", 0),
-			*err = 1, VOID);
+		return (*err = 1, ft_perror(0, "Missing coordinates for a light.", 0));
 	if (lmap->lights[lmap->nb_ls].emittance < 0)
 		lmap->lights[lmap->nb_ls].emittance = 1;
 	if (lmap->lights[lmap->nb_ls].color.bl < 0)

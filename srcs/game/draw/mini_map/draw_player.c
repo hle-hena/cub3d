@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 13:28:24 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/06 11:55:11 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/18 15:18:47 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,12 @@ void	draw_player_tip(t_data *data, t_point center, float theta)
 		* cos(theta + PI / 2 / 2);
 	base.y = center.y + data->map->mini_map_scale / 4
 		* sin(theta + PI / 2 / 2);
-	draw_line(data, tip, base, 0x001B2E);
+	draw_line(data, tip, base, 0x685044);
 	base.x = center.x + data->map->mini_map_scale / 4
 		* cos(theta - PI / 2 / 2);
 	base.y = center.y + data->map->mini_map_scale / 4
 		* sin(theta - PI / 2 / 2);
-	draw_line(data, tip, base, 0x001B2E);
+	draw_line(data, tip, base, 0x685044);
 }
 
 void	draw_player(t_data *data, t_point center, float theta)
@@ -50,6 +50,6 @@ void	draw_player(t_data *data, t_point center, float theta)
 			continue ;
 		draw.x = center.x + (int)(data->map->mini_map_scale / 4 * cos(a));
 		draw.y = center.y + (int)(data->map->mini_map_scale / 4 * sin(a));
-		ft_put_pixel(data, draw, 0x001B2E);
+		ft_put_pixel(data, draw, 0x685044);
 	}
 }

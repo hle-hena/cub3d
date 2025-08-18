@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 12:49:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/16 17:54:14 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/18 13:59:23 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,11 +42,11 @@ void	set_img_color(t_img **img, char *line, t_col color, int *err)
 {
 	*img = malloc(sizeof(t_img));
 	if (!*img)
-		return (ft_perror(-1, "Internal error: malloc.", 0), *err = 1, VOID);
+		return (*err = 1, ft_perror(-1, "Internal error: malloc.", 0));
 	(*img)->img = mlx_new_image(get_data()->mlx, 1, 1);
 	if (!(*img)->img)
-		return (ft_perror(-1, ft_strsjoin((char *[]){"An error happened during \
-the opening of the image for '", line, "'.", NULL}), 1), *err = 1, VOID);
+		return (*err = 1, ft_perror(-1, ft_strsjoin((char *[]){"An error \
+happened during the opening of the image for '", line, "'.", NULL}), 1));
 	(*img)->height = 1;
 	(*img)->width = 1;
 	(*img)->data = (int *)mlx_get_data_addr((*img)->img, &(*img)->bpp,
@@ -75,23 +75,21 @@ void	retrieve_texture_color(t_img **img, char *line, int *err)
 	t_col	color;
 
 	if (ft_strnstr(line, ".xpm", ft_strlen(line)))
-		return (ft_perror(-1, "Assets should be in a subfolder.", 0), *err = 1,
-			VOID);
+		return (*err = 1, ft_perror(-1, "Assets should be in a subfolder.", 0));
 	if (retrieve_color(&line, &color.re, err, "red"))
 		return ;
 	if (skip_pattern(&line, " , "))
-		return (ft_perror(-1, "Wrong pattern recognised for an rgb color.", 0),
-			*err = 1, VOID);
+		return (*err = 1, ft_perror(-1, "Wrong pattern recognised for an rgb \
+color.", 0));
 	if (retrieve_color(&line, &color.gr, err, "green"))
 		return ;
 	if (skip_pattern(&line, " , "))
-		return (ft_perror(-1, "Wrong pattern recognised for an rgb color.", 0),
-			*err = 1, VOID);
+		return (*err = 1, ft_perror(-1, "Wrong pattern recognised for an rgb \
+color.", 0));
 	if (retrieve_color(&line, &color.bl, err, "blue"))
 		return ;
 	if (*line)
-		return (ft_perror(-1, "Expected a \\n after the last color. \
-If you wanted to put a reflectance do ': [value]'.", 0),
-			*err = 1, VOID);
+		return (*err = 1, ft_perror(-1, "Expected a \\n after the last color. \
+If you wanted to put a reflectance do ': [value]'.", 0));
 	set_img_color(img, line, color, err);
 }

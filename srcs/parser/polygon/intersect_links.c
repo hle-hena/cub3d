@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 14:29:09 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/17 19:26:16 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/18 11:09:50 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,27 +19,16 @@ void	intersect_links(t_link *l1, t_link *l2, t_inter *inter, t_graph *graph)
 	temp.dist = -1;
 	temp.pos = -1;
 	if (l1->type == 0 && l2->type == 0)
-	{
 		temp = intersect_slseg(l1, l2, graph);
-		if (temp.dist > -0.5f && (temp.dist < inter->dist || inter->dist < 0))
-			*inter = (t_inter){temp.coo, (t_vec){0}, 0, temp.dist};
-	}
 	else if (l1->type == 0)
-	{
 		temp = intersect_alsl(l1, l2, graph, &check_solutions_slarc);
-		if (temp.dist > -0.5f && (temp.dist < inter->dist || inter->dist < 0))
-			*inter = (t_inter){temp.coo, (t_vec){0}, 0, temp.dist};
-	}
 	else if (l2->type == 0)
 	{
 		temp = intersect_alsl(l2, l1, graph, &check_solutions_alseg);
-		if (temp.pos > -0.5f && (temp.pos < inter->dist || inter->dist < 0))
-			*inter = (t_inter){temp.coo, (t_vec){0}, 0, temp.pos};
+		temp.dist = temp.pos;
 	}
 	else
-	{
 		temp = intersect_alarc(l1, l2, graph);
-		if (temp.dist > -0.5f && (temp.dist < inter->dist || inter->dist < 0))
-			*inter = (t_inter){temp.coo, (t_vec){0}, 0, temp.dist};
-	}
+	if (temp.dist > -0.5f && (temp.dist < inter->dist || inter->dist < 0))
+		*inter = (t_inter){temp.coo, (t_vec){0}, 0, temp.dist};
 }

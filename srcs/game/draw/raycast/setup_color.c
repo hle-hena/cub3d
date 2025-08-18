@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/06 11:44:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/06 11:45:25 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/18 14:07:49 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,10 +77,10 @@ void	draw_ceil(t_data *data, t_th_draw *td, t_point curr, t_draw *draw)
 	world = reflect_across_mirror(world, draw, curr, &td->bounces);
 	if (world.x < 0 || world.x >= data->map->wid || world.y < 0
 		|| world.y >= data->map->len)
-		return ((void)setup_color(draw, td, (t_col){0}, 0));
+		return (setup_color(draw, td, (t_col){0}, 0));
 	i = (t_point){(int)world.x, (int)world.y};
 	if (!td->ray_dir.tile_dict[data->map->map[i.y * data->map->wid + i.x]])
-		return ((void)setup_color(draw, td, (t_col){0}, 0));
+		return (setup_color(draw, td, (t_col){0}, 0));
 	tex = td->ray_dir.tile_dict[data->map->map[i.y * data->map->wid
 		+ i.x]]->tex_ce.img;
 	light = data->lmap.lmap[(int)(world.x * LMAP_PRECISION)
@@ -105,10 +105,10 @@ void	draw_floor(t_data *data, t_th_draw *td, t_point curr, t_draw *draw)
 	world = reflect_across_mirror(world, draw, curr, &td->bounces);
 	if (world.x < 0 || world.x >= data->map->wid || world.y < 0
 		|| world.y >= data->map->len)
-		return ((void)setup_color(draw, td, (t_col){0}, 0));
+		return (setup_color(draw, td, (t_col){0}, 0));
 	i = (t_point){(int)world.x, (int)world.y};
 	if (!td->ray_dir.tile_dict[data->map->map[i.y * data->map->wid + i.x]])
-		return ((void)setup_color(draw, td, (t_col){0}, 0));
+		return (setup_color(draw, td, (t_col){0}, 0));
 	tex = td->ray_dir.tile_dict[data->map->map[i.y * data->map->wid
 		+ i.x]]->tex_fl.img;
 	light = data->lmap.lmap[(int)(world.x * LMAP_PRECISION)

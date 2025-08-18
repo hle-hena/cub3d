@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 10:52:00 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/07 16:09:52 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/18 13:48:02 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,17 +57,17 @@ void	retrieve_line(t_tile *tile, char *arg, int *err)
 
 	line = malloc(sizeof(t_wpath));
 	if (!line)
-		return (ft_del((void **)&line), *err = 1, VOID);
+		return (*err = 1, ft_del((void **)&line));
 	if (skip_pattern(&arg, "( ( "))
-		return (ft_del((void **)&line), *err = 1, VOID);
+		return (*err = 1, ft_del((void **)&line));
 	if (retrieve_coo(&arg, 0, 1, &line->start))
-		return (ft_del((void **)&line), *err = 1, VOID);
+		return (*err = 1, ft_del((void **)&line));
 	if (skip_pattern(&arg, " ) , ( "))
-		return (ft_del((void **)&line), *err = 1, VOID);
+		return (*err = 1, ft_del((void **)&line));
 	if (retrieve_coo(&arg, 0, 1, &line->end))
-		return (ft_del((void **)&line), *err = 1, VOID);
+		return (*err = 1, ft_del((void **)&line));
 	if (skip_pattern(&arg, " ) )"))
-		return (ft_del((void **)&line), *err = 1, VOID);
+		return (*err = 1, ft_del((void **)&line));
 	line->texture.img = NULL;
 	line->normal = vec_normalize((t_vec){
 			-line->end.y + line->start.y,
@@ -76,7 +76,7 @@ void	retrieve_line(t_tile *tile, char *arg, int *err)
 	line->mode = 0;
 	line->center = (t_vec){0};
 	if (retrieve_reflectance(&arg, &line->reflectance))
-		return (ft_del((void **)&line), *err = 1, VOID);
+		return (*err = 1, ft_del((void **)&line));
 	add_link(&tile->wpath, line);
 }
 
@@ -107,7 +107,7 @@ void	retrieve_arc(t_tile *tile, char *arg, int *err)
 
 	arc = malloc(sizeof(t_wpath));
 	if (!arc)
-		return (ft_del((void **)&arc), *err = 1, VOID);
+		return (*err = 1, ft_del((void **)&arc));
 	if (retrieve_arc_coo(arc, &arg, err))
 		return ;
 	arc->texture.img = NULL;
@@ -119,9 +119,9 @@ void	retrieve_arc(t_tile *tile, char *arg, int *err)
 	{
 		ft_perror(-1, "The second point of the arc should be at the same \
 distance to the center as the first.", 0);
-		return (ft_del((void **)&arc), *err = 1, VOID);
+		return (*err = 1, ft_del((void **)&arc));
 	}
 	if (retrieve_reflectance(&arg, &arc->reflectance))
-		return (ft_del((void **)&arc), *err = 1, VOID);
+		return (*err = 1, ft_del((void **)&arc));
 	add_link(&tile->wpath, arc);
 }
