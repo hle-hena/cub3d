@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 21:54:54 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/25 09:39:29 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/07 15:12:55 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,12 @@ void	is_value_missing(int value, char *identifier, int id, int *missing)
 		letter[0] = id;
 		letter[1] = 0;
 		*missing = 1;
-		ft_perror(-1, ft_strsjoin((char *[]){"Missing ", identifier, "\tfor id ",
-			letter, NULL}), 1);
+		ft_perror(-1, ft_strsjoin((char *[]){"Missing ", identifier,
+				"\tfor id ", letter, NULL}), 1);
 	}
 }
 
-void	is_text_missing(t_img *img, char *identifier, int id, int *missing)
+void	is_text_missing(void *img, char *identifier, int id, int *missing)
 {
 	char	letter[2];
 
@@ -35,79 +35,67 @@ void	is_text_missing(t_img *img, char *identifier, int id, int *missing)
 		letter[0] = id;
 		letter[1] = 0;
 		*missing = 1;
-		ft_perror(-1, ft_strsjoin((char *[]){"Missing ", identifier, "\tfor id ",
-			letter, NULL}), 1);
+		ft_perror(-1, ft_strsjoin((char *[]){"Missing ", identifier,
+				"\tfor id ", letter, NULL}), 1);
 	}
 }
 
-void	fill_preset(t_tile **tiles)
+int	has_walls(t_tile *tile, int id)
 {
-	t_tile	*tile;
+	char	letter[2];
+	int		missing;
 
-	tile = tiles['0'];
-	if (tile)
+	missing = 0;
+	if (!tile->wpath)
 	{
-		if (tile->ceil_height == -1)
-			tile->ceil_height = 100;
-		if (tile->floor_height == -1)
-			tile->floor_height = 0;
-		if (tile->is_wall == -1)
-			tile->is_wall = 0;
+		letter[0] = id;
+		letter[1] = 0;
+		ft_perror(-1, ft_strsjoin((char *[]){"Missing walls\tfor id ",
+				letter, NULL}), 1);
+		return (1);
 	}
-	tile = tiles['1'];
-	if (tile)
-	{
-		if (tile->ceil_height == -1)
-			tile->ceil_height = 100;
-		if (tile->floor_height == -1)
-			tile->floor_height = 0;
-		if (tile->is_wall == -1)
-			tile->is_wall = 1;
-	}
+	is_text_missing(tile->wall.img, "wt", id, &missing);
+	is_value_missing(tile->is_wall, "W", id, &missing);
+	is_text_missing(tile->tex_ce.img, "C", id, &missing);
+	is_text_missing(tile->tex_fl.img, "F", id, &missing);
+	return (missing);
 }
 
-void	is_replace_tile_missing(t_tile **tiles, t_map *map, int *missing)
+int	is_replace_tile_missing(t_tile **tiles, t_map *map)
 {
-	if (*missing)
-		return ;
 	if (map->replace_tile == map->void_char && !tiles['0'])
 		return (ft_perror(-1, "Map is missing the player replace tile.\nYou \
-should add something like 'P=0' before starting the map.", 0), *missing = 1,
-			VOID);
+should add something like 'P=0' before the start of the map.", 0), 1);
 	else if (map->replace_tile == map->void_char)
 		map->replace_tile = '0';
 	if (tiles[(int)map->replace_tile]->is_wall)
 		return (ft_perror(-1, "The player replace tile should not be a wall \
-tile.", 0), *missing = 1, VOID);
+tile.", 0), 1);
+	return (0);
 }
 
 int	is_dict_full(t_map *map, int err)
 {
 	t_tile	**tiles;
 	size_t	i;
-	int		missing;
 
 	if (err)
 		return (1);
 	i = -1;
-	missing = 0;
 	tiles = get_tile_dict();
-	fill_preset(tiles);
 	while (++i < 256)
 	{
 		if (tiles[i])
 		{
-			is_text_missing(tiles[i]->tex_no.img, "NO", i, &missing);
-			is_text_missing(tiles[i]->tex_so.img, "SO", i, &missing);
-			is_text_missing(tiles[i]->tex_we.img, "WE", i, &missing);
-			is_text_missing(tiles[i]->tex_ea.img, "EA", i, &missing);
-			is_text_missing(tiles[i]->tex_ce.img, "C", i, &missing);
-			is_text_missing(tiles[i]->tex_fl.img, "F", i, &missing);
-			is_value_missing(tiles[i]->ceil_height, "CH", i, &missing);
-			is_value_missing(tiles[i]->floor_height, "FH", i, &missing);
-			is_value_missing(tiles[i]->is_wall, "W", i, &missing);
+			if (!tiles[i]->wpath)
+			{
+				add_base_wall(tiles[i], &err);
+				if (err)
+					return (1);
+			}
+			else if (has_walls(tiles[i], i))
+				return (1);
 		}
 	}
-	is_replace_tile_missing(tiles, map, &missing);
-	return (missing);
+	return (is_replace_tile_missing(tiles, map));
 }

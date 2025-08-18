@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 18:45:08 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/29 11:00:40 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/06 14:55:00 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,6 @@ int	light_check(t_map *map)
 			if (lmap.lights[i].pos.x >= map->wid
 				|| lmap.lights[i].pos.y >= map->len)
 				return (ft_perror(0, "A light is outsided the map.", 0), 1);
-			// if (get_tile_dict()[*(data->map->matrix
-			// 			+ (int)lmap.lights[i].pos.x + (int)lmap.lights[i].pos.y
-			// 			* data->map->wid)]->is_wall)
-			// 	return (ft_perror(0, "Don't put a light in a wall.", 0), 1);
 		}
 	}
 	return (0);
@@ -57,23 +53,23 @@ int	check_neighbors(t_map *map, t_tile **tiles, int x, int y)
 	open = 0;
 	if (x >= 1)
 	{
-		if (*(map->matrix + y * map->wid + x - 1) != ' ')
-			open += !tiles[*(map->matrix + y * map->wid + x - 1)]->is_wall;
+		if (*(map->map + y * map->wid + x - 1) != ' ')
+			open += !tiles[*(map->map + y * map->wid + x - 1)]->is_wall;
 	}
 	if (x < map->wid - 2)
 	{
-		if (*(map->matrix + y * map->wid + x + 1) != ' ')
-			open += !tiles[*(map->matrix + y * map->wid + x + 1)]->is_wall;
+		if (*(map->map + y * map->wid + x + 1) != ' ')
+			open += !tiles[*(map->map + y * map->wid + x + 1)]->is_wall;
 	}
 	if (y >= 1)
 	{
-		if (*(map->matrix + (y - 1) * map->wid + x) != ' ')
-			open += !tiles[*(map->matrix + (y - 1) * map->wid + x)]->is_wall;
+		if (*(map->map + (y - 1) * map->wid + x) != ' ')
+			open += !tiles[*(map->map + (y - 1) * map->wid + x)]->is_wall;
 	}
 	if (y < map->len - 2)
 	{
-		if (*(map->matrix + (y + 1) * map->wid + x) != ' ')
-			open += !tiles[*(map->matrix + (y + 1) * map->wid + x)]->is_wall;
+		if (*(map->map + (y + 1) * map->wid + x) != ' ')
+			open += !tiles[*(map->map + (y + 1) * map->wid + x)]->is_wall;
 	}
 	return (open);
 }
@@ -93,13 +89,13 @@ int	is_map_valid(t_map *mp, t_tile **tiles, int err)
 		x = -1;
 		while (++x < mp->wid)
 		{
-			if (*(mp->matrix + y * mp->wid + x) == mp->void_char)
+			if (*(mp->map + y * mp->wid + x) == mp->void_char)
 			{
 				if (check_neighbors(mp, tiles, x, y))
 					return (print_map_open(x + 1, y + 1), 1);
-			} 
+			}
 			else if ((x == 0 || x == mp->wid - 1 || y == 0 || y == mp->len - 1)
-				&& tiles[*(mp->matrix + y * mp->wid + x)]->is_wall != 1)
+				&& tiles[*(mp->map + y * mp->wid + x)]->is_wall != 1)
 				return (print_map_open(x + 1, y + 1), 1);
 		}
 	}

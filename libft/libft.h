@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 18:53:15 by marvin            #+#    #+#             */
-/*   Updated: 2025/05/19 16:57:24 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/07 16:53:35 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,8 @@ char	*ft_toupper(char *str);
 /********************************/
 void	ft_lstadd_back(t_list **lst, t_list *new);
 void	ft_lstadd_front(t_list **lst, t_list *new);
-t_list	*ft_lstchr(t_list *lst, void *to_find, int (*cmp)(void *, void *));
+t_list	*ft_lstchr(t_list *lst, void *to_find, float utils,
+			int (*cmp)(void *, void *, float));
 void	ft_lstclear(t_list **lst, void (*del)(void **));
 void	ft_lstdelink(t_list **prev, t_list **link, void (*del)(void **));
 int		ft_lstcountf(t_list *lst, int (*f)(t_list *));
@@ -61,7 +62,7 @@ t_list	*ft_lstlast(t_list *lst);
 t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void **));
 t_list	*ft_lstnew(void *content);
 void	ft_lstremove_if(t_list **head, int (*cnd)(void *, void *),
-	void (*del)(void **), void *to_find);
+			void (*del)(void **), void *to_find);
 int		ft_lstsize(t_list *lst);
 int		ft_lstsorted(t_list *lst, int (*f)(t_list *));
 t_list	*ft_lstrev(t_list *head);
@@ -89,7 +90,7 @@ int		ft_memcmp(const void *add1, const void *add2, size_t n);
 void	*ft_memcpy(void *dest, const void *src, size_t n);
 void	*ft_memmove(void *dest, const void *src, size_t n);
 void	*ft_memset(void *add, int oct, size_t n);
-void	*ft_realloc(void *ptr, size_t size);
+void	*ft_realloc(void *ptr, size_t size, size_t oldsize);
 
 /*			print&co			*/
 /********************************/

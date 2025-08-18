@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/09 14:58:02 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/18 14:43:03 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,17 +21,30 @@
 # include <time.h>
 # include <sys/time.h>
 # include <stdio.h>
-
 # include <pthread.h>
-# include <float.h>
+# include <immintrin.h>
 
+# define ADD_8 _mm256_add_ps
+# define SUB_8 _mm256_sub_ps
+# define MUL_8 _mm256_mul_ps
+# define SET_8 _mm256_set1_ps
+# define LOAD_8 _mm256_load_ps
+# define BLEND_8 _mm256_blendv_ps
+# define FLT_EPSILON 1.19209289550781250000000000000000000e-7F
 # define PI 3.1415926535897932384
-# define VOID (void)0
-typedef unsigned long long t_uint64;
-typedef long long t_int64;
 
-# define TARGET_FPS 60
-# define FRAME_TIME_US (1000000 / 60)
+# define HASH_SIZE 1024
+# define MOVE_SPEED 0.075f
+# define ROT_SPEED 0.2f
+# define ATT_COEF 0.05
+# define MAX_BOUNCE 6
+# define IMG_BUFFER 4
+# define LMAP_PRECISION 129
+# define BLOCK_X 16
+# define BLOCK_Y 16
+
+typedef unsigned long long	t_uint64;
+typedef long long			t_int64;
 
 typedef struct s_trigometry_values
 {
@@ -41,9 +54,9 @@ typedef struct s_trigometry_values
 
 typedef struct s_color
 {
-	int re;
-	int gr;
-	int bl;
+	int	re;
+	int	gr;
+	int	bl;
 }	t_col;
 
 typedef struct s_vector
@@ -58,12 +71,10 @@ typedef struct s_point
 	int		y;
 }	t_point;
 
-# define HASH_SIZE 1024
-
 typedef struct s_img
 {
 	void	*img;
-	char	*data;
+	int		*data;
 	char	*path;
 	int		bpp;
 	int		size_line;
@@ -77,9 +88,6 @@ typedef struct s_texture
 	t_img	*img;
 	float	reflectance;
 }	t_text;
-
-# define MOVE_SPEED 0.075f
-# define ROT_SPEED 0.2f
 
 typedef struct s_player
 {
@@ -103,16 +111,16 @@ typedef struct s_trace
 	float	precise_dist;
 	float	last_dist;
 	float	emittance;
+	float	base_emittance;
 	float	angle_factor;
 }	t_trace;
-
-# define ATT_COEF 0.0002
 
 typedef struct s_light
 {
 	t_vec	pos;
 	t_col	color;
 	float	emittance;
+	int		index;
 }	t_light;
 
 typedef struct s_light_face
@@ -120,6 +128,7 @@ typedef struct s_light_face
 	t_vec	normal;
 	float	emittance;
 	int		color;
+	int		ibuffer;
 }	t_flight;
 
 typedef struct s_light_tile
@@ -137,6 +146,61 @@ typedef struct s_light_map
 	int			len;
 }	t_lmap;
 
+typedef struct s_intersection
+{
+	t_vec	coo;
+	t_vec	normal;
+	float	pos;
+	float	dist;
+}	t_inter;
+
+typedef struct s_info_check_intersection
+{
+	t_inter	*inter;
+	t_vec	dir;
+	float	t;
+}	t_info_check;
+
+typedef struct s_graph_link	t_link;
+typedef struct s_graph_node	t_node;
+
+struct s_graph_node
+{
+	t_vec	coo;
+	t_link	*connect[512];
+	int		visited;
+};
+
+struct s_graph_link
+{
+	t_node	*start;
+	t_node	*end;
+	t_vec	center;
+	int		type;
+	int		visited[2];
+	float	reflectance;
+	int		run_forward;
+};
+
+typedef struct s_info_arc
+{
+	t_vec	v_hit;	
+	t_vec	v_end;	
+	t_vec	v_start;
+	t_vec	hit;
+	float	total_angle;
+	int		is_full_circle;
+	int		run_forward;
+}	t_info_arc;
+
+typedef struct s_graph
+{
+	t_node	nodes[1024];
+	t_link	links[512];
+	int		nb_links;
+	int		nb_nodes;
+}	t_graph;
+
 typedef struct s_wpath
 {
 	t_vec	start;
@@ -146,26 +210,28 @@ typedef struct s_wpath
 	t_vec	normal;
 	float	reflectance;
 	float	pos;
+	float	pos_start;
+	float	pos_end;
 	int		mode;
+	int		run_forward;
 }	t_wpath;
 
-typedef	struct s_tile
+typedef struct s_tile
 {
 	t_list		*wpath;
+	t_text		wall;
 	t_text		tex_no;
 	t_text		tex_so;
 	t_text		tex_we;
 	t_text		tex_ea;
 	t_text		tex_ce;
 	t_text		tex_fl;
-	int			ceil_height;
-	int			floor_height;
 	int			is_wall;
 }	t_tile;
 
 typedef struct s_map
 {
-	int			*matrix;
+	int			*map;
 	char		void_char;
 	char		replace_tile;
 	int			len;
@@ -185,23 +251,36 @@ typedef struct s_events
 	int		echap;
 }	t_event;
 
-# define MAX_BOUNCE 16
-
 typedef struct s_hit
 {
 	t_img		*texture[MAX_BOUNCE];
 	t_flight	*light[MAX_BOUNCE];
 	t_wpath		wall[MAX_BOUNCE];
-	t_vec		ray_dir[MAX_BOUNCE];
 	t_vec		hit[MAX_BOUNCE];
 	float		dist[MAX_BOUNCE];
 	int			draw_start[MAX_BOUNCE];
 	int			draw_end[MAX_BOUNCE];
 	int			tex_pos_fp[MAX_BOUNCE];
 	int			step_fp[MAX_BOUNCE];
-	char		*tex_col[MAX_BOUNCE];
+	int			*tex_col[MAX_BOUNCE];
 	int			bounces;
 }	t_hit;
+
+typedef struct s_draw
+{
+	float		reflectance[MAX_BOUNCE];
+	int			light_color[MAX_BOUNCE];
+	float		light_emit[MAX_BOUNCE];
+	int			tex_pos_fp[MAX_BOUNCE];
+	int			tex_sizeline[MAX_BOUNCE];
+	int			step_fp[MAX_BOUNCE];
+	int			*tex_col[MAX_BOUNCE];
+	int			draw_start[MAX_BOUNCE];
+	int			draw_end[MAX_BOUNCE];
+	t_vec		normal[MAX_BOUNCE];
+	t_vec		hit[MAX_BOUNCE];
+	int			bounces;
+}	t_draw;
 
 typedef struct s_ray
 {
@@ -218,7 +297,7 @@ typedef struct s_ray
 	float	precise_dist;
 }	t_ray;
 
-typedef	struct s_ray_dir
+typedef struct s_ray_dir
 {
 	t_vec	l;
 	t_vec	r;
@@ -226,7 +305,7 @@ typedef	struct s_ray_dir
 	t_tile	**tile_dict;
 }	t_rdir;
 
-typedef	struct s_cam
+typedef struct s_cam
 {
 	t_vec	dir;
 	t_vec	plane;
@@ -239,9 +318,53 @@ typedef struct s_void
 	t_flight	*flight;
 }	t_void;
 
-# define DRAW_THREADS 12
+typedef struct s_simd_utils
+{
+	__m256	one;
+	__m256	div;
+	__m256	mul;
+}	t_sutils;
+
+typedef struct s_col_256
+{
+	__m256	r;
+	__m256	g;
+	__m256	b;
+}	t_col_256;
+
+typedef struct s_col_256i
+{
+	__m256i	r;
+	__m256i	g;
+	__m256i	b;
+}	t_col_256i;
+
+typedef struct s_col_simd
+{
+	float	r[8]
+		__attribute__((aligned(32)));
+	float	g[8]
+		__attribute__((aligned(32)));
+	float	b[8]
+		__attribute__((aligned(32)));
+}	t_s_col;
+
+typedef struct s_simd_info
+{
+	t_s_col										fallback;
+	t_s_col										textures[MAX_BOUNCE];
+	t_s_col										light_color[MAX_BOUNCE];
+	float emittance[MAX_BOUNCE][8]__attribute__	((aligned(32)));
+	float refl_val[MAX_BOUNCE][8]__attribute__	((aligned(32)));
+	int nb_hit	[8]__attribute__				((aligned(32)));
+	t_sutils									*utils;
+}	t_simd;
+
 typedef struct s_thread_draw
 {
+	t_simd			info;
+	int				current_pix;
+	int				bounces;
 	t_rdir			ray_dir;
 	int				start_x;
 	int				end_x;
@@ -257,8 +380,7 @@ typedef struct s_data
 {
 	void		*mlx;
 	void		*win;
-	t_img		img;
-	char		*img_end;
+	t_img		img[IMG_BUFFER];
 	int			win_h;
 	int			win_w;
 	int			render_h;
@@ -267,30 +389,137 @@ typedef struct s_data
 	t_lmap		lmap;
 	t_cam		cam;
 	t_map		*map;
-	t_hit		*hits;
+	t_draw		*draw;
 	t_event		event;
 	t_void		*empty;
-	t_th_draw	thread_pool[DRAW_THREADS];
-	pthread_t	threads[DRAW_THREADS];
+	int			draw_thread;
+	t_th_draw	*thread_pool;
+	pthread_t	*threads;
+	int			img_buffer;
+	t_sutils	simd_utils;
 }	t_data;
 
-// # define LMAP_PRECISION 512
-# define LMAP_PRECISION 128
+/* 
+ * 
+ *   Utils functions for geometry, both for the polygon algo to get the texture
+ * wrapping, and for the raycaster.
+ * 
+ */
+t_vec		vec_sub(t_vec a, t_vec b);
+t_vec		vec_add(t_vec a, t_vec b);
+float		vec_dot(t_vec a, t_vec b);
+float		vec_cross(t_vec a, t_vec b);
+t_vec		vec_scale(t_vec a, float s);
+float		vec_len2(t_vec a);
+t_vec		vec_normalize(t_vec a);
+int			is_on_arc_sweep(t_info_arc info);
+float		get_arc_angle(t_vec	v_start, t_vec	v_hit, float total_angle);
 
+/* 
+ * 
+ *   Specific functions for the texture wrapping algo.
+ * 
+ */
+int			build_polygons(void);
+int			build_primitive_graph(t_list *wpath, t_graph *graph);
+int			find_node(t_node *nodes, t_vec coo, int *current,
+				int should_create);
+void		replace_connection(t_node *dest, t_link *to_replace,
+				t_link *to_add);
+int			add_connection(t_node *dest, t_link *to_add);
+t_graph		*retrieve_outer_face(t_graph *graph, float *perimeter);
+float		perimeter_link(t_link *link);
+int			grow_graph(t_graph *g, int i_node);
+void		sort_edges(t_graph *graph);
+void		get_face(t_graph *subgraph, t_link *current_link);
+float		polygon_area(t_graph *graph, float *perimeter);
+void		add_base_wall(t_tile *tile, int *err);
+
+/* 
+ * 
+ *   Specific geometry functions for the texture wrapping algo.
+ * 
+ */
+t_inter		intersect_slseg(t_link *l1, t_link *l2, t_graph *graph);
+t_inter		check_solutions_alseg(float *t, t_link *seg, t_link *arc,
+				t_graph *graph);
+t_inter		check_solutions_slarc(float *t, t_link *seg, t_link *arc,
+				t_graph *graph);
+t_inter		intersect_alsl(t_link *seg, t_link *arc, t_graph *graph,
+				t_inter (*check)(float *, t_link *, t_link *, t_graph *));
+t_inter		intersect_alarc(t_link *arc1, t_link *arc2, t_graph *graph);
+void		intersect_links(t_link *l1, t_link *l2, t_inter *inter,
+				t_graph *graph);
+
+/* 
+ * 
+ *   Functions for the geometry of the raycaster, both for the render and 
+ * the light map.
+ * 
+ */
+t_inter		intersect_sseg(t_vec origin, t_vec dir, t_wpath seg);
+t_inter		intersect_sarc(t_vec origin, t_vec dir, t_wpath arc);
+t_inter		intersect_switch(t_vec origin, t_vec dir, t_wpath path_to_inter);
+
+/* 
+ * 
+ *   Hooks for mlx functions.
+ * 
+ */
+void		loop(void);
+int			mlx_close(t_data *data);
+int			event_loop(t_data *data);
+int			key_down(int keycode, t_data *data);
+int			key_up(int keycode, t_data *data);
+int			mouse_move(int x, int y, t_data *data);
+
+/* 
+ * 
+ *   Specific functions for the render.
+ * 
+ */
+void		cast_rays(t_data *data);
+t_hit		raycast(t_data *data, t_vec dir, t_vec origin);
+t_vec		**get_cast_table(void);
 void		*draw_walls_thread(void *arg);
-t_data		*get_data(void);
-t_map		*get_map(void);
-t_map		*load_map(int ac, char **av);
-int			clean_map(void);
-int			clean_data(void);
-
-// static inline int	get(t_map *map, int x, int y)
-// {
-// 	return (*(map->matrix + y * map->wid + x));
-// }
-
+int			is_correct_flight(void *content, void *to_find, float threshold);
+int			does_hit(t_list	*wpath, t_ray *ray, t_wpath *wall);
+void		handle_reflexion(t_data *data, t_hit *hit, t_ray *ray,
+				t_wpath wall);
+void		init_ray(t_ray *ray, t_vec dir, t_vec origin);
+void		handle_hit(t_data *data, t_ray *ray, t_hit *hit);
 void		fill_cast_table(t_data *data, int *err);
+void		draw_walls(t_th_draw *td);
+void		get_colors_simd(t_simd info, int out_colors[8]);
+t_col		color_blend(int base_color, int light_color, float emittance);
+void		draw_wall(t_th_draw *td, t_draw *draw);
+void		draw_floor(t_data *data, t_th_draw *td, t_point curr, t_draw *draw);
+void		draw_ceil(t_data *data, t_th_draw *td, t_point curr, t_draw *draw);
+void		setup_color(t_draw *draw, t_th_draw *td, t_col fallback,
+				int nb_hit);
+void		start_threads(t_data *data);
 
+/* 
+ * 
+ *   Specific functions for the mini_map render.
+ * 
+ */
+void		draw_player(t_data *data, t_point center, float theta);
+void		ft_put_pixel(t_data *data, t_point point, int color);
+void		draw_tile(t_data *data, t_point start, t_trig vals, int color);
+void		draw_circle(t_data *data, t_point center, int rad, int color);
+void		draw_line(t_data *data, t_point start, t_point end, int color);
+void		draw_mini_map(t_data *data);
+int			point_is_in_mini_map(t_data *data, t_point point);
+
+/* 
+ * 
+ *   Parser functions
+ * 
+ */
+t_map		*load_map(int ac, char **av);
+void		retrieve_line(t_tile *tile, char *arg, int *err);
+void		retrieve_arc(t_tile *tile, char *arg, int *err);
 t_tile		*new_tile(void);
 t_tile		**get_tile_dict(void);
 char		*retrieve_tile_dict(t_map *map, int map_fd, int *err);
@@ -307,58 +536,55 @@ void		retrieve_map(t_map *map, char *line, int map_fd, int *err);
 void		retrieve_light(char *line, int *err);
 int			retrieve_lonely(t_map *map, char *line, int *err);
 int			is_map_valid(t_map *map, t_tile **tiles, int err);
+void		new_image(t_data *data, t_img *img_struct, int width, int height);
 
-void		add_link(t_list **lst, void *content);
-
-int			is_correct_flight(void *content, void *to_find);
-int			does_hit(t_list	*wpath, t_ray *ray, t_wpath *wall);
-void		handle_reflexion(t_data *data, t_hit *hit, t_ray *ray,
-	t_wpath wall);
-void		init_ray(t_ray *ray, t_vec dir, t_vec origin);
-t_vec		normalize(t_vec v);
-void		handle_hit(t_data *data, t_ray *ray, t_hit *hit);
-
-void		loop(void);
-int			mlx_close(t_data *data);
-int			event_loop(t_data *data);
-int			key_down(int keycode, t_data *data);
-int			key_up(int keycode, t_data *data);
-int			mouse_down(int button, int x, int y, t_data *data);
-int			mouse_up(int button, int x, int y, t_data *data);
-int			mouse_move(int x, int y, t_data *data);
-t_col		rev_calc_color(int col);
-int			calc_color(t_col col);
-int			interpolate_color(int col1, int col2, float percent);
-int			ft_get_pixel_color(t_data *data, t_point point);
-
-float		ft_atof_err(char *str, float min, float max, char **last);
-void		cast_rays(t_data *data);
-
-int			point_is_in_fov(t_data *data, t_point point);
-void		draw_player(t_data *data, t_point center, float theta);
-void		ft_put_pixel(t_data *data, t_point point, int color);
-void		draw_tile(t_data *data, t_point start, t_trig vals, int color);
-void		draw_circle(t_data *data, t_point center, int rad, int color);
-void		draw_line(t_data *data, t_point start, t_point end, int color);
-void		draw_mini_map(t_data *data);
-int			point_is_in_mini_map(t_data *data, t_point point);
-
-t_hit		raycast(t_data *data, t_vec dir, t_vec origin);
-t_vec		**get_cast_table(void);
-
-int			ft_atoi_err(char *arg, int *index);
-
-void		fps_counter(t_data *data);
-
+/* 
+ * 
+ *   Specific functions for the light map creation
+ * 
+ */
 int			create_lmap(t_data *data);
 void		raytrace(t_data *data, t_light light, t_vec dir);
 void		handle_light(t_data *data, t_trace *ray, t_light light);
 void		reflect_light(t_data *data, t_trace *ray, t_wpath wall,
-	t_light light);
+				t_light light);
 int			does_light(t_list *wpath, t_trace *ray, t_wpath *wall);
 void		init_trace(t_trace *ray, t_vec dir, t_vec origin, float emittance);
 t_flight	*find_flight(t_data *data, t_point pos, t_wpath wall);
+t_flight	*new_flight(t_vec normal);
+int			add_col_val_physical(int col1, int col2, float weight1,
+				float weight2);
+void		light_floor(t_data *data, t_trace *ray, t_light light);
+void		light_wall(t_data *data, t_trace *ray, t_wpath wall,
+				t_light light);
 
-void	print_dict(t_data *data);
+/* 
+ * 
+ *   Getter functions
+ * 
+ */
+t_data		*get_data(void);
+t_map		*get_map(void);
+
+/* 
+ * 
+ *   Utils functions
+ * 
+ */
+void		add_link(t_list **lst, void *content);
+int			calc_color(t_col col);
+float		ft_atof_err(char *str, float min, float max, char **last);
+int			ft_atoi_err(char **arg);
+void		fps_counter(t_data *data, t_uint64 now);
+int			skip_pattern(char **arg, char *pattern);
+void		clear_n_lines(int n);
+
+/* 
+ * 
+ *   Clean functions
+ * 
+ */
+int			clean_map(void);
+int			clean_data(void);
 
 #endif

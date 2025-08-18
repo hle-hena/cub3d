@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 10:18:57 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/06/09 14:10:42 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/13 11:12:35 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	close_threads(t_data *data)
 	int	i;
 
 	i = -1;
-	while (++i < DRAW_THREADS)
+	while (++i < data->draw_thread)
 	{
 		pthread_mutex_lock(&data->thread_pool[i].mutex);
 		data->thread_pool[i].ready = 2;
@@ -25,6 +25,44 @@ void	close_threads(t_data *data)
 		pthread_mutex_unlock(&data->thread_pool[i].mutex);
 		pthread_join(data->threads[i], NULL);
 	}
+	ft_del((void **)&data->threads);
+	ft_del((void **)&data->thread_pool);
+}
+
+void	clean_mlx(t_data *data)
+{
+	int	i;
+
+	i = -1;
+	while (++i < IMG_BUFFER)
+	{
+		if (data->img[i].img)
+			mlx_destroy_image(data->mlx, data->img[i].img);
+	}
+	if (data->empty)
+	{
+		if (data->empty->texture.img && data->empty->texture.img->img)
+			mlx_destroy_image(data->mlx, data->empty->texture.img->img);
+		ft_del((void **)&data->empty->flight);
+		ft_del((void **)&data->empty->texture.img);
+	}
+	if (data->win)
+		mlx_destroy_window(data->mlx, data->win);
+	if (data->mlx)
+		mlx_destroy_display(data->mlx);
+	ft_del((void **)&data->empty);
+}
+
+void	clean_lmap(t_data *data)
+{
+	int	i;
+
+	i = -1;
+	ft_del((void **)&data->lmap.lights);
+	if (!data->lmap.lmap)
+		return ;
+	while (++i < data->lmap.len * data->lmap.wid)
+		ft_lstclear(&data->lmap.lmap[i].flight, ft_del);
 }
 
 int	clean_data(void)
@@ -35,14 +73,10 @@ int	clean_data(void)
 	clean_map();
 	close_threads(data);
 	mlx_do_key_autorepeaton(data->mlx);
-	if (data->img.img)
-		mlx_destroy_image(data->mlx, data->img.img);
-	if (data->win)
-		mlx_destroy_window(data->mlx, data->win);
-	if (data->mlx)
-		mlx_destroy_display(data->mlx);
-	if (data->hits)
-		ft_del((void **)&data->hits);
+	clean_mlx(data);
+	clean_lmap(data);
+	if (data->draw)
+		ft_del((void **)&data->draw);
 	if (*get_cast_table())
 		ft_del((void **)get_cast_table());
 	if (data->lmap.lmap)

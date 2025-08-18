@@ -6,32 +6,31 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 12:49:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/23 13:47:57 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/18 13:59:23 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-int	ft_atoi_err(char *arg, int *index)
+int	ft_atoi_err(char **arg)
 {
 	int	nb;
 	int	digits;
 
 	nb = 0;
 	digits = 0;
-	if (!arg)
+	if (!(*arg))
 		return (-1);
-	while (ft_isspace(*arg))
-		(arg++, ((*index)++));
-	if (!*arg || !ft_isdigit(*arg))
+	while (ft_isspace(**arg))
+		(*arg)++;
+	if (!**arg || !ft_isdigit(**arg))
 		return (-1);
-	while (*arg == '0' && ft_isdigit(*(arg + 1)))
-		(arg++, ((*index)++));
-	while (ft_isdigit(*arg))
+	while (**arg == '0' && ft_isdigit(*((*arg) + 1)))
+		(*arg)++;
+	while (ft_isdigit(**arg))
 	{
-		nb = nb * 10 + (*arg - '0');
-		(*index)++;
-		arg++;
+		nb = nb * 10 + (**arg - '0');
+		(*arg)++;
 		digits++;
 		if (nb > 255)
 			return (-1);
@@ -43,42 +42,54 @@ void	set_img_color(t_img **img, char *line, t_col color, int *err)
 {
 	*img = malloc(sizeof(t_img));
 	if (!*img)
-		return (ft_perror(-1, "Internal error: malloc.", 0), *err = 1, VOID);
+		return (*err = 1, ft_perror(-1, "Internal error: malloc.", 0));
 	(*img)->img = mlx_new_image(get_data()->mlx, 1, 1);
 	if (!(*img)->img)
-		return (ft_perror(-1, ft_strsjoin((char *[]){"An error happened during \
-the opening of the image for '", line, "'.", NULL}), 1), *err = 1, VOID);
+		return (*err = 1, ft_perror(-1, ft_strsjoin((char *[]){"An error \
+happened during the opening of the image for '", line, "'.", NULL}), 1));
 	(*img)->height = 1;
 	(*img)->width = 1;
-	(*img)->data = mlx_get_data_addr((*img)->img, &(*img)->bpp, &(*img)->size_line,
-		&(*img)->endian);
+	(*img)->data = (int *)mlx_get_data_addr((*img)->img, &(*img)->bpp,
+			&(*img)->size_line, &(*img)->endian);
 	(*img)->bpp /= 8;
+	(*img)->size_line /= (*img)->bpp;
 	(*img)->endian = 0;
 	*(int *)(*img)->data = calc_color(color);
+}
+
+int	retrieve_color(char **line, int *color, int *err, char *color_name)
+{
+	*color = ft_atoi_err(line);
+	if (*err == -1)
+	{
+		ft_perror(-1, ft_strsjoin((char *[]){"Expected a positive number under\
+ 255 as ", color_name, ".", NULL}), 0);
+		*err = 1;
+		return (1);
+	}
+	return (0);
 }
 
 void	retrieve_texture_color(t_img **img, char *line, int *err)
 {
 	t_col	color;
-	int		i;
 
-	i = 0;
 	if (ft_strnstr(line, ".xpm", ft_strlen(line)))
-		return (ft_perror(-1, "Assets should be in a subfolder.", 0), *err = 1,
-			VOID);
-	color.re = ft_atoi_err(line, &i);
-	if (color.re == -1 || line[i] != ',')
-		return (ft_perror(-1, ft_strsjoin((char *[]){"Expected a positive numbe\
-r under 255 as color 1. Instead got ", line, ".", NULL}), 1), *err = 1, VOID);
-	i++;
-	color.gr = ft_atoi_err(&line[i], &i);
-	if (color.gr == -1 || line[i] != ',')
-		return (ft_perror(-1, ft_strsjoin((char *[]){"Expected a positive numbe\
-r under 255 as color 2. Instead got ", line, ".", NULL}), 1), *err = 1, VOID);
-	i++;
-	color.bl = ft_atoi_err(&line[i], &i);
-	if (color.bl == -1 || line[i])
-		return (ft_perror(-1, ft_strsjoin((char *[]){"Expected a positive numbe\
-r under 255 as color 3. Instead got ", line, ".", NULL}), 1), *err = 1, VOID);
+		return (*err = 1, ft_perror(-1, "Assets should be in a subfolder.", 0));
+	if (retrieve_color(&line, &color.re, err, "red"))
+		return ;
+	if (skip_pattern(&line, " , "))
+		return (*err = 1, ft_perror(-1, "Wrong pattern recognised for an rgb \
+color.", 0));
+	if (retrieve_color(&line, &color.gr, err, "green"))
+		return ;
+	if (skip_pattern(&line, " , "))
+		return (*err = 1, ft_perror(-1, "Wrong pattern recognised for an rgb \
+color.", 0));
+	if (retrieve_color(&line, &color.bl, err, "blue"))
+		return ;
+	if (*line)
+		return (*err = 1, ft_perror(-1, "Expected a \\n after the last color. \
+If you wanted to put a reflectance do ': [value]'.", 0));
 	set_img_color(img, line, color, err);
 }

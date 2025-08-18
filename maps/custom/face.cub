@@ -1,0 +1,44 @@
+. {
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+	wt textures/simonkraft/bookshelf_01.xpm
+	wl ((1, 0), (0, 0))
+	wl ((0, 1), (0, 0))
+	#wl ((1, 0), (1, 1))
+	#wl ((0, 1), (1, 1))
+	#wl ((0.5, 1), (0.5, 0))
+	#wl ((1, 0.5), (0, 0.5))
+	#wl ((0, 0.4), (0.6, 1))
+	#wl ((0.4, 0), (1, 0.6))
+}
+1 {
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+	wt textures/simonkraft/bookshelf_01.xpm
+	wa ((0.5, 0), (0.5, 0), (0.5, 0.5)): 0.8
+}
+0 {
+	NO textures/simonkraft/bookshelf_01.xpm
+	SO textures/simonkraft/bookshelf_02.xpm
+	WE textures/simonkraft/bookshelf_03.xpm
+	EA textures/simonkraft/bookshelf.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 0
+}
+P=0
+
+L ((2.5, 2.5), 1)
+L ((6.5, 6.5), 1)
+
+111111111
+100000001
+100000001
+100000001
+1N0000001
+100000001
+100000001
+100000001 
+111111111

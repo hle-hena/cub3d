@@ -6,29 +6,11 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 21:48:07 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/05/01 12:21:27 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/04 10:46:19 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
-
-int	mouse_down(int button, int x, int y, t_data *data)
-{
-	(void)x;
-	(void)y;
-	(void)data;
-	printf("Mouse down : [%d]\n", button);
-	return (0);
-}
-
-int	mouse_up(int button, int x, int y, t_data *data)
-{
-	(void)x;
-	(void)y;
-	(void)data;
-	printf("Mouse up : [%d]\n", button);
-	return (0);
-}
 
 int	mouse_move(int x, int y, t_data *data)
 {

@@ -1,0 +1,4 @@
+Need to detect double and overlapped lines to simplify them.
+
+
+Found an issue, the light can leak when going up x or y I think ?
