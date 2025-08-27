@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/18 14:43:03 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/27 17:01:54 by gakarbou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -248,6 +248,8 @@ typedef struct s_events
 	int		mo_l;
 	int		mo_r;
 	int		rot;
+	int		rot_left;
+	int		rot_right;
 	int		echap;
 }	t_event;
 

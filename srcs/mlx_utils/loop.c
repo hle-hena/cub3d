@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 21:36:26 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/04 10:46:23 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/27 17:30:48 by gakarbou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ int	mlx_close(t_data *data)
 {
 	(void)data;
 	clean_data();
-	printf("End of cub3d\n");
+	printf("End of cub3D\n");
 	exit(0);
 }
 

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:16:19 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/07 16:38:47 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/27 17:26:16 by gakarbou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ t_map	*load_map(int ac, char **av)
 
 	err = 0;
 	if (ac != 2)
-		ft_perror(1, "Invalid usage. Correct :\n\t./cub3d map_name.cub",
+		ft_perror(1, "Invalid usage. Correct :\n\t./cub3D map_name.cub",
 			clean_data());
 	map_fd = get_map_fd(av[1]);
 	map = get_map();

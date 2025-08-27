@@ -1,6 +1,6 @@
 MAKEFLAGS += --no-print-directory
 
-NAME = cub3d
+NAME = cub3D
 CC = cc 
 FLAGS = -Wall -Wextra -Werror -I./include -Imlx -mavx2
 RM = rm -f
@@ -68,6 +68,8 @@ fdebug: $(NAME)
 
 valgrind: all
 	valgrind --leak-check=full --show-leak-kinds=all ./$(NAME) $(ARG)
+	
+bonus : all
 
 $(LIBFT):
 	@echo

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 10:37:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/07/30 11:36:00 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/27 17:20:53 by gakarbou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,15 @@ identifier at ", line, ".", NULL}), 1), *err = 1, 0);
 	else if (ft_strncmp("WE ", line, 3) == 0)
 		retrieve_texture(&(tiles['1'])->tex_we, arg, err, "WE");
 	else if (ft_strncmp("C ", line, 2) == 0)
+	{
+		retrieve_texture(&(tiles['1'])->tex_ce, arg, err, "C");
 		retrieve_texture(&(tiles['0'])->tex_ce, arg, err, "C");
+	}
 	else if (ft_strncmp("F ", line, 2) == 0)
+	{
+		retrieve_texture(&(tiles['1'])->tex_fl, arg, err, "F");
 		retrieve_texture(&(tiles['0'])->tex_fl, arg, err, "F");
+	}
 	return (ft_del((void **)&arg), 0);
 }
 

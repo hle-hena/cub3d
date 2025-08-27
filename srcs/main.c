@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:05:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/07 16:36:09 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/27 17:28:50 by gakarbou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ void	init_utils(t_data *data)
 	data->map->mini_map_scale = 32;
 	data->draw = malloc(data->render_w * sizeof(t_draw));
 	if (!data->draw)
-		ft_perror(1, "cub3d: Internal error: malloc.", clean_data());
+		ft_perror(1, "cub3D: Internal error: malloc.", clean_data());
 	fill_cast_table(data, &err);
 	if (err)
 		ft_perror(1, NULL, 0);

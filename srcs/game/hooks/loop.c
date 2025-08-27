@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 21:49:44 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/06 10:32:25 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/27 17:09:13 by gakarbou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ void	move_event(t_data *data)
 
 	cos_val = cos(data->map->player.rot * PI / 180);
 	sin_val = sin(data->map->player.rot * PI / 180);
+	data->event.rot -= (data->event.rot_left - data->event.rot_right) * 20;
 	if (data->event.rot < 0)
 		data->map->player.rot += (float)data->event.rot * ROT_SPEED + 360;
 	else

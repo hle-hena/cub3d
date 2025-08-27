@@ -6,11 +6,11 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 18:02:27 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/18 14:06:39 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/27 17:29:50 by gakarbou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3d.h"
+#include "cub3D.h"
 
 void	resize_lines(t_list *grid, char void_char, size_t max_wid, int *err)
 {
@@ -49,7 +49,7 @@ void	set_map(t_map *map, t_list *grid, int *err)
 		return (ft_lstclear(&grid, ft_del));
 	map->map = malloc((map->len * map->wid) * sizeof(int));
 	if (!map->map)
-		return (ft_perror(-1, "cub3d: Internal error: malloc", 0),
+		return (ft_perror(-1, "cub3D: Internal error: malloc", 0),
 			*err = 1, ft_lstclear(&grid, ft_del));
 	while (grid)
 	{
