@@ -55,10 +55,9 @@ OBJ = $(SRCS:.c=.o)
 all: FLAGS += -O3
 all: $(NAME)
 
-light: FLAGS += -D LIGHT_ON=1 -O3
 light:
 	@rm -rf srcs/game/draw/raycast/get_colors.o srcs/game/draw/raycast/setup_color.o
-	$(MAKE) $(NAME)
+	@$(MAKE) $(NAME) FLAGS="$(FLAGS) -D LIGHT_ON=1 -O3"
 
 no: clear
 no: $(NAME)
