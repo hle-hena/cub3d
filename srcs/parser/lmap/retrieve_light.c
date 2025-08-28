@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 10:55:35 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 10:11:10 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/28 11:01:18 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ t_col	retrieve_light_color(char **line, int *err)
 int	finished(char **line, int *err)
 {
 	if (**line != ')' && **line != ',')
-		(ft_perror(0, ft_strsjoin((char *[]){"The separator in the light is \
+		(ft_perror(-1, ft_strsjoin((char *[]){"The separator in the light is \
 wrong. expected ',' or ')'. Got '", *line, "'.", NULL}), 1), *err = 1);
 	return (**line != ')');
 }
