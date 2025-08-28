@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/06 11:44:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 10:11:10 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/28 10:54:31 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,13 +28,13 @@ void	setup_color(t_draw *draw, t_th_draw *td, t_col fallback, int nb_hit)
 		td->info.textures[nb_hit].r[td->current_pix] = (col >> 16) & 0xFF;
 		td->info.textures[nb_hit].g[td->current_pix] = (col >> 8) & 0xFF;
 		td->info.textures[nb_hit].b[td->current_pix] = col & 0xFF;
-		col = draw->light_color[nb_hit];
+		col = (LIGHT_ON * 0xFFFFFF) + (!LIGHT_ON * draw->light_color[nb_hit]);
 		td->info.light_color[nb_hit].r[td->current_pix] = (col >> 16) & 0xFF;
 		td->info.light_color[nb_hit].g[td->current_pix] = (col >> 8) & 0xFF;
 		td->info.light_color[nb_hit].b[td->current_pix] = col & 0xFF;
 		td->info.refl_val[nb_hit][td->current_pix] = draw->reflectance[nb_hit];
-		td->info.emittance[nb_hit][td->current_pix]
-			= draw->light_emit[nb_hit];
+		td->info.emittance[nb_hit][td->current_pix] = (LIGHT_ON * 1)
+			+ (!LIGHT_ON * draw->light_emit[nb_hit]);
 		draw->tex_pos_fp[nb_hit] += draw->step_fp[nb_hit];
 	}
 }

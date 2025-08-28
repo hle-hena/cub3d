@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   cub3d.h                                            :+:      :+:    :+:   */
+/*   cub3D.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 10:11:10 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/28 10:57:01 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,10 @@
 # define LMAP_PRECISION 129
 # define BLOCK_X 16
 # define BLOCK_Y 16
+
+# ifndef LIGHT_ON
+#  define LIGHT_ON 0
+# endif
 
 typedef unsigned long long	t_uint64;
 typedef long long			t_int64;

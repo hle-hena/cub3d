@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/06 11:42:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 10:11:10 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/28 10:54:39 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,8 @@ t_col	color_blend(int base_color, int light_color, float emittance)
 	t_col	light;
 	t_col	final;
 
+	emittance = (LIGHT_ON * 1) + (!LIGHT_ON * emittance);
+	light_color = (LIGHT_ON * 0xFFFFFF) + (!LIGHT_ON * light_color);
 	if (emittance < 0.001)
 		return ((t_col){0});
 	em = (int)(emittance * 256.0f);
