@@ -30,7 +30,7 @@ SRCS = $(addprefix srcs/, \
 		$(addprefix status/, fps.c)\
 		$(addprefix hooks/, key.c loop.c mouse.c)\
 	)\
-	main.c debug.c\
+	main.c\
 )
 
 OBJ = $(SRCS:.c=.o)
