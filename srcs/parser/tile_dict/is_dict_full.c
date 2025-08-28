@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 21:54:54 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 13:04:03 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/28 17:25:52 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,13 +81,12 @@ should add something like 'P=0' before starting the map.", 0), *missing = 1,
 tile.", 0), *missing = 1, VOID);
 }
 
-int	is_dict_full(t_map *map, int err)
+int	is_dict_full(t_map *map, int i)
 {
 	t_tile	**tiles;
-	size_t	i;
 	int		missing;
 
-	if (err)
+	if (i)
 		return (1);
 	i = -1;
 	missing = 0;
@@ -95,18 +94,17 @@ int	is_dict_full(t_map *map, int err)
 	fill_preset(tiles);
 	while (++i < 256)
 	{
-		if (tiles[i])
-		{
-			is_text_missing(tiles[i]->tex_no, "NO", i, &missing);
-			is_text_missing(tiles[i]->tex_so, "SO", i, &missing);
-			is_text_missing(tiles[i]->tex_we, "WE", i, &missing);
-			is_text_missing(tiles[i]->tex_ea, "EA", i, &missing);
-			is_text_missing(tiles[i]->tex_ce, "C", i, &missing);
-			is_text_missing(tiles[i]->tex_fl, "F", i, &missing);
-			is_value_missing(tiles[i]->ceil_height, "CH", i, &missing);
-			is_value_missing(tiles[i]->floor_height, "FH", i, &missing);
-			is_value_missing(tiles[i]->is_wall, "W", i, &missing);
-		}
+		if (!tiles[i])
+			continue ;
+		is_text_missing(tiles[i]->tex_no, "NO", i, &missing);
+		is_text_missing(tiles[i]->tex_so, "SO", i, &missing);
+		is_text_missing(tiles[i]->tex_we, "WE", i, &missing);
+		is_text_missing(tiles[i]->tex_ea, "EA", i, &missing);
+		is_text_missing(tiles[i]->tex_ce, "C", i, &missing);
+		is_text_missing(tiles[i]->tex_fl, "F", i, &missing);
+		is_value_missing(tiles[i]->ceil_height, "CH", i, &missing);
+		is_value_missing(tiles[i]->floor_height, "FH", i, &missing);
+		is_value_missing(tiles[i]->is_wall, "W", i, &missing);
 	}
 	is_replace_tile_missing(tiles, map, &missing);
 	return (missing);

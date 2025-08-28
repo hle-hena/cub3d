@@ -6,13 +6,13 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 15:29:31 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/28 17:36:53 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img)
+void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img)
 {
 	t_img		*tex;
 	t_vec		cast;
@@ -35,14 +35,15 @@ static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img)
 				* tex->width));
 }
 
-static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray,
-	char *img)
+void	draw_floor(t_point curr, t_rdir ray, char *img, int is_floor)
 {
+	t_data		*data;
 	t_img		*tex;
 	t_vec		cast;
 	t_vec		world;
 	t_point		i;
 
+	data = get_data();
 	cast = ray.cast_table[curr.y * data->win_wid + curr.x];
 	world = (t_vec){data->map->player.x + cast.y * (ray.l.x + cast.x
 			* ray.r.x), data->map->player.y + cast.y
@@ -53,10 +54,21 @@ static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray,
 	i = (t_point){(int)world.x, (int)world.y};
 	if (!ray.tile_dict[data->map->matrix[i.y * data->map->wid + i.x]])
 		return ((void)(*(int *)img = 0));
-	tex = ray.tile_dict[data->map->matrix[i.y * data->map->wid + i.x]]->tex_fl;
+	tex = ray.tile_dict[data->map->matrix[i.y * data->map->wid + i.x]]->tex_ce;
+	if (is_floor)
+		tex = ray.tile_dict[data->map->matrix[i.y * data->map->wid
+			+ i.x]]->tex_fl;
 	*(int *)img = *(((int *)tex->data) + (tex->size_line / 4)
 			* (int)((world.y - i.y) * tex->height) + (int)((world.x - i.x)
 				* tex->width));
+}
+
+void	draw_wall(t_hit *hit, char *img)
+{
+	hit->tex_y = hit->tex_pos_fp >> 16;
+	*(int *)img = *(int *)(hit->tex_col + hit->tex_y
+			* hit->texture->size_line);
+	hit->tex_pos_fp += hit->step_fp;
 }
 
 void	*draw_walls_thread(void *arg)
@@ -78,16 +90,9 @@ void	*draw_walls_thread(void *arg)
 		{
 			hit = &data->hits[curr.x];
 			if (curr.y >= hit->draw_start && curr.y < hit->draw_end)
-			{
-				hit->tex_y = hit->tex_pos_fp >> 16;
-				*(int *)img = *(int *)(hit->tex_col + hit->tex_y
-						* hit->texture->size_line);
-				hit->tex_pos_fp += hit->step_fp;
-			}
-			else if (curr.y < hit->draw_start)
-				draw_ceil(data, curr, td->ray_dir, img);
+				draw_wall(hit, img);
 			else
-				draw_floor(data, curr, td->ray_dir, img);
+				draw_floor(curr, td->ray_dir, img, curr.y > hit->draw_start);
 			img += data->img.bpp;
 		}
 		img += td->add_next_line;

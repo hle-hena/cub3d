@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 18:02:27 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 14:39:01 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/28 17:22:15 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,10 +116,8 @@ void	retrieve_map(t_map *map, char *line, int map_fd, int *err)
 	int		wid;
 
 	grid = NULL;
-	while (1)
+	while (line)
 	{
-		if (!line)
-			break ;
 		if (ft_strncmp(line, "\n", 2) == 0)
 		{
 			ft_del((void **)&line);
@@ -134,8 +132,7 @@ void	retrieve_map(t_map *map, char *line, int map_fd, int *err)
 				*err = 1, (void)0);
 		line[wid] = 0;
 		add_link(&grid, line);
-		map->len++;
-		if (wid > map->wid)
+		if (++map->len && wid > map->wid)
 			map->wid = wid;
 		line = get_next_line(map_fd);
 	}
