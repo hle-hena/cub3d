@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 18:45:08 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/24 11:08:35 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/28 13:01:58 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ int	is_map_valid(t_map *mp, t_tile **tiles, int err)
 			{
 				if (check_neighbors(mp, tiles, x, y))
 					return (print_map_open(x + 1, y + 1), 1);
-			} 
+			}
 			else if ((x == 0 || x == mp->wid - 1 || y == 0 || y == mp->len - 1)
 				&& tiles[*(mp->matrix + y * mp->wid + x)]->is_wall != 1)
 				return (print_map_open(x + 1, y + 1), 1);

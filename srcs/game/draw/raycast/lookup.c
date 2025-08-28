@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 14:53:26 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/24 11:31:27 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/28 12:40:03 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,10 @@ void	fill_cast_table(t_data *data, int *err)
 			(*table)[y * data->win_wid + x].x = (float)x / data->win_wid;
 			if (y > data->win_len / 2)
 				(*table)[y * data->win_wid + x].y = (float)data->win_len * 2
-						/ (2.0f * (y - data->win_len / 2));
+					/ (2.0f * (y - data->win_len / 2));
 			else
 				(*table)[y * data->win_wid + x].y = (float)data->win_len * 2
-						/ (2.0f * (data->win_len / 2 - y));
+					/ (2.0f * (data->win_len / 2 - y));
 		}
 	}
 }

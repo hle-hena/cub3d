@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 10:37:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/23 14:17:40 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/28 13:48:22 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ int	lonely_type_switch(t_tile **tiles, char *line, int *err, int index)
 
 	if (!line[0] || line[0] == '#')
 		return (0);
-	arg = ft_strtrim(line + 2, " \t\n"); //This is unsafe, what if line is < 2
+	arg = ft_strtrim(line + 2, " \t\n");
 	if (!arg)
 		return (*err = 1, 0);
 	if (!*arg)

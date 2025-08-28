@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 18:02:27 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/24 11:16:47 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/28 14:39:01 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,7 +133,7 @@ void	retrieve_map(t_map *map, char *line, int map_fd, int *err)
 			return (ft_lstclear(&grid, ft_del), ft_del((void **)&line),
 				*err = 1, (void)0);
 		line[wid] = 0;
-		add_link(&grid, line);//This is absolutly wild, should not do that lmaoo
+		add_link(&grid, line);
 		map->len++;
 		if (wid > map->wid)
 			map->wid = wid;

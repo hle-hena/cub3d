@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/24 14:45:36 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/28 14:28:42 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ typedef unsigned long long t_uint64;
 typedef long long t_int64;
 
 # define TARGET_FPS 60
-# define FRAME_TIME_US (1000000 / 60)
+# define FRAME_TIME_US 16666
 
 typedef struct s_trigometry_values
 {
@@ -217,13 +217,9 @@ int		key_up(int keycode, t_data *data);
 int		mouse_down(int button, int x, int y, t_data *data);
 int		mouse_up(int button, int x, int y, t_data *data);
 int		mouse_move(int x, int y, t_data *data);
-t_col	rev_calc_color(int col);
-int		calc_color(t_col col);
-int		ft_get_pixel_color(t_data *data, t_point point);
 
 void	cast_rays(t_data *data);
 
-int		point_is_in_fov(t_data *data, t_point point);
 void	draw_player(t_data *data, t_point center, double theta);
 void	ft_put_pixel(t_data *data, t_point point, int color);
 void	draw_tile(t_data *data, t_point start, t_trig vals, int color);
@@ -234,8 +230,6 @@ int		point_is_in_mini_map(t_data *data, t_point point);
 
 t_hit	raycast(t_data *data, t_vec dir, t_player player);
 t_vec	**get_cast_table(void);
-void	draw_line_in_direction(t_data *data, t_point start, t_vec dir,
-	float dist);
 
 
 void	fps_counter(t_data *data);

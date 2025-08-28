@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:05:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 12:02:28 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/28 12:35:00 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,11 @@ void	init_mlx(t_data *data)
 {
 	mlx_get_screen_size(data->mlx, &data->win_wid, &data->win_len);
 	data->win_len *= 0.9;
-	// data->win_wid *= 2;
-	// data->win_len *= 2;
 	data->win = mlx_new_window(data->mlx, data->win_wid, data->win_len,
-		"Cub3d");
+			"Cub3d");
 	data->img.img = mlx_new_image(data->mlx, data->win_wid, data->win_len);
 	data->img.data = mlx_get_data_addr(data->img.img, &data->img.bpp,
-		&data->img.size_line, &data->img.endian);
+			&data->img.size_line, &data->img.endian);
 	data->img.bpp /= 8;
 	data->event = (t_event){0};
 	data->delta_t = 0;
@@ -41,7 +39,7 @@ void	init_utils(t_data *data)
 
 	err = 0;
 	data->map->mini_map = (t_point)
-		{data->win_wid * 0.9, data->win_len * 0.15};
+	{data->win_wid * 0.9, data->win_len * 0.15};
 	data->map->mini_map_scale = 32;
 	data->hits = malloc(data->win_wid * sizeof(t_hit));
 	if (!data->hits)
@@ -57,10 +55,9 @@ int	main(int ac, char **av)
 
 	data = get_data();
 	data->mlx = mlx_init();
-	// mlx_do_key_autorepeatoff(data->mlx);
 	data->map = load_map(ac, av);
 	if (data->map)
-	{	
+	{
 		init_mlx(data);
 		init_utils(data);
 		loop();

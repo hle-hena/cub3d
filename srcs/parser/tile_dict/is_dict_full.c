@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 21:54:54 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/23 14:15:14 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/28 13:04:03 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@ void	is_value_missing(int value, char *identifier, int id, int *missing)
 		letter[0] = id;
 		letter[1] = 0;
 		*missing = 1;
-		ft_perror(-1, ft_strsjoin((char *[]){"Missing ", identifier, "\tfor id ",
-			letter, NULL}), 1);
+		ft_perror(-1, ft_strsjoin((char *[]){"Missing ", identifier, " for id ",
+				letter, NULL}), 1);
 	}
 }
 
@@ -35,8 +35,8 @@ void	is_text_missing(t_img *img, char *identifier, int id, int *missing)
 		letter[0] = id;
 		letter[1] = 0;
 		*missing = 1;
-		ft_perror(-1, ft_strsjoin((char *[]){"Missing ", identifier, "\tfor id ",
-			letter, NULL}), 1);
+		ft_perror(-1, ft_strsjoin((char *[]){"Missing ", identifier, " for id ",
+				letter, NULL}), 1);
 	}
 }
 

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:28:34 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/23 14:19:07 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/28 14:27:50 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,16 +81,16 @@ void	retrieve_tile(t_tile **tiles, int map_fd, char *line, int *err)
 	if (!*tiles)
 		*tiles = new_tile();
 	if (!*tiles)
-		return (ft_perror(-1, "Internal error: malloc.", 0), *err = 1, VOID);
+		return (*err = 1, ft_perror(-1, "Internal error: malloc.", 0));
 	while (1)
 	{
 		temp = get_next_line(map_fd);
 		if (!temp)
-			return (ft_perror(-1, "Internal error: malloc.", 0), *err = 1, VOID);
+			return (*err = 1, ft_perror(-1, "Internal error: malloc.", 0));
 		line = ft_strtrim(temp, "\t\n ");
 		ft_del((void **)&temp);
 		if (!line)
-			return (ft_perror(-1, "Internal error: malloc.", 0), *err = 1, VOID);
+			return (*err = 1, ft_perror(-1, "Internal error: malloc.", 0));
 		if (ft_strncmp("}", line, 2) == 0)
 			return (ft_del((void **)&line), VOID);
 		retrieve_switch(*tiles, line, err);

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 16:34:13 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/21 17:55:52 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/28 14:30:26 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ void	retrieve_value(int *value, char *arg, int *err, char *id)
 		arg++;
 		if (*value > limits[1])
 			return (ft_perror(-1, ft_strsjoin((char *[]){"Expected a positive \
-number smaller than ", lim_str[1], " for identifier '", id ,"'.", NULL}), 1),
+number smaller than ", lim_str[1], " for identifier '", id, "'.", NULL}), 1),
 				*err = 1, VOID);
 	}
 	if (*arg)
@@ -66,6 +66,6 @@ number smaller than ", lim_str[1], " for identifier '", id ,"'.", NULL}), 1),
 					arg, "in id '", id, "'.", NULL}), 1), *err = 1, VOID);
 	if (*value < limits[0])
 		return (ft_perror(-1, ft_strsjoin((char *[]){"Expected a positive \
-number bigger than ", lim_str[0], " for identifier '", id ,"'.", NULL}), 1),
+number bigger than ", lim_str[0], " for identifier '", id, "'.", NULL}), 1),
 				*err = 1, VOID);
 }
