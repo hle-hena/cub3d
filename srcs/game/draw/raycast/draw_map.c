@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 15:03:15 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/28 15:29:31 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,66 +14,49 @@
 
 static inline void	draw_ceil(t_data *data, t_point curr, t_rdir ray, char *img)
 {
-	t_tile	*tile;
-	t_vec	cast;
-	t_vec	world;
-	t_point	iworld;
-	t_point	pix;
-	t_img	*tex;
-	int	offset;
+	t_img		*tex;
+	t_vec		cast;
+	t_vec		world;
+	t_point		i;
 
-	cast = *(ray.cast_table + curr.y * data->win_wid + curr.x);
-	world.x = data->map->player.x + cast.y * (ray.l.x + cast.x * ray.r.x);
-	world.y = data->map->player.y + cast.y * (ray.l.y + cast.x * ray.r.y);
-	iworld.x = (int)world.x;
-	iworld.y = (int)world.y;
-	if (iworld.y < 0 || iworld.y >= data->map->len || iworld.x < 0
-		|| iworld.x >= data->map->wid)
-		return ;
-	tile = *(ray.tile_dict + *(data->map->matrix + iworld.y * data->map->wid + iworld.x));
-	if (!tile)
-		return ;
-	tex = tile->tex_ce;
-	pix.x = ((world.x - iworld.x) * tex->width);
-	pix.y = ((world.y - iworld.y) * tex->height);
-	if (pix.x >= tex->width)
-		pix.x = tex->width - 1;
-	if (pix.y >= tex->height)
-		pix.y = tex->height - 1;
-	offset = pix.y * tex->size_line + pix.x * tex->bpp;
-	*(int *)img = *(int *)(tex->data + offset);
+	cast = ray.cast_table[curr.y * data->win_wid + curr.x];
+	world = (t_vec){data->map->player.x + cast.y * (ray.l.x + cast.x
+			* ray.r.x), data->map->player.y + cast.y
+		* (ray.l.y + cast.x * ray.r.y)};
+	if (world.x < 0 || world.x >= data->map->wid || world.y < 0
+		|| world.y >= data->map->len)
+		return ((void)(*(int *)img = 0));
+	i = (t_point){(int)world.x, (int)world.y};
+	if (!ray.tile_dict[data->map->matrix[i.y * data->map->wid + i.x]])
+		return ((void)(*(int *)img = 0));
+	tex = ray.tile_dict[data->map->matrix[i.y * data->map->wid + i.x]]->tex_ce;
+	*(int *)img = *(((int *)tex->data) + (tex->size_line / 4)
+			* (int)((world.y - i.y) * tex->height) + (int)((world.x - i.x)
+				* tex->width));
 }
 
-static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray, char *img)
+static inline void	draw_floor(t_data *data, t_point curr, t_rdir ray,
+	char *img)
 {
-	t_tile	*tile;
-	t_vec	cast;
-	t_vec	world;
-	t_point	pix;
-	t_point	iworld;
-	t_img	*tex;
-	int	offset;
+	t_img		*tex;
+	t_vec		cast;
+	t_vec		world;
+	t_point		i;
 
-	cast = *(ray.cast_table + curr.y * data->win_wid + curr.x);
-	world.x = data->map->player.x + cast.y * (ray.l.x + cast.x * ray.r.x);
-	world.y = data->map->player.y + cast.y * (ray.l.y + cast.x * ray.r.y);
-	iworld.x = (int)world.x;
-	iworld.y = (int)world.y;
-	if (iworld.y < 0 || iworld.y >= data->map->len || iworld.x < 0
-		|| iworld.x >= data->map->wid)
-		return ;
-	tile = *(ray.tile_dict + *(data->map->matrix + iworld.y * data->map->wid + iworld.x));
-	if (!tile)
-		return ;
-	tex = tile->tex_fl;
-	pix.x = ((world.x - iworld.x) * tex->width);
-	pix.y = ((world.y - iworld.y) * tex->height);
-	if (pix.x >= tex->width)
-		pix.x = tex->width - 1;
-	if (pix.y >= tex->height)
-		pix.y = tex->height - 1;
-	offset = pix.y * tex->size_line + pix.x * tex->bpp;
-	*(int *)img = *(int *)(tex->data + offset);
+	cast = ray.cast_table[curr.y * data->win_wid + curr.x];
+	world = (t_vec){data->map->player.x + cast.y * (ray.l.x + cast.x
+			* ray.r.x), data->map->player.y + cast.y
+		* (ray.l.y + cast.x * ray.r.y)};
+	if (world.x < 0 || world.x >= data->map->wid || world.y < 0
+		|| world.y >= data->map->len)
+		return ((void)(*(int *)img = 0));
+	i = (t_point){(int)world.x, (int)world.y};
+	if (!ray.tile_dict[data->map->matrix[i.y * data->map->wid + i.x]])
+		return ((void)(*(int *)img = 0));
+	tex = ray.tile_dict[data->map->matrix[i.y * data->map->wid + i.x]]->tex_fl;
+	*(int *)img = *(((int *)tex->data) + (tex->size_line / 4)
+			* (int)((world.y - i.y) * tex->height) + (int)((world.x - i.x)
+				* tex->width));
 }
 
 void	*draw_walls_thread(void *arg)
