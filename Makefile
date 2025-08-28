@@ -59,6 +59,10 @@ light:
 	@rm -rf srcs/game/draw/raycast/get_colors.o srcs/game/draw/raycast/setup_color.o
 	@$(MAKE) $(NAME) FLAGS="$(FLAGS) -D LIGHT_ON=1 -O3"
 
+no_light:
+	@rm -rf srcs/game/draw/raycast/get_colors.o srcs/game/draw/raycast/setup_color.o
+	@$(MAKE) $(NAME) FLAGS="$(FLAGS) -D LIGHT_ON=0 -O3"
+
 no: clear
 no: $(NAME)
 
