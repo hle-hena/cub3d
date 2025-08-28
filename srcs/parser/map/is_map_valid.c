@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 18:45:08 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 10:11:10 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/28 11:06:40 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int	light_check(t_map *map)
 		{
 			if (lmap.lights[i].pos.x >= map->wid
 				|| lmap.lights[i].pos.y >= map->len)
-				return (ft_perror(0, "A light is outsided the map.", 0), 1);
+				return (ft_perror(-1, "A light is outsided the map.", 0), 1);
 		}
 	}
 	return (0);
