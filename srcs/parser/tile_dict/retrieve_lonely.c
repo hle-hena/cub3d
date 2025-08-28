@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 10:37:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 10:21:32 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/28 10:25:33 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,9 +82,9 @@ int	retrieve_lonely(t_map *map, char *line, int *err)
 	temp = is_end(line);
 	if (temp == 1)
 		return (1);
-	if (temp == '1' && !tiles['1'])
+	if (!tiles['1'])
 		tiles['1'] = new_tile();
-	if (temp == '1' && !tiles['1'])
+	if (!tiles['1'])
 		return (ft_perror(-1, "Internal error: tile creation", 0), *err = 1, 0);
 	if (temp == '0' && !tiles['0'])
 		tiles['0'] = new_tile();
