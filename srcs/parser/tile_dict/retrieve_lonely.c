@@ -6,11 +6,25 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 10:37:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 10:25:33 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/28 11:13:17 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3D.h"
+
+void	retrieve_for_both(t_tile **tiles, char *arg, int *err, char *id)
+{
+	if (*id == 'C')
+	{
+		retrieve_texture(&(tiles['1'])->tex_ce, arg, err, id);
+		retrieve_texture(&(tiles['0'])->tex_ce, arg, err, id);
+	}
+	else if (*id == 'F')
+	{
+		retrieve_texture(&(tiles['1'])->tex_fl, arg, err, id);
+		retrieve_texture(&(tiles['0'])->tex_fl, arg, err, id);
+	}
+}
 
 int	lonely_type_switch(t_tile **tiles, char *line, int *err, int index)
 {
@@ -34,15 +48,9 @@ identifier at ", line, ".", NULL}), 1), *err = 1, 0);
 	else if (ft_strncmp("WE ", line, 3) == 0)
 		retrieve_texture(&(tiles['1'])->tex_we, arg, err, "WE");
 	else if (ft_strncmp("C ", line, 2) == 0)
-	{
-		retrieve_texture(&(tiles['1'])->tex_ce, arg, err, "C");
-		retrieve_texture(&(tiles['0'])->tex_ce, arg, err, "C");
-	}
+		retrieve_for_both(tiles, arg, err, "C");
 	else if (ft_strncmp("F ", line, 2) == 0)
-	{
-		retrieve_texture(&(tiles['1'])->tex_fl, arg, err, "F");
-		retrieve_texture(&(tiles['0'])->tex_fl, arg, err, "F");
-	}
+		retrieve_for_both(tiles, arg, err, "F");
 	return (ft_del((void **)&arg), 0);
 }
 
