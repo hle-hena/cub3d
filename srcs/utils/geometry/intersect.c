@@ -6,11 +6,11 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 11:43:04 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/18 14:24:16 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/28 10:11:10 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3d.h"
+#include "cub3D.h"
 
 t_inter	intersect_switch(t_vec origin, t_vec dir, t_wpath path_to_inter)
 {

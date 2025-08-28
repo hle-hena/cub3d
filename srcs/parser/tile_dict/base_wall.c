@@ -6,11 +6,11 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/07 10:08:05 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/18 12:09:34 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/28 10:11:10 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3d.h"
+#include "cub3D.h"
 
 int	add_wall(t_tile *tile, t_wpath content, int *err)
 {

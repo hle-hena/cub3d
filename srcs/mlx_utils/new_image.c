@@ -6,11 +6,11 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/07 16:21:30 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/07 16:36:50 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/28 10:11:10 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3d.h"
+#include "cub3D.h"
 
 void	new_image(t_data *data, t_img *img_struct, int width, int height)
 {

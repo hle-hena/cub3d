@@ -6,11 +6,11 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 13:37:04 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/18 14:24:16 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/28 10:11:10 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3d.h"
+#include "cub3D.h"
 
 static inline t_wpath	line(t_point curr, t_wpath base)
 {

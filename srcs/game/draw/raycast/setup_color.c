@@ -6,11 +6,11 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/06 11:44:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/18 14:07:49 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/28 10:11:10 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3d.h"
+#include "cub3D.h"
 
 //This function is cache-miss-read heavy ...
 void	setup_color(t_draw *draw, t_th_draw *td, t_col fallback, int nb_hit)

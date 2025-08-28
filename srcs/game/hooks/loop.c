@@ -6,11 +6,11 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 21:49:44 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/27 17:09:13 by gakarbou         ###   ########.fr       */
+/*   Updated: 2025/08/28 10:11:10 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3d.h"
+#include "cub3D.h"
 
 /* Previous code for the collision. Works only on square collision.
 		delta.x = (delta.x / len) * MOVE_SPEED * data->delta_t;
