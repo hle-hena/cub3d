@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:28:34 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 14:27:50 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/29 11:35:43 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,11 +44,11 @@ void	retrieve_switch(t_tile *tile, char *line, int *err)
 	if (!line[0] || line[0] == '#')
 		return ;
 	if (!line[1 + (line[1] != 0)])
-		return (ft_perror(-1, ft_strsjoin((char *[]){"Empty line after \
-identifier at ", line, ".", NULL}), 1), *err = 1, VOID);
+		return (*err = 1, ft_perror(-1, ft_strsjoin((char *[]){"Empty line \
+after identifier at ", line, ".", NULL}), 1));
 	arg = ft_strtrim(line + 2, " \t\n");
 	if (!arg)
-		return (*err = 1, VOID);
+		return ((void)(*err = 1));
 	type_switch(tile, line, arg, err);
 	ft_del((void **)&arg);
 }
@@ -92,7 +92,7 @@ void	retrieve_tile(t_tile **tiles, int map_fd, char *line, int *err)
 		if (!line)
 			return (*err = 1, ft_perror(-1, "Internal error: malloc.", 0));
 		if (ft_strncmp("}", line, 2) == 0)
-			return (ft_del((void **)&line), VOID);
+			return (ft_del((void **)&line));
 		retrieve_switch(*tiles, line, err);
 		ft_del((void **)&line);
 		if (*err)

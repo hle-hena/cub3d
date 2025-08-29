@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 14:53:26 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 12:40:03 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/29 11:30:32 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	fill_cast_table(t_data *data, int *err)
 	table = get_cast_table();
 	*table = malloc((data->win_len * data->win_wid) * sizeof(t_vec *));
 	if (!*table)
-		return (ft_perror(-1, "Internal error: malloc.", 0), *err = 1, VOID);
+		return (*err = 1, ft_perror(-1, "Internal error: malloc.", 0));
 	y = -1;
 	while (++y < data->win_len)
 	{

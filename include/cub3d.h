@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 14:28:42 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/29 11:45:43 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,15 +21,12 @@
 # include <sys/time.h>
 # include <stdio.h>
 
-# include <pthread.h>
-
 # define PI 3.1415926535897932384
-# define VOID (void)0
-typedef unsigned long long t_uint64;
-typedef long long t_int64;
-
 # define TARGET_FPS 60
 # define FRAME_TIME_US 16666
+
+typedef unsigned long long	t_uint64;
+typedef long long			t_int64;
 
 typedef struct s_trigometry_values
 {
@@ -39,9 +36,9 @@ typedef struct s_trigometry_values
 
 typedef struct s_color
 {
-	int re;
-	int gr;
-	int bl;
+	int	re;
+	int	gr;
+	int	bl;
 }	t_col;
 
 typedef struct s_vector
@@ -80,7 +77,7 @@ typedef struct s_player
 	int		rot;
 }	t_player;
 
-typedef	struct s_tile
+typedef struct s_tile
 {
 	t_img		*tex_no;
 	t_img		*tex_so;
@@ -139,7 +136,7 @@ typedef struct s_ray
 	int		side;
 }	t_ray;
 
-typedef	struct s_ray_dir
+typedef struct s_ray_dir
 {
 	t_vec	l;
 	t_vec	r;
@@ -147,7 +144,7 @@ typedef	struct s_ray_dir
 	t_tile	**tile_dict;
 }	t_rdir;
 
-typedef	struct s_cam
+typedef struct s_cam
 {
 	t_vec	dir;
 	t_vec	plane;
@@ -168,8 +165,6 @@ typedef struct s_data
 	t_event	event;
 }	t_data;
 
-# define DRAW_THREADS 4
-
 typedef struct s_thread_draw
 {
 	t_data	*data;
@@ -184,11 +179,6 @@ t_map	*get_map(void);
 t_map	*load_map(int ac, char **av);
 int		clean_map(void);
 int		clean_data(void);
-
-// static inline int	get(t_map *map, int x, int y)
-// {
-// 	return (*(map->matrix + y * map->wid + x));
-// }
 
 void	fill_cast_table(t_data *data, int *err);
 
@@ -214,8 +204,6 @@ int		mlx_close(t_data *data);
 int		event_loop(t_data *data);
 int		key_down(int keycode, t_data *data);
 int		key_up(int keycode, t_data *data);
-int		mouse_down(int button, int x, int y, t_data *data);
-int		mouse_up(int button, int x, int y, t_data *data);
 int		mouse_move(int x, int y, t_data *data);
 
 void	cast_rays(t_data *data);
@@ -231,11 +219,7 @@ int		point_is_in_mini_map(t_data *data, t_point point);
 t_hit	raycast(t_data *data, t_vec dir, t_player player);
 t_vec	**get_cast_table(void);
 
-
 void	fps_counter(t_data *data);
-
-
-
-void	print_dict(t_data *data);
+void	*draw_walls(void *arg);
 
 #endif

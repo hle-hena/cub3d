@@ -6,13 +6,14 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 18:01:30 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/08 17:01:57 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/29 11:40:57 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../libft.h"
 
-static void	remove_node(t_list **node, void (*del)(void **)) {
+static void	remove_node(t_list **node, void (*del)(void **))
+{
 	t_list	*temp;
 
 	temp = *node;
@@ -24,8 +25,8 @@ static void	remove_node(t_list **node, void (*del)(void **)) {
 void	ft_lstremove_if(t_list **head, int (*cnd)(void *, void *),
 	void (*del)(void **), void *to_find)
 {
-	t_list *current;
-	t_list *prev;
+	t_list	*current;
+	t_list	*prev;
 
 	current = *head;
 	prev = NULL;

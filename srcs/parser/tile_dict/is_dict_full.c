@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 21:54:54 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 17:25:52 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/29 11:31:55 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,14 +71,13 @@ void	is_replace_tile_missing(t_tile **tiles, t_map *map, int *missing)
 	if (*missing)
 		return ;
 	if (map->replace_tile == map->void_char && !tiles['0'])
-		return (ft_perror(-1, "Map is missing the player replace tile.\nYou \
-should add something like 'P=0' before starting the map.", 0), *missing = 1,
-			VOID);
+		return (*missing = 1, ft_perror(-1, "Map is missing the player replace \
+tile.\nYou should add something like 'P=0' before starting the map.", 0));
 	else if (map->replace_tile == map->void_char)
 		map->replace_tile = '0';
 	if (tiles[(int)map->replace_tile]->is_wall)
-		return (ft_perror(-1, "The player replace tile should not be a wall \
-tile.", 0), *missing = 1, VOID);
+		return (*missing = 1, ft_perror(-1, "The player replace tile should not\
+ be a wall tile.", 0));
 }
 
 int	is_dict_full(t_map *map, int i)

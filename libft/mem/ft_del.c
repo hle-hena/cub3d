@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 16:23:08 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/04 15:56:07 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/29 11:41:48 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@ void	ft_del(void **add)
 {
 	if (*add)
 	{
-		
 		free(*add);
 		*add = NULL;
 	}

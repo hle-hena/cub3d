@@ -25,7 +25,7 @@ SRCS = $(addprefix srcs/, \
 		$(addprefix draw/, \
 			$(addprefix mini_map/, draw_circle.c draw_line.c draw_map.c \
 				draw_player.c draw_square.c)\
-			$(addprefix raycast/, draw_map.c lookup.c raycast.c)\
+			$(addprefix raycast/, draw_map.c draw_walls.c lookup.c raycast.c)\
 		)\
 		$(addprefix status/, fps.c)\
 		$(addprefix hooks/, key.c loop.c mouse.c)\
