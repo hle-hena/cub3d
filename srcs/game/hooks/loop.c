@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 21:49:44 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 12:56:06 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/29 15:17:57 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@ void	do_colisions(t_data *data, t_vec delta, float len)
 	int	wall_x;
 	int	wall_y;
 
-	delta.x = (delta.x / len) * MOVE_SPEED * data->delta_t;
-	delta.y = (delta.y / len) * MOVE_SPEED * data->delta_t;
+	delta.x = (delta.x / len) * MOVE_SPEED;
+	delta.y = (delta.y / len) * MOVE_SPEED;
 	wall_x = (int)(data->map->player.x + delta.x);
 	wall_y = (int)(data->map->player.y + delta.y);
 	if (!get_tile_dict()[*(data->map->matrix + (int)data->map->player.y
@@ -50,6 +50,7 @@ void	move_event(t_data *data)
 
 	cos_val = cos(data->map->player.rot * PI / 180);
 	sin_val = sin(data->map->player.rot * PI / 180);
+	data->event.rot -= (data->event.rot_left - data->event.rot_right) * 20;
 	if (data->event.rot < 0)
 		data->map->player.rot += (float)data->event.rot * ROT_SPEED + 360;
 	else

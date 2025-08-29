@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 12:49:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 14:25:46 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/29 14:18:26 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,7 +114,7 @@ color.", 0));
 	if (retrieve_color(&line, &color.bl, err, "blue"))
 		return ;
 	if (*line)
-		return (*err = 1, ft_perror(-1, "Expected a \\n after the last color. \
-If you wanted to put a reflectance do ': [value]'.", 0));
+		return (*err = 1, ft_perror(-1, "Expected a \\n after the last color.",
+				0));
 	set_img_color(img, line, color, err);
 }

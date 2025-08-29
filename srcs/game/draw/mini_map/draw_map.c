@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 22:36:25 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/29 11:55:55 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/29 16:28:27 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,9 @@ int	point_is_in_mini_map(t_data *data, t_point point)
 	int	dy;
 	int	radius;
 
+	if (point.x < 0 || point.y < 0 || point.x >= data->win_wid
+		|| point.y >= data->win_len)
+		return (0);
 	dx = point.x - data->map->mini_map.x;
 	dy = point.y - data->map->mini_map.y;
 	radius = data->win_len / 8;

@@ -6,36 +6,39 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 18:51:23 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 12:43:36 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/29 15:05:09 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-t_hit	hit_info(t_data *data, t_player player, t_ray ray, t_vec dir)
+t_hit	hit_info(t_data *data, t_player p, t_ray ray, t_vec dir)
 {
-	t_hit	hit;
+	t_hit	h;
 
 	if (ray.side == 0)
-		hit.dist = (ray.curr.x - player.x + (1 - ray.step.x) / 2.0f) / dir.x;
+		h.dist = (ray.curr.x - p.x + (1 - ray.step.x) / 2.0f) / dir.x;
 	else
-		hit.dist = (ray.curr.y - player.y + (1 - ray.step.y) / 2.0f) / dir.y;
-	hit.ray_hit.x = player.x + dir.x * hit.dist;
-	hit.ray_hit.y = player.y + dir.y * hit.dist;
+		h.dist = (ray.curr.y - p.y + (1 - ray.step.y) / 2.0f) / dir.y;
+	h.ray_hit = (t_vec){p.x + dir.x * h.dist, p.y + dir.y * h.dist};
+	if (ray.step.x == -1)
+		h.ray_hit.y = (int)h.ray_hit.y + 1.0f - h.ray_hit.y + (int)h.ray_hit.y;
+	if (ray.step.y == 1)
+		h.ray_hit.x = (int)h.ray_hit.x + 1.0f - h.ray_hit.x + (int)h.ray_hit.x;
 	if (ray.side == 0 && ray.step.x == 1)
-		hit.texture = get_tile_dict()[*(data->map->matrix + ray.curr.y
+		h.texture = get_tile_dict()[*(data->map->matrix + ray.curr.y
 				* data->map->wid + ray.curr.x)]->tex_ea;
 	else if (ray.side == 0)
-		hit.texture = get_tile_dict()[*(data->map->matrix + ray.curr.y
+		h.texture = get_tile_dict()[*(data->map->matrix + ray.curr.y
 				* data->map->wid + ray.curr.x)]->tex_we;
 	else if (ray.step.y == 1)
-		hit.texture = get_tile_dict()[*(data->map->matrix + ray.curr.y
+		h.texture = get_tile_dict()[*(data->map->matrix + ray.curr.y
 				* data->map->wid + ray.curr.x)]->tex_no;
 	else
-		hit.texture = get_tile_dict()[*(data->map->matrix + ray.curr.y
+		h.texture = get_tile_dict()[*(data->map->matrix + ray.curr.y
 				* data->map->wid + ray.curr.x)]->tex_so;
-	hit.side = ray.side;
-	return (hit);
+	h.side = ray.side;
+	return (h);
 }
 
 void	init_ray(t_ray *ray, t_vec dir, t_player player)

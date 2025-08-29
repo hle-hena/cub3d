@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 12:34:15 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 14:26:23 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/29 14:59:21 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,19 +46,18 @@ char	*retrieve_tile_dict(t_map *map, int map_fd, int *err)
 		if (!temp)
 			return (NULL);
 		line = ft_strtrim(temp, "\t\n ");
-		ft_del((void **)&temp);
 		if (!line)
-			return (ft_perror(-1, "Internal error: malloc", 0), *err = 1, NULL);
-		if (!line[0])
+			return (ft_perror(-1, "Internal error: malloc", 0),
+				ft_del((void **)&temp), *err = 1, NULL);
+		if (line[0])
 		{
-			ft_del((void **)&line);
-			continue ;
+			if (is_define(line, err))
+				retrieve_tile(&get_tile_dict()[(int)*line], map_fd, line, err);
+			else if (retrieve_lonely(map, line, err))
+				return (ft_del((void **)&line), temp);
 		}
-		if (is_define(line, err))
-			retrieve_tile(&get_tile_dict()[(int)*line], map_fd, line, err);
-		else if (retrieve_lonely(map, line, err))
-			return (line);
 		ft_del((void **)&line);
+		ft_del((void **)&temp);
 		if (*err)
 			return (NULL);
 	}

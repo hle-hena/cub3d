@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:05:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 12:35:00 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/29 15:10:21 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,7 @@ void	init_utils(t_data *data)
 	int	err;
 
 	err = 0;
-	data->map->mini_map = (t_point)
-	{data->win_wid * 0.9, data->win_len * 0.15};
+	data->map->mini_map = (t_point){data->win_wid * 0.9, data->win_len * 0.15};
 	data->map->mini_map_scale = 32;
 	data->hits = malloc(data->win_wid * sizeof(t_hit));
 	if (!data->hits)

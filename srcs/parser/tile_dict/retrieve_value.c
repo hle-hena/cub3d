@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 16:34:13 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/29 11:38:05 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/29 16:08:29 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ positive number smaller than ", lim_str[1], " for identifier '", id, "'.",
 	}
 	if (*arg)
 		return (*err = 1, ft_perror(-1, ft_strsjoin((char *[]){"Unexpected char\
- near ", arg, "in id '", id, "'.", NULL}), 1));
+ near ", arg, " in id '", id, "'.", NULL}), 1));
 	if (*value < limits[0])
 		return (*err = 1, ft_perror(-1, ft_strsjoin((char *[]){"Expected a \
 positive number bigger than ", lim_str[0], " for identifier '", id, "'.",

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/29 11:46:10 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/08/29 16:14:05 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ t_hit	cast_ray(t_data *data, t_vec ray_dir)
 
 	ray_hit = raycast(data, ray_dir, data->map->player);
 	ray_hit.ray_dir = ray_dir;
-	ray_hit.dist = fmax(ray_hit.dist, 0.0001f);
+	ray_hit.dist = fmax(ray_hit.dist, 0.001f);
 	line_height = fmax(1, (int)(data->win_len * 2 / ray_hit.dist));
 	tex_start = -line_height / 2 + data->win_len / 2;
 	tex_end = line_height / 2 + data->win_len / 2;
@@ -49,7 +49,7 @@ t_hit	cast_ray(t_data *data, t_vec ray_dir)
 	if (ray_hit.side == 0)
 		wall_x = ray_hit.ray_hit.y;
 	wall_x -= (int)wall_x;
-	line_height = tex_end - tex_start;
+	line_height = ft_max(1, tex_end - tex_start);
 	ray_hit.step_fp = (ray_hit.texture->height << 16) / line_height;
 	ray_hit.tex_pos_fp = (ray_hit.draw_start - data->win_len / 2 + line_height
 			/ 2) * ray_hit.step_fp;
