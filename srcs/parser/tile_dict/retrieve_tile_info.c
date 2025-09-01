@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:28:34 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/29 11:35:43 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/09/01 14:29:55 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,6 @@ void	type_switch(t_tile *tile, char *line, char *arg, int *err)
 		retrieve_texture(&tile->tex_fl, arg, err, "F");
 	else if (ft_strncmp("W ", line, 2) == 0)
 		retrieve_value(&tile->is_wall, arg, err, "W");
-	else if (ft_strncmp("CH ", line, 2) == 0)
-		retrieve_value(&tile->ceil_height, arg, err, "CH");
-	else if (ft_strncmp("FH ", line, 2) == 0)
-		retrieve_value(&tile->floor_height, arg, err, "FH");
 	else
 		(ft_perror(-1, ft_strsjoin((char *[]){"Invalid identifier at \
 line : ", line, ".", NULL}), 1), *err = 1);
@@ -66,8 +62,6 @@ t_tile	*new_tile(void)
 	new->tex_no = NULL;
 	new->tex_so = NULL;
 	new->tex_we = NULL;
-	new->ceil_height = -1;
-	new->floor_height = -1;
 	new->is_wall = -1;
 	return (new);
 }

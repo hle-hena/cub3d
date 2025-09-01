@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 10:37:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 17:29:42 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/09/01 14:29:43 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,6 @@ int	lonely_type_switch(t_tile *tile, char *arg, int *err, char *line)
 		retrieve_texture(&tile->tex_fl, arg, err, "F");
 	else if (ft_strncmp("W ", line, 2) == 0)
 		retrieve_value(&tile->is_wall, arg, err, "W");
-	else if (ft_strncmp("CH ", line, 2) == 0)
-		retrieve_value(&tile->ceil_height, arg, err, "CH");
-	else if (ft_strncmp("FH ", line, 2) == 0)
-		retrieve_value(&tile->floor_height, arg, err, "FH");
 	else
 		return (ft_del((void **)&arg), 1);
 	return (ft_del((void **)&arg), 0);

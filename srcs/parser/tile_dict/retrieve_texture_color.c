@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 12:49:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/29 14:18:26 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/09/01 11:41:45 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,10 +85,10 @@ happened during the opening of the image for '", line, "'.", NULL}), 1));
 int	retrieve_color(char **line, int *color, int *err, char *color_name)
 {
 	*color = ft_atoi_err(line);
-	if (*err == -1)
+	if (*err == -1 || *color == -1)
 	{
 		ft_perror(-1, ft_strsjoin((char *[]){"Expected a positive number under\
- 255 as ", color_name, ".", NULL}), 0);
+ 255 as ", color_name, ".", NULL}), 1);
 		*err = 1;
 		return (1);
 	}

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/29 15:12:42 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/09/01 15:01:27 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ typedef struct s_img
 	int		height;
 }	t_img;
 
-# define MOVE_SPEED 0.075f
+# define MOVE_SPEED 0.15f
 # define ROT_SPEED 0.2f
 
 typedef struct s_player
@@ -85,8 +85,6 @@ typedef struct s_tile
 	t_img		*tex_ea;
 	t_img		*tex_ce;
 	t_img		*tex_fl;
-	int			ceil_height;
-	int			floor_height;
 	int			is_wall;
 }	t_tile;
 
@@ -133,9 +131,11 @@ typedef struct s_ray
 {
 	t_vec	dist;
 	t_vec	slope;
+	t_vec	ori;
 	t_point	curr;
 	t_point	step;
 	int		side;
+	int		running;
 }	t_ray;
 
 typedef struct s_ray_dir

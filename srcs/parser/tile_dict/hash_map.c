@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 13:03:11 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/29 11:30:51 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/09/01 11:04:33 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ unsigned long	hash_str(const char *str)
 
 void	load_new_hash(t_img **hash_table, unsigned int i, char *path, int *err)
 {
-	hash_table[i] = malloc(sizeof(t_img));
+	hash_table[i] = ft_calloc(1, sizeof(t_img));
 	if (!hash_table)
 		return ;
 	hash_table[i]->img = mlx_xpm_file_to_image(get_data()->mlx, path,

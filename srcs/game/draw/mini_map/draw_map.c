@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 22:36:25 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/29 17:07:53 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/09/01 15:15:52 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,11 +35,11 @@ void	draw_tiles(t_data *data)
 
 	vals.cos = cos(-(data->map->player.rot + 90) * PI / 180);
 	vals.sin = sin(-(data->map->player.rot + 90) * PI / 180);
-	curr.y = ft_max(-1, data->map->player.y - 10);
-	while (++curr.y < ft_min(data->map->len, data->map->player.y + 10))
+	curr.y = ft_max(-1, floorf(data->map->player.y - 9));
+	while (++curr.y < ft_min(data->map->len, ceil(data->map->player.y + 8)))
 	{
-		curr.x = ft_max(-1, data->map->player.x - 10);
-		while (++curr.x < ft_min(data->map->wid, data->map->player.x + 10))
+		curr.x = ft_max(-1, floorf(data->map->player.x - 9));
+		while (++curr.x < ft_min(data->map->wid, ceil(data->map->player.x + 8)))
 		{
 			start.x = (curr.x) * data->map->mini_map_scale + curr.x;
 			start.y = (curr.y) * data->map->mini_map_scale + curr.y;

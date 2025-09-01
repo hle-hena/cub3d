@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 21:54:54 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/29 11:31:55 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/09/01 14:29:34 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,20 +47,12 @@ void	fill_preset(t_tile **tiles)
 	tile = tiles['0'];
 	if (tile)
 	{
-		if (tile->ceil_height == -1)
-			tile->ceil_height = 100;
-		if (tile->floor_height == -1)
-			tile->floor_height = 0;
 		if (tile->is_wall == -1)
 			tile->is_wall = 0;
 	}
 	tile = tiles['1'];
 	if (tile)
 	{
-		if (tile->ceil_height == -1)
-			tile->ceil_height = 100;
-		if (tile->floor_height == -1)
-			tile->floor_height = 0;
 		if (tile->is_wall == -1)
 			tile->is_wall = 1;
 	}
@@ -101,8 +93,6 @@ int	is_dict_full(t_map *map, int i)
 		is_text_missing(tiles[i]->tex_ea, "EA", i, &missing);
 		is_text_missing(tiles[i]->tex_ce, "C", i, &missing);
 		is_text_missing(tiles[i]->tex_fl, "F", i, &missing);
-		is_value_missing(tiles[i]->ceil_height, "CH", i, &missing);
-		is_value_missing(tiles[i]->floor_height, "FH", i, &missing);
 		is_value_missing(tiles[i]->is_wall, "W", i, &missing);
 	}
 	is_replace_tile_missing(tiles, map, &missing);
