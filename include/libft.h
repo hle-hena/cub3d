@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 18:53:15 by marvin            #+#    #+#             */
-/*   Updated: 2025/08/18 13:36:35 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/09/02 10:02:18 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ typedef struct s_list
 typedef long long int	t_lli;
 typedef long int		t_li;
 
-# define BUFFER_SIZE 256
+# define BUFFER_SIZE 2048
 
 /*			freedom				*/
 /********************************/

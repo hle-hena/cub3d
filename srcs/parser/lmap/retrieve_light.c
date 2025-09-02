@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 10:55:35 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 11:07:34 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/09/02 15:27:54 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ t_col	retrieve_light_color(char **line, int *err)
 			*err = 1, (t_col){0});
 	color.bl = ft_atoi_err(line);
 	if (color.bl == -1)
-		return (ft_perror(-1, "Expected a positive number under 255 as bl.\
+		return (ft_perror(-1, "Expected a positive number under 255 as blue.\
 ", 0), *err = 1, (t_col){0});
 	if (skip_pattern(line, " } "))
 		return (ft_perror(-1, "Wrong pattern recognised for an rgb color.", 0),

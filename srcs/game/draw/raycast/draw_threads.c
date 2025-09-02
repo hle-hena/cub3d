@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/06 11:40:41 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 10:11:10 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/09/02 15:15:16 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,10 @@ void	*draw_walls_thread(void *arg)
 		while (!job->ready)
 			pthread_cond_wait(&job->cond_start, &job->mutex);
 		if (job->ready == 2)
+		{
+			pthread_mutex_unlock(&job->mutex);
 			break ;
+		}
 		job->ready = 0;
 		pthread_mutex_unlock(&job->mutex);
 		draw_walls(job);

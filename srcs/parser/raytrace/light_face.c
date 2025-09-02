@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/06 16:00:24 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 10:11:10 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/09/02 15:45:34 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,9 +76,13 @@ void	light_wall(t_data *data, t_trace *ray, t_wpath wall,
 void	light_floor(t_data *data, t_trace *ray, t_light light)
 {
 	t_tlight	*tlight;
+	float		angle_factor;
 
 	tlight = (data->lmap.lmap + ray->curr.x + ray->curr.y * data->lmap.wid);
 	ray->emittance = (ray->base_emittance)
 		/ (1 + ATT_COEF * pow(ray->precise_dist / LMAP_PRECISION, 2));
-	light_flight(&tlight->ce_fl, ray->emittance, light);
+	angle_factor = 0.05f + (1.0f - 0.05f) / (1.0f + powf((ray->precise_dist
+					/ LMAP_PRECISION) / 0.8f, 1.57f));
+	angle_factor = sqrtf(sqrtf(angle_factor));
+	light_flight(&tlight->ce_fl, ray->emittance * angle_factor, light);
 }

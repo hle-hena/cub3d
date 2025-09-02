@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 22:36:25 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 10:11:10 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/09/02 11:18:20 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,9 @@ int	point_is_in_mini_map(t_data *data, t_point point)
 	int	dy;
 	int	radius;
 
+	if (point.x < 0 || point.y < 0 || point.x >= data->win_w
+		|| point.y >= data->win_h)
+		return (0);
 	dx = point.x - data->map->mini_map.x;
 	dy = point.y - data->map->mini_map.y;
 	radius = data->win_h / 8;
@@ -32,11 +35,11 @@ void	draw_tiles(t_data *data)
 
 	vals.cos = cos(-(data->map->player.rot + 90) * PI / 180);
 	vals.sin = sin(-(data->map->player.rot + 90) * PI / 180);
-	curr.y = -1;
-	while (++curr.y < data->map->len)
+	curr.y = ft_max(-1, floorf(data->map->player.y - 9));
+	while (++curr.y < ft_min(data->map->len, ceil(data->map->player.y + 8)))
 	{
-		curr.x = -1;
-		while (++curr.x < data->map->wid)
+		curr.x = ft_max(-1, floorf(data->map->player.x - 9));
+		while (++curr.x < ft_min(data->map->wid, ceil(data->map->player.x + 8)))
 		{
 			start.x = (curr.x) * data->map->mini_map_scale + curr.x;
 			start.y = (curr.y) * data->map->mini_map_scale + curr.y;
