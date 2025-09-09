@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/06 16:00:24 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/09/02 15:45:34 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/09/09 17:47:06 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,12 @@ void	light_flight(t_flight *flight, float emittance,
 			flight->emittance = fmin(flight->emittance + emittance, 1);
 		}
 		flight->ibuffer = light.index;
+	}
+	else if (emittance > flight->emittance)
+	{
+		flight->color = calc_color((t_col){light.color.re * emittance,
+				light.color.gr * emittance, light.color.bl * emittance});
+		flight->emittance = emittance;
 	}
 }
 

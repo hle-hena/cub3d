@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 15:54:38 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/09/02 13:42:19 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/09/09 17:58:35 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,9 @@
 
 # define HASH_SIZE 1024
 # define MOVE_SPEED 0.075f
-# define ROT_SPEED 0.2f
-# define ATT_COEF 0.05
-# define MAX_BOUNCE 6
+# define ROT_SPEED 0.15f
+# define ATT_COEF 0.005
+# define MAX_BOUNCE 2
 # define IMG_BUFFER 4
 # define LMAP_PRECISION 129
 # define BLOCK_X 16

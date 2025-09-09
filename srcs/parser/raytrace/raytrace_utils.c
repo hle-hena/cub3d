@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 10:13:01 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 10:11:10 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/09/09 10:45:38 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,22 @@ int	is_correct_flight(void *content, void *to_find, float threshold)
 		&& fabs(cont_normal.y - find_normal.y) < threshold);
 }
 
+void	nudge_origin(t_vec *origin, t_vec dir)
+{
+	if (fmod(origin->x, 1.0) == 0.0 && dir.x < 0)
+		origin->x -= 1e-4f;
+	else if (fmod(origin->x, 1.0) == 0.0 && dir.x >= 0)
+		origin->x += 1e-4f;
+	if (fmod(origin->y, 1.0) == 0.0 && dir.y < 0)
+		origin->y -= 1e-4f;
+	else if (fmod(origin->y, 1.0) == 0.0 && dir.y >= 0)
+		origin->y += 1e-4f;
+}
+
 void	init_trace(t_trace *ray, t_vec dir, t_vec origin, float emittance)
 {
 	origin = (t_vec){origin.x * LMAP_PRECISION, origin.y * LMAP_PRECISION};
+	nudge_origin(&origin, dir);
 	*ray = (t_trace){.bounce = 0, .origin = origin, .dir = dir, .running = 1,
 		.precise_dist = 0, .last_dist = 0, .emittance = emittance,
 		.base_emittance = emittance};

@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 18:13:11 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 10:11:10 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/09/09 10:13:39 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ void	retrieve_texture(t_text *texture, char *line, int *err, char *id)
 identifier ", id, ".", NULL}), 1));
 	get_arg(ft_split(line, ':'), &arg, &reflectance, err);
 	if (*err)
-		return (ft_del((void **)&arg), ft_del((void **)&reflect_light));
+		return (ft_del((void **)&arg), ft_del((void **)&reflectance));
 	if (ft_strchr(arg, '/'))
 		retrieve_texture_path(&texture->img, arg, err);
 	else

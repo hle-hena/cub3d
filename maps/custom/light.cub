@@ -1,45 +1,45 @@
 1 {
-	NO textures/custom/frosted2.xpm:0.6
-	SO textures/custom/frosted2.xpm:0.6
-	EA textures/custom/frosted2.xpm:0.6
-	WE textures/custom/frosted2.xpm:0.6
-	C 200,200,200
-	F 200,200,200
+	NO textures/custom/frosted2.xpm:0.9
+	SO textures/custom/frosted2.xpm:0.9
+	EA textures/custom/frosted2.xpm:0.9
+	WE textures/custom/frosted2.xpm:0.9
+	C textures/custom/floor.xpm
+	F textures/custom/floor.xpm
 	W 1
 }
 2 {
-	C 200,200,200
-	F 200,200,200
+	C textures/custom/floor.xpm
+	F textures/custom/floor.xpm
 	W 1
 	wt textures/custom/frosted1.xpm
-	wa ((1, 0), (0, 1), (0, 0)):0.6
+	wa ((1, 0), (0, 1), (0, 0)):0.9
 }
 3 {
-	C 200,200,200
-	F 200,200,200
+	C textures/custom/floor.xpm
+	F textures/custom/floor.xpm
 	W 1
 	wt textures/custom/frosted1.xpm
-	wa ((1, 1), (0, 0), (1, 0)):0.6
+	wa ((1, 1), (0, 0), (1, 0)):0.9
 }
 4 {
-	C 200,200,200
-	F 200,200,200
+	C textures/custom/floor.xpm
+	F textures/custom/floor.xpm
 	W 1
 	wt textures/custom/frosted1.xpm
-	wa ((0, 1), (1, 0), (1, 1)):0.6
+	wa ((0, 1), (1, 0), (1, 1)):0.9
 }
 5 {
-	C 200,200,200
-	F 200,200,200
+	C textures/custom/floor.xpm
+	F textures/custom/floor.xpm
 	W 1
 	wt textures/custom/frosted1.xpm
-	wa ((0, 0), (1, 1), (0, 1)):0.6
+	wa ((0, 0), (1, 1), (0, 1)):0.9
 }
 6 {
-	C 200,200,200
-	F 200,200,200
+	C textures/custom/floor.xpm
+	F textures/custom/floor.xpm
 	W 1
-	wt 255,255,255
+	wt textures/custom/tiles.xpm
 	wa ((0.5, 0), (0.5, 0), (0.5, 0.1)): 0
 	wa ((0, 0.5), (0, 0.5), (0.1, 0.5)): 0
 	wa ((0.5, 1), (0.5, 1), (0.5, 0.9)): 0
@@ -51,8 +51,8 @@
 	SO 120,120,120
 	WE 120,120,120
 	EA 120,120,120
-	C 200,200,200
-	F 200,200,200
+	C textures/custom/floor.xpm
+	F textures/custom/floor.xpm
 	W 0
 }
 L ((2.5, 2.5), {255, 0, 0}, 1)

@@ -1,0 +1,41 @@
+A {
+	NO textures/custom/micro_hle-hena.xpm
+	SO textures/custom/micro_hle-hena.xpm
+	WE textures/custom/micro_hle-hena.xpm
+	EA textures/custom/micro_hle-hena.xpm
+	C 171,154,137
+	F 139,99,58
+	W 1
+}
+.{
+	NO textures/custom/micro_hle-hena.xpm
+	SO textures/custom/micro_hle-hena.xpm
+	WE textures/custom/micro_hle-hena.xpm
+	EA textures/custom/micro_hle-hena.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 0
+}
+L ((1.5, 1.5), {255, 0, 0}, 0.8)
+L ((2.5, 2.5), 0.5)
+L ((4.5, 6.5), {255, 0, 0}, 0.8)
+L ((5.5, 7.5), 0.2)
+L ((7.5, 7.5), {180, 0, 0}, 0.6)
+L ((1.1, 8.1), {255, 0, 0}, 0.4)
+L ((12.5, 5.5), {80, 0, 0}, 0.4)
+L ((9.5, 4.5), {50, 0, 0}, 0.8)
+L ((14.5, 5.5), {255, 0, 0}, 0.5)
+L ((17.5, 1.5), {0, 54, 46}, 0.8)
+P=.
+
+AAAAAAAAAAAAAAAAAAA
+AN.A..A..A..A..A..A
+A..A..A..A..A..A..A
+A..A..A..A..A..A..A
+A..A..A.....A..A..A
+A.................A
+A....AAAAAAAA.....A
+AAAA...........AAAA
+A......A.A.A......A
+AAAAAAAAAAAAAAAAAAA
+

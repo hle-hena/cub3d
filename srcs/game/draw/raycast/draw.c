@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 10:11:10 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/09/09 14:22:18 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ void	draw_block(t_data *data, t_th_draw *td, t_point bcurr, int *img)
 				draw_wall(td, draw);
 			else if (curr.y < draw->draw_start[draw->bounces])
 				draw_ceil(data, td, curr, draw);
-			else if (curr.y >= draw->draw_end[draw->bounces])
+			else if (curr.y > draw->draw_end[draw->bounces])
 				draw_floor(data, td, curr, draw);
 			++td->current_pix;
 			if (td->current_pix == 8)

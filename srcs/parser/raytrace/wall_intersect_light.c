@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 11:10:35 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 10:11:10 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/09/09 10:14:08 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ static inline int	is_valid_hit(t_trace *ray, float dist)
 		|| (ray->dir.y > 0 && floorf(hit.y) > ray->curr.y)
 		|| (ray->dir.y < 0 && floorf(hit.y) < ray->curr.y))
 		return (0);
-	ray->precise_dist = ray->last_dist + dist;
+	ray->precise_dist = dist;
 	ray->origin = hit;
 	return (1);
 }

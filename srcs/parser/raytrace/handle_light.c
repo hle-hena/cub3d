@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 11:32:35 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/28 10:11:10 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/09/09 10:14:17 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,6 @@ void	handle_light(t_data *data, t_trace *ray, t_light light)
 			+ ray->real.x)];
 	if (!tile)
 		return ;
-	ray->precise_dist += ray->last_dist;
 	light_floor(data, ray, light);
 	if (!tile->is_wall)
 		return ;
