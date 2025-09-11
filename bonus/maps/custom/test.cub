@@ -1,0 +1,112 @@
+. {
+	C textures/custom/461223113.xpm
+	F textures/custom/461223113.xpm
+	W 1
+	wt textures/simonkraft/bookshelf_01.xpm
+	wl ((1, 0), (0, 0))
+	wl ((0, 1), (0, 0))
+	wl ((1, 0), (1, 1))
+	wl ((0, 1), (1, 1))
+	wl ((0.5, 1), (0.5, 0))
+	wl ((1, 0.5), (0, 0.5))
+	wl ((0, 0.4), (0.6, 1))
+	wl ((0.4, 0), (1, 0.6))
+}
+! {
+	C textures/custom/461223113.xpm
+	F textures/custom/461223113.xpm
+	W 1
+	wt textures/custom/white_metal.xpm
+	wa ((0.6, 0.8), (0.6, 0.8), (0.6, 0.5))
+	wa ((0.4, 0.8), (0.4, 0.8), (0.4, 0.5))
+	wa ((0.8, 0.6), (0.8, 0.6), (0.5, 0.6))
+	wa ((0.8, 0.4), (0.8, 0.4), (0.5, 0.4))
+	wl ((1, 1), (0, 0))
+	wl ((1, 0), (0, 1))
+	wl ((0, 0), (0.8, 0.5))
+	wl ((0, 0), (0.5, 0.8))
+	wl ((1, 0), (0.5, 0.8))
+	wl ((1, 0), (0.2, 0.5))
+	wl ((1, 1), (0.2, 0.5))
+	wl ((1, 1), (0.5, 0.2))
+	wl ((0, 1), (0.5, 0.2))
+	wl ((0, 1), (0.8, 0.5))
+	wa ((0, 0.3), (0, 0.3), (0.3, 0.3))
+	wa ((0, 0.7), (0, 0.7), (0.3, 0.7))
+	wa ((1, 0.3), (1, 0.3), (0.7, 0.3))
+	wa ((1, 0.7), (1, 0.7), (0.7, 0.7))
+	wl ((0.95, 0.95), (0.05, 0.95))
+	wl ((0.95, 0.95), (0.95, 0.05))
+	wl ((0.05, 0.05), (0.05, 0.95))
+	wl ((0.05, 0.05), (0.95, 0.05))
+}
+a {
+	C textures/custom/461223113.xpm
+	F textures/custom/461223113.xpm
+	W 1
+	wt textures/simonkraft/bookshelf_01.xpm
+	wa ((0.5, 1), (1, 0.5), (0.5, 0.5))
+}
+p {
+	C textures/custom/461223113.xpm
+	F textures/custom/461223113.xpm
+	W 1
+	wt textures/simonkraft/bookshelf_01.xpm
+	wl ((0, 0.5), (0.8, 0.5))
+	wl ((0.5, 0.5), (1, 0.5))
+}
+# {
+	C textures/custom/461223113.xpm
+	F textures/custom/461223113.xpm
+	W 1
+	wt textures/simonkraft/bookshelf_01.xpm
+	#wa ((0.4, 0.8), (0.4, 0.8), (0.4, 0.5))
+	wl ((0, 0), (1, 1))
+	wa ((0.6, 0.8), (0.6, 0.8), (0.6, 0.5))
+}
+1 {
+	C textures/custom/461223113.xpm
+	F textures/custom/461223113.xpm
+	W 1
+	wt textures/custom/white_metal.xpm
+	wa ((0.5, 0), (0.5, 0), (0.5, 0.5)): 0
+}
+2 {
+	C textures/custom/461223113.xpm
+	F textures/custom/461223113.xpm
+	W 1
+	wt textures/custom/white_metal.xpm
+	wa ((0.5, 0), (0.5, 0), (0.5, 0.5))
+	wa ((0.5, 0), (0.5, 0), (0.5, 0.5))
+}
+0 {
+	NO textures/simonkraft/bookshelf_01.xpm
+	SO textures/simonkraft/bookshelf_02.xpm
+	WE textures/simonkraft/bookshelf_03.xpm
+	EA textures/simonkraft/bookshelf.xpm
+	C textures/custom/461223113.xpm
+	F textures/custom/461223113.xpm
+	W 0
+}
++ {
+	C textures/custom/461223113.xpm
+	F textures/custom/461223113.xpm
+	W 1
+	wt 255555,0,0
+	wl ((0,0),(1,1))
+}
+P=0
+
+L ((2.5, 2.5), 1)
+#L ((4.5, 4.5), 1)
+L ((6.5, 6.5), 1)
+
++++++++++
++0000000+
++0000000+
++0000000+
++N00!000+
++0000000+
++0000000+
++0000000+
++++++++++

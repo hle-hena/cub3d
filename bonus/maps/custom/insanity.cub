@@ -1,0 +1,61 @@
+1 {
+	NO 0,255,0:0.95
+	SO 0,255,0:0.95
+	EA 0,255,0:0.95
+	WE 0,255,0:0.95
+	C textures/custom/tiles.xpm
+	F textures/custom/tiles.xpm
+	W 1
+}
+2 {
+	C textures/custom/tiles.xpm
+	F textures/custom/tiles.xpm
+	W 1
+	wt 0,255,0
+	wa ((1, 0), (0, 1), (0, 0)):0.95
+}
+3 {
+	C textures/custom/tiles.xpm
+	F textures/custom/tiles.xpm
+	W 1
+	wt 0,255,0
+	wa ((1, 1), (0, 0), (1, 0)):0.95
+}
+4 {
+	C textures/custom/tiles.xpm
+	F textures/custom/tiles.xpm
+	W 1
+	wt 0,255,0
+	wa ((0, 1), (1, 0), (1, 1)):0.95
+}
+5 {
+	C textures/custom/tiles.xpm
+	F textures/custom/tiles.xpm
+	W 1
+	wt 0,255,0
+	wa ((0, 0), (1, 1), (0, 1)):0.95
+}
+
+. {
+	NO 120,120,120
+	SO 120,120,120
+	WE 120,120,120
+	EA 120,120,120
+	C textures/custom/tiles.xpm
+	F textures/custom/tiles.xpm
+	W 0
+}
+L ((1.5, 1.5), {0,255,0}, 1)
+L ((4.5, 4.5), {0,255,0}, 1)
+L ((7.5, 7.5), {0,255,0}, 1)
+P=.
+
+111111111
+14.....51
+1.......1
+1.......1
+1...N...1
+1.......1
+1.......1
+13.....21
+111111111
