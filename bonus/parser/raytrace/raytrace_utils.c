@@ -1,0 +1,66 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   raytrace_utils.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/28 10:13:01 by hle-hena          #+#    #+#             */
+/*   Updated: 2025/09/11 15:07:51 by hle-hena         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "cub3D_bonus.h"
+
+int	is_correct_flight(void *content, void *to_find, float threshold)
+{
+	t_vec	cont_normal;
+	t_vec	find_normal;
+
+	cont_normal = ((t_flight *)content)->normal;
+	find_normal = *(t_vec *)to_find;
+	return (fabs(cont_normal.x - find_normal.x) < threshold
+		&& fabs(cont_normal.y - find_normal.y) < threshold);
+}
+
+void	nudge_origin(t_vec *origin, t_vec dir)
+{
+	*origin = (t_vec){origin->x * LMAP_PRECISION, origin->y * LMAP_PRECISION};
+	if (fmod(origin->x, 1.0) == 0.0 && dir.x < 0)
+		origin->x -= 1e-4f;
+	else if (fmod(origin->x, 1.0) == 0.0 && dir.x >= 0)
+		origin->x += 1e-4f;
+	if (fmod(origin->y, 1.0) == 0.0 && dir.y < 0)
+		origin->y -= 1e-4f;
+	else if (fmod(origin->y, 1.0) == 0.0 && dir.y >= 0)
+		origin->y += 1e-4f;
+}
+
+void	init_trace(t_trace *ray, t_vec dir, t_vec origin, float emittance)
+{
+	nudge_origin(&origin, dir);
+	*ray = (t_trace){.bounce = 0, .origin = origin, .dir = dir, .running = 1,
+		.precise_dist = 0, .last_dist = 0, .emittance = emittance,
+		.base_emittance = emittance};
+	ray->step.x = 1;
+	if (dir.x < 0)
+		ray->step.x = -1;
+	ray->step.y = 1;
+	if (dir.y < 0)
+		ray->step.y = -1;
+	ray->slope.x = HUGE_VALF;
+	if (dir.x != 0)
+		ray->slope.x = fabs(1.0f / dir.x);
+	ray->slope.y = HUGE_VALF;
+	if (dir.y != 0)
+		ray->slope.y = fabs(1.0f / dir.y);
+	if (dir.x < 0)
+		ray->dist.x = (origin.x - floorf(origin.x)) * ray->slope.x;
+	else
+		ray->dist.x = (ceilf(origin.x) - origin.x) * ray->slope.x;
+	if (dir.y < 0)
+		ray->dist.y = (origin.y - floorf(origin.y)) * ray->slope.y;
+	else
+		ray->dist.y = (ceilf(origin.y) - origin.y) * ray->slope.y;
+	ray->curr = (t_point){floorf(origin.x), floorf(origin.y)};
+}
