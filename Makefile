@@ -79,12 +79,12 @@ all: FLAGS += -O3
 all: $(NAME)
 
 light:
-	@rm -rf srcs/game/draw/raycast/get_colors.o srcs/game/draw/raycast/setup_color.o
-	@$(MAKE) $(NAME) FLAGS="$(FLAGS) -D LIGHT_ON=1 -O3"
+	@rm -rf bonus/game/draw/raycast/get_colors.o bonus/game/draw/raycast/setup_color.o
+	@$(MAKE) bonus FLAGS="$(FLAGS) -D LIGHT_ON=1 -O3"
 
 no_light:
-	@rm -rf srcs/game/draw/raycast/get_colors.o srcs/game/draw/raycast/setup_color.o
-	@$(MAKE) $(NAME) FLAGS="$(FLAGS) -D LIGHT_ON=0 -O3"
+	@rm -rf bonus/game/draw/raycast/get_colors.o bonus/game/draw/raycast/setup_color.o
+	@$(MAKE) bonus FLAGS="$(FLAGS) -D LIGHT_ON=0 -O3"
 
 no: clear
 no: $(NAME)
@@ -100,7 +100,7 @@ fdebug: $(NAME)
 valgrind: all
 	valgrind --leak-check=full --show-leak-kinds=all ./$(NAME) $(ARG)
 	
-bonus: FLAGS += -O3 -g
+bonus: FLAGS += -O3
 bonus: $(LIBFT) $(BONUS_OBJ)
 	@echo "\n\033[2K\r\033[94mLinking $(NAME) 🗹\033[0m\n"
 	@echo "\033[2K\r\033[94mLinking mlx 🗹\033[0m\n"
