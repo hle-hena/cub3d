@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 22:06:06 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/08/29 16:14:05 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/09/15 18:35:55 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,7 @@ void	draw(t_data *data)
 {
 	t_th_draw	td;
 	t_rdir		ray_dir;
-	int			i;
 
-	i = -1;
 	ray_dir = (t_rdir){(t_vec){data->cam.dir.x - data->cam.plane.x,
 		data->cam.dir.y - data->cam.plane.y}, (t_vec){data->cam.plane.x * 2,
 		data->cam.plane.y * 2}, *get_cast_table(), get_tile_dict()};

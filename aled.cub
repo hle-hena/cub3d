@@ -1,0 +1,853 @@
+. {
+	NO textures/rainbow/micro_lthong.xpm
+	SO textures/rainbow/micro_tbahin.xpm
+	WE textures/rainbow/micro_lmas.xpm
+	EA textures/rainbow/micro_mcolonna.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 0
+}
+
+? {
+	NO textures/rainbow/micro_gdelhota.xpm
+	SO textures/rainbow/micro_rkerman.xpm
+	WE textures/rainbow/micro_aramon.xpm
+	EA textures/rainbow/micro_vfuster-.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+> {
+	NO textures/rainbow/micro_qbanet.xpm
+	SO textures/rainbow/micro_vtouze.xpm
+	WE textures/rainbow/micro_tgoimond.xpm
+	EA textures/rainbow/micro_bde-wits.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+< {
+	NO textures/rainbow/micro_bponthus.xpm
+	SO textures/rainbow/micro_svidot.xpm
+	WE textures/rainbow/micro_dsylvain.xpm
+	EA textures/rainbow/micro_lberrue.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+M {
+	NO textures/rainbow/micro_aglampor.xpm
+	SO textures/rainbow/micro_lraverdy.xpm
+	WE textures/rainbow/micro_cvu.xpm
+	EA textures/rainbow/micro_kbrener-.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+A {
+	NO textures/rainbow/micro_lucmansa.xpm
+	SO textures/rainbow/micro_momillio.xpm
+	WE textures/rainbow/micro_thschnei.xpm
+	EA textures/rainbow/micro_flverge.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+B {
+	NO textures/rainbow/micro_wasmaata.xpm
+	SO textures/rainbow/micro_begonzal.xpm
+	WE textures/rainbow/micro_asoutaie.xpm
+	EA textures/rainbow/micro_nbenhami.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+V {
+	NO textures/rainbow/micro_yasabri.xpm
+	SO textures/rainbow/micro_jlefevre.xpm
+	WE textures/rainbow/micro_lroussel.xpm
+	EA textures/rainbow/micro_vilabard.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+C {
+	NO textures/rainbow/micro_nrontard.xpm
+	SO textures/rainbow/micro_juduchar.xpm
+	WE textures/rainbow/micro_jauffret.xpm
+	EA textures/rainbow/micro_malauzie.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+X {
+	NO textures/rainbow/micro_guviure.xpm
+	SO textures/rainbow/micro_bgonon.xpm
+	WE textures/rainbow/micro_mafrendo.xpm
+	EA textures/rainbow/micro_mmacia.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+Z {
+	NO textures/rainbow/micro_bpleutin.xpm
+	SO textures/rainbow/micro_jedurand.xpm
+	WE textures/rainbow/micro_rdubois.xpm
+	EA textures/rainbow/micro_masaldan.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+/ {
+	NO textures/rainbow/micro_gaesteve.xpm
+	SO textures/rainbow/micro_babreton.xpm
+	WE textures/rainbow/micro_artmarti.xpm
+	EA textures/rainbow/micro_jelefevr.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+, {
+	NO textures/rainbow/micro_fbourgue.xpm
+	SO textures/rainbow/micro_romlambe.xpm
+	WE textures/rainbow/micro_chbouthe.xpm
+	EA textures/rainbow/micro_rmetge.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+m {
+	NO textures/rainbow/micro_mchaudil.xpm
+	SO textures/rainbow/micro_mrocher.xpm
+	WE textures/rainbow/micro_rsebasti.xpm
+	EA textures/rainbow/micro_thsion.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+n {
+	NO textures/rainbow/micro_lle-saul.xpm
+	SO textures/rainbow/micro_scervell.xpm
+	WE textures/rainbow/micro_svidal.xpm
+	EA textures/rainbow/micro_iboukart.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+b {
+	NO textures/rainbow/micro_jenguyen.xpm
+	SO textures/rainbow/micro_mpajot-t.xpm
+	WE textures/rainbow/micro_gdaignea.xpm
+	EA textures/rainbow/micro_gcot.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+v {
+	NO textures/rainbow/micro_maxipeti.xpm
+	SO textures/rainbow/micro_raaguilo.xpm
+	WE textures/rainbow/micro_fbelotti.xpm
+	EA textures/rainbow/micro_hchauvin.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+c {
+	NO textures/rainbow/micro_ypanares.xpm
+	SO textures/rainbow/micro_livsauze.xpm
+	WE textures/rainbow/micro_ocassany.xpm
+	EA textures/rainbow/micro_nbrabant.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+x {
+	NO textures/rainbow/micro_ebansse.xpm
+	SO textures/rainbow/micro_acontet-.xpm
+	WE textures/rainbow/micro_croche.xpm
+	EA textures/rainbow/micro_andypere.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+z {
+	NO textures/rainbow/micro_acheviro.xpm
+	SO textures/rainbow/micro_tremy.xpm
+	WE textures/rainbow/micro_lillopez.xpm
+	EA textures/rainbow/micro_ael-harc.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+| {
+	NO textures/rainbow/micro_lpoussin.xpm
+	SO textures/rainbow/micro_jhureau.xpm
+	WE textures/rainbow/micro_desambou.xpm
+	EA textures/rainbow/micro_sbarbe.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+" {
+	NO textures/rainbow/micro_tgriblin.xpm
+	SO textures/rainbow/micro_yseguin.xpm
+	WE textures/rainbow/micro_lolefevr.xpm
+	EA textures/rainbow/micro_nopareti.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+L {
+	NO textures/rainbow/micro_yaolive.xpm
+	SO textures/rainbow/micro_mmurru.xpm
+	WE textures/rainbow/micro_mle-brie.xpm
+	EA textures/rainbow/micro_flmuller.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+K {
+	NO textures/rainbow/micro_hhecquet.xpm
+	SO textures/rainbow/micro_tlorne.xpm
+	WE textures/rainbow/micro_abelmoha.xpm
+	EA textures/rainbow/micro_ryada.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+J {
+	NO textures/rainbow/micro_lgerard.xpm
+	SO textures/rainbow/micro_mlavail.xpm
+	WE textures/rainbow/micro_ecullier.xpm
+	EA textures/rainbow/micro_mifuente.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+H {
+	NO textures/rainbow/micro_abeaugra.xpm
+	SO textures/rainbow/micro_vbonnard.xpm
+	WE textures/rainbow/micro_yestello.xpm
+	EA textures/rainbow/micro_lefoffan.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+G {
+	NO textures/rainbow/micro_chdonnat.xpm
+	SO textures/rainbow/micro_apetre.xpm
+	WE textures/rainbow/micro_mbilly.xpm
+	EA textures/rainbow/micro_nitadros.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+F {
+	NO textures/rainbow/micro_dvan-hum.xpm
+	SO textures/rainbow/micro_lchiva.xpm
+	WE textures/rainbow/micro_jverdier.xpm
+	EA textures/rainbow/micro_omfelk.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+D {
+	NO textures/rainbow/micro_tcavaill.xpm
+	SO textures/rainbow/micro_badal-la.xpm
+	WE textures/rainbow/micro_axemicha.xpm
+	EA textures/rainbow/micro_ybellocq.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+' {
+	NO textures/rainbow/micro_mscottez.xpm
+	SO textures/rainbow/micro_bavaness.xpm
+	WE textures/rainbow/micro_mpeyre-s.xpm
+	EA textures/rainbow/micro_artperez.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+; {
+	NO textures/rainbow/micro_gero.xpm
+	SO textures/rainbow/micro_mcreus.xpm
+	WE textures/rainbow/micro_yonieva.xpm
+	EA textures/rainbow/micro_vgaspari.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+l {
+	NO textures/rainbow/micro_nrossa.xpm
+	SO textures/rainbow/micro_dmoreux.xpm
+	WE textures/rainbow/micro_ltressen.xpm
+	EA textures/rainbow/micro_dylmarti.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+k {
+	NO textures/rainbow/micro_pmenard.xpm
+	SO textures/rainbow/micro_epelcerf.xpm
+	WE textures/rainbow/micro_idumenil.xpm
+	EA textures/rainbow/micro_bhennequ.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+j {
+	NO textures/rainbow/micro_tcarlier.xpm
+	SO textures/rainbow/micro_miwaki.xpm
+	WE textures/rainbow/micro_wifons.xpm
+	EA textures/rainbow/micro_admoreir.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+h {
+	NO textures/rainbow/micro_gmattler.xpm
+	SO textures/rainbow/micro_cguinot.xpm
+	WE textures/rainbow/micro_fltrin.xpm
+	EA textures/rainbow/micro_hdjetta.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+g {
+	NO textures/rainbow/micro_fwebe-ir.xpm
+	SO textures/rainbow/micro_yibourk.xpm
+	WE textures/rainbow/micro_tsoleil.xpm
+	EA textures/rainbow/micro_mzaian.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+f {
+	NO textures/rainbow/micro_nidruon.xpm
+	SO textures/rainbow/micro_ihauchar.xpm
+	WE textures/rainbow/micro_jeel-qai.xpm
+	EA textures/rainbow/micro_pfay.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+d {
+	NO textures/rainbow/micro_mounali.xpm
+	SO textures/rainbow/micro_fbordes.xpm
+	WE textures/rainbow/micro_cfiachet.xpm
+	EA textures/rainbow/micro_mabenet.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+s {
+	NO textures/rainbow/micro_mbetcher.xpm
+	SO textures/rainbow/micro_vmarty.xpm
+	WE textures/rainbow/micro_fatdiall.xpm
+	EA textures/rainbow/micro_olthorel.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+a {
+	NO textures/rainbow/micro_acabarba.xpm
+	SO textures/rainbow/micro_tcassu.xpm
+	WE textures/rainbow/micro_mbarrere.xpm
+	EA textures/rainbow/micro_ksongbe.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+P {
+	NO textures/rainbow/micro_cipelat.xpm
+	SO textures/rainbow/micro_orauline.xpm
+	WE textures/rainbow/micro_rjacquet.xpm
+	EA textures/rainbow/micro_mazeghou.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+O {
+	NO textures/rainbow/micro_gvalogne.xpm
+	SO textures/rainbow/micro_jfarchic.xpm
+	WE textures/rainbow/micro_ssalce.xpm
+	EA textures/rainbow/micro_smarty.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+I {
+	NO textures/rainbow/micro_anporced.xpm
+	SO textures/rainbow/micro_asaux.xpm
+	WE textures/rainbow/micro_oloncle.xpm
+	EA textures/rainbow/micro_cgrasser.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+U {
+	NO textures/rainbow/micro_bepoisso.xpm
+	SO textures/rainbow/micro_maouvrar.xpm
+	WE textures/rainbow/micro_jrinaudo.xpm
+	EA textures/rainbow/micro_mrabat.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+Y {
+	NO textures/rainbow/micro_ybahjaou.xpm
+	SO textures/rainbow/micro_truello.xpm
+	WE textures/rainbow/micro_sjavary.xpm
+	EA textures/rainbow/micro_sabelian.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+T {
+	NO textures/rainbow/micro_grobledo.xpm
+	SO textures/rainbow/micro_mjochum.xpm
+	WE textures/rainbow/micro_lumontgo.xpm
+	EA textures/rainbow/micro_arpages.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+R {
+	NO textures/rainbow/micro_hduflos.xpm
+	SO textures/rainbow/micro_tmoirand.xpm
+	WE textures/rainbow/micro_mmarie.xpm
+	EA textures/rainbow/micro_kgiannou.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+Q {
+	NO textures/rainbow/micro_ffourque.xpm
+	SO textures/rainbow/micro_lowarnie.xpm
+	WE textures/rainbow/micro_mpayre.xpm
+	EA textures/rainbow/micro_mmeuric.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+\ {
+	NO textures/rainbow/micro_msenecha.xpm
+	SO textures/rainbow/micro_rrodor.xpm
+	WE textures/rainbow/micro_nhaller.xpm
+	EA textures/rainbow/micro_acoste.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+p {
+	NO textures/rainbow/micro_mbermude.xpm
+	SO textures/rainbow/micro_adelattr.xpm
+	WE textures/rainbow/micro_esuberbi.xpm
+	EA textures/rainbow/micro_asangerm.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+o {
+	NO textures/rainbow/micro_tomlimon.xpm
+	SO textures/rainbow/micro_asene.xpm
+	WE textures/rainbow/micro_odiachen.xpm
+	EA textures/rainbow/micro_ezeppa.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+i {
+	NO textures/rainbow/micro_acasanov.xpm
+	SO textures/rainbow/micro_lalouis.xpm
+	WE textures/rainbow/micro_edelanno.xpm
+	EA textures/rainbow/micro_ctravers.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+u {
+	NO textures/rainbow/micro_fboulbes.xpm
+	SO textures/rainbow/micro_kmegdoud.xpm
+	WE textures/rainbow/micro_roroca.xpm
+	EA textures/rainbow/micro_lopapon.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+y {
+	NO textures/rainbow/micro_qcoudeyr.xpm
+	SO textures/rainbow/micro_salcaraz.xpm
+	WE textures/rainbow/micro_lpellegr.xpm
+	EA textures/rainbow/micro_cgregoir.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+t {
+	NO textures/rainbow/micro_ilbonnev.xpm
+	SO textures/rainbow/micro_libelmim.xpm
+	WE textures/rainbow/micro_kguillem.xpm
+	EA textures/rainbow/micro_tat-nguy.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+r {
+	NO textures/rainbow/micro_fabvalet.xpm
+	SO textures/rainbow/micro_gdornic.xpm
+	WE textures/rainbow/micro_lduflot.xpm
+	EA textures/rainbow/micro_gbricot.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+e {
+	NO textures/rainbow/micro_lhabrial.xpm
+	SO textures/rainbow/micro_lesalmon.xpm
+	WE textures/rainbow/micro_dbonali.xpm
+	EA textures/rainbow/micro_ccadoret.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+w {
+	NO textures/rainbow/micro_slecoq.xpm
+	SO textures/rainbow/micro_vcamille.xpm
+	WE textures/rainbow/micro_jotudela.xpm
+	EA textures/rainbow/micro_hnogared.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+q {
+	NO textures/rainbow/micro_flonaben.xpm
+	SO textures/rainbow/micro_aandrieu.xpm
+	WE textures/rainbow/micro_ahaidara.xpm
+	EA textures/rainbow/micro_dsoum.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
++ {
+	NO textures/rainbow/micro_bemma.xpm
+	SO textures/rainbow/micro_gakarbou.xpm
+	WE textures/rainbow/micro_tboulogn.xpm
+	EA textures/rainbow/micro_mroberge.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+_ {
+	NO textures/rainbow/micro_mabdali.xpm
+	SO textures/rainbow/micro_jlongin.xpm
+	WE textures/rainbow/micro_hle-hena.xpm
+	EA textures/rainbow/micro_lpla.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+* {
+	NO textures/rainbow/micro_rmichel-.xpm
+	SO textures/rainbow/micro_dabae.xpm
+	WE textures/rainbow/micro_axlleres.xpm
+	EA textures/rainbow/micro_mguille.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+& {
+	NO textures/rainbow/micro_thsanche.xpm
+	SO textures/rainbow/micro_amaisonn.xpm
+	WE textures/rainbow/micro_estepere.xpm
+	EA textures/rainbow/micro_jde-meo.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+^ {
+	NO textures/rainbow/micro_lgamba.xpm
+	SO textures/rainbow/micro_mkadri.xpm
+	WE textures/rainbow/micro_tscasso.xpm
+	EA textures/rainbow/micro_hbaduel.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+% {
+	NO textures/rainbow/micro_kmartine.xpm
+	SO textures/rainbow/micro_pbataill.xpm
+	WE textures/rainbow/micro_npederen.xpm
+	EA textures/rainbow/micro_lheinric.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+$ {
+	NO textures/rainbow/micro_lsalmon.xpm
+	SO textures/rainbow/micro_afontan.xpm
+	WE textures/rainbow/micro_mnie.xpm
+	EA textures/rainbow/micro_tgerardi.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+# {
+	NO textures/rainbow/micro_kpourcel.xpm
+	SO textures/rainbow/micro_btiza.xpm
+	WE textures/rainbow/micro_mgobert.xpm
+	EA textures/rainbow/micro_tgibert.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+@ {
+	NO textures/rainbow/micro_rayderha.xpm
+	SO textures/rainbow/micro_nbiron.xpm
+	WE textures/rainbow/micro_leoherna.xpm
+	EA textures/rainbow/micro_jmetezea.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+! {
+	NO textures/rainbow/micro_thoribal.xpm
+	SO textures/rainbow/micro_dfleury.xpm
+	WE textures/rainbow/micro_lmatkows.xpm
+	EA textures/rainbow/micro_sperpign.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+~ {
+	NO textures/rainbow/micro_amori.xpm
+	SO textures/rainbow/micro_npires.xpm
+	WE textures/rainbow/micro_oliradet.xpm
+	EA textures/rainbow/micro_nfradet.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+= {
+	NO textures/rainbow/micro_joncurci.xpm
+	SO textures/rainbow/micro_sfroidev.xpm
+	WE textures/rainbow/micro_cletorre.xpm
+	EA textures/rainbow/micro_drenassi.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+- {
+	NO textures/rainbow/micro_ybringui.xpm
+	SO textures/rainbow/micro_nsion.xpm
+	WE textures/rainbow/micro_locagnio.xpm
+	EA textures/rainbow/micro_sdestann.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+0 {
+	NO textures/rainbow/micro_tle-saut.xpm
+	SO textures/rainbow/micro_froque.xpm
+	WE textures/rainbow/micro_arafa.xpm
+	EA textures/rainbow/micro_bbach.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+9 {
+	NO textures/rainbow/micro_tedcarpi.xpm
+	SO textures/rainbow/micro_ncasado.xpm
+	WE textures/rainbow/micro_cgeoffra.xpm
+	EA textures/rainbow/micro_jdupuis.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+8 {
+	NO textures/rainbow/micro_daboyer.xpm
+	SO textures/rainbow/micro_mescobar.xpm
+	WE textures/rainbow/micro_iarrar.xpm
+	EA textures/rainbow/micro_samberna.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+7 {
+	NO textures/rainbow/micro_ldeville.xpm
+	SO textures/rainbow/micro_alsaez.xpm
+	WE textures/rainbow/micro_lseiberr.xpm
+	EA textures/rainbow/micro_jsoulet.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+6 {
+	NO textures/rainbow/micro_agtshiba.xpm
+	SO textures/rainbow/micro_qbarron.xpm
+	WE textures/rainbow/micro_xberger.xpm
+	EA textures/rainbow/micro_alribeyr.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+5 {
+	NO textures/rainbow/micro_vgiraudo.xpm
+	SO textures/rainbow/micro_igilbert.xpm
+	WE textures/rainbow/micro_maudauph.xpm
+	EA textures/rainbow/micro_rstride.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+4 {
+	NO textures/rainbow/micro_enzgonca.xpm
+	SO textures/rainbow/micro_tladron-.xpm
+	WE textures/rainbow/micro_mdiamant.xpm
+	EA textures/rainbow/micro_leudelin.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+3 {
+	NO textures/rainbow/micro_pabatail.xpm
+	SO textures/rainbow/micro_ewrandri.xpm
+	WE textures/rainbow/micro_axelpeti.xpm
+	EA textures/rainbow/micro_picarlie.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+2 {
+	NO textures/rainbow/micro_cparras.xpm
+	SO textures/rainbow/micro_engiacom.xpm
+	WE textures/rainbow/micro_acrave.xpm
+	EA textures/rainbow/micro_romaurel.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+1 {
+	NO textures/rainbow/micro_norabino.xpm
+	SO textures/rainbow/micro_evbrehau.xpm
+	WE textures/rainbow/micro_teandria.xpm
+	EA textures/rainbow/micro_ancabail.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+` {
+	NO textures/rainbow/micro_gpeyre.xpm
+	SO textures/rainbow/micro_luponce.xpm
+	WE textures/rainbow/micro_fguillet.xpm
+	EA textures/rainbow/micro_kouali.xpm
+	C textures/wolfenstein/wood.xpm
+	F textures/wolfenstein/grey_stone.xpm
+	W 1
+}
+
+L ((1.5, 1.5), {255, 0, 0}, 0.8)
+L ((2.5, 2.5), 0.5)
+L ((4.5, 6.5), {255, 0, 0}, 0.8)
+L ((5.5, 7.5), 0.2)
+L ((7.5, 7.5), {180, 0, 0}, 0.6)
+L ((1.1, 8.1), {255, 0, 0}, 0.4)
+L ((12.5, 5.5), {80, 0, 0}, 0.4)
+L ((9.5, 4.5), {50, 0, 0}, 0.8)
+L ((14.5, 5.5), {255, 0, 0}, 0.5)
+L ((17.5, 1.5), {0, 54, 46}, 0.8)
+P=.
+
+
+w_tQt0~&~hV`?^U;eeo
+$N.<..u..5..2..r..\
+D..2..o..u..B..0..=
+|..l..$..K../..*..w
+5..X..r.....\..F..U
+L.................G
+~....8/.4fU~y.....,
+I!%\...........|J1z
+s......z.M.O......i
+pM|RJ_1#UUwmHw\-,d|

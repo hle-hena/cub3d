@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:05:37 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/09/11 14:50:25 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/09/15 20:44:13 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,6 +101,8 @@ int	main(int ac, char **av)
 
 	data = get_data();
 	data->mlx = mlx_init();
+	if (!data->mlx)
+		ft_perror(1, "Problem while initializing mlx.", 0);
 	data->map = load_map(ac, av);
 	if (data->map)
 	{

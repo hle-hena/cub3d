@@ -75,7 +75,7 @@ BONUS_OBJ = $(BONUS_SRCS:.c=.o)
 	@$(CC) $(FLAGS) -c $< -o $(<:.c=.o)
 	@printf "\r\033[K"
 
-all: FLAGS += -O3
+all: FLAGS += -g
 all: $(NAME)
 
 light:
