@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:16:19 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/04/23 14:21:45 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/09/15 20:45:13 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,11 @@ int	get_map_fd(char *map_name)
 
 	extension = ft_strrchr(map_name, '.');
 	if (!extension)
-		ft_perror(1, "Invalid usage. File name should be .cub", clean_data());
+		ft_perror(1, "Invalid usage. File name should finish with .cub",
+			clean_data());
 	if (ft_strncmp(".cub", extension, 5))
-		ft_perror(1, "Invalid usage. File name should be .cub", clean_data());
+		ft_perror(1, "Invalid usage. File name should finish with .cub",
+			clean_data());
 	map_fd = open(map_name, O_RDONLY, 0777);
 	if (map_fd == -1)
 		ft_perror(1, "File not found.", clean_data());

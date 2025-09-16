@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 10:37:56 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/09/01 14:29:43 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/09/15 20:40:14 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,10 +65,6 @@ int	is_end(char *line)
 	else if (ft_strncmp("F ", line, 2) == 0)
 		is_end = 0;
 	else if (ft_strncmp("W ", line, 2) == 0)
-		is_end = 0;
-	else if (ft_strncmp("CH ", line, 2) == 0)
-		is_end = 0;
-	else if (ft_strncmp("FH ", line, 2) == 0)
 		is_end = 0;
 	else
 		is_end = 1;

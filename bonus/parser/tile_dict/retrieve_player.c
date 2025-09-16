@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 19:33:55 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/09/11 14:51:04 by hle-hena         ###   ########.fr       */
+/*   Updated: 2025/09/16 14:03:56 by gakarbou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,8 @@ void	retrieve_player(t_map *map, char *line, int *err)
 twice.", 0));
 	if (ft_strlen(line) > 3)
 		return (*err = 1, ft_perror(-1, ft_strsjoin((char *[]){"The line '\
-", line, "' should be P=[char to replace the player with]. Got too much char.",
+", line, "' should be P=[char to replace the player with]. \
+Got too much char.",
 					NULL}), 1));
 	if (!line[2])
 		return (*err = 1, ft_perror(-1, ft_strsjoin((char *[]){"The line '\
