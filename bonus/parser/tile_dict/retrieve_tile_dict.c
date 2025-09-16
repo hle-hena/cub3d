@@ -6,7 +6,7 @@
 /*   By: hle-hena <hle-hena@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 12:34:15 by hle-hena          #+#    #+#             */
-/*   Updated: 2025/09/15 19:53:47 by root             ###   ########.fr       */
+/*   Updated: 2025/09/11 14:51:07 by hle-hena         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,8 @@ int	is_define(char *line, int *err)
 		return (ft_perror(-1, "Trying to set ' ' to a non void tile.", 0),
 			*err = 1);
 	if (line[i] == '{' && ft_strchr("NSWE", line[0]))
-	{
-		printf("%s\n", line);
 		return (ft_perror(-1, "Trying to set player_head_char to a tile.", 0),
 			*err = 1);
-	}
 	return (line[i] == '{');
 }
 
